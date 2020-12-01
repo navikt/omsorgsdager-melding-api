@@ -1,6 +1,5 @@
 package no.nav.omsorgsdagermeldingapi.søknad.søknad
 
-import com.fasterxml.jackson.annotation.JsonAlias
 import no.nav.omsorgsdagermeldingapi.søker.Søker
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
@@ -22,12 +21,4 @@ data class Søknad(
             harBekreftetOpplysninger = harBekreftetOpplysninger,
             harForståttRettigheterOgPlikter = harForståttRettigheterOgPlikter
         )
-
-}
-
-enum class Arbeidssituasjon(){
-    @JsonAlias("selvstendigNæringsdrivende") SELVSTENDIG_NÆRINGSDRIVENDE,
-    @JsonAlias("arbeidstaker") ARBEIDSTAKER,
-    @JsonAlias("frilanser") FRILANSER,
-    @JsonAlias("annen") ANNEN
 }

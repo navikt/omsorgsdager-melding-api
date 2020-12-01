@@ -6,8 +6,9 @@ import io.ktor.locations.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
-import no.nav.omsorgsdagermeldingapi.felles.SØKNAD_URL
-import no.nav.omsorgsdagermeldingapi.felles.VALIDERING_URL
+import no.nav.omsorgsdagermeldingapi.felles.MELDING_URL_DELE
+import no.nav.omsorgsdagermeldingapi.felles.MELDING_URL_FORDELE
+import no.nav.omsorgsdagermeldingapi.felles.MELDING_URL_OVERFØRE
 import no.nav.omsorgsdagermeldingapi.felles.formaterStatuslogging
 import no.nav.omsorgsdagermeldingapi.general.auth.IdTokenProvider
 import no.nav.omsorgsdagermeldingapi.general.getCallId
@@ -25,17 +26,16 @@ fun Route.søknadApis(
     idTokenProvider: IdTokenProvider
 ) {
 
-    @Location(SØKNAD_URL)
-    class sendSøknad
+    @Location(MELDING_URL_OVERFØRE)
+    class sendSøknadForOverføring
+    post { _ : sendSøknadForOverføring ->
+        logger.info("Mottatt ny melding om overføring av omsorgsdager.")
 
-    post { _ : sendSøknad ->
-        logger.info("Mottatt ny søknad.")
-
-        logger.trace("Mapper søknad")
+        logger.trace("Mapper melding")
         val søknad = call.receive<Søknad>()
-        logger.trace("Søknad mappet.")
+        logger.trace("Melding mappet.")
 
-        logger.trace("Validerer søknad")
+        logger.trace("Validerer melding")
         søknad.valider()
         logger.trace("Validering OK.")
 
@@ -51,14 +51,55 @@ fun Route.søknadApis(
         call.respond(HttpStatusCode.Accepted)
     }
 
-    @Location(VALIDERING_URL)
-    class validerSoknad
+    @Location(MELDING_URL_DELE)
+    class sendSøknadForDeling
+    post { _ : sendSøknadForDeling ->
+        logger.info("Mottatt ny melding om deling av omsorgsdager.")
 
-    post { _: validerSoknad ->
+        logger.trace("Mapper melding")
         val søknad = call.receive<Søknad>()
-        logger.trace("Validerer søknad...")
+        logger.trace("Melding mappet.")
+
+        logger.trace("Validerer melding")
         søknad.valider()
-        logger.trace("Validering Ok.")
+        logger.trace("Validering OK.")
+
+        logger.info(formaterStatuslogging(søknad.søknadId, "validert OK"))
+
+        søknadService.registrer(
+            søknad = søknad,
+            metadata = call.metadata(),
+            callId = call.getCallId(),
+            idToken = idTokenProvider.getIdToken(call)
+        )
+
         call.respond(HttpStatusCode.Accepted)
     }
+
+
+    @Location(MELDING_URL_FORDELE)
+    class sendSøknadForFordeling
+    post { _ : sendSøknadForFordeling ->
+        logger.info("Mottatt ny melding om fordeling av omsorgsdager.")
+
+        logger.trace("Mapper melding")
+        val søknad = call.receive<Søknad>()
+        logger.trace("Melding mappet.")
+
+        logger.trace("Validerer melding")
+        søknad.valider()
+        logger.trace("Validering OK.")
+
+        logger.info(formaterStatuslogging(søknad.søknadId, "validert OK"))
+
+        søknadService.registrer(
+            søknad = søknad,
+            metadata = call.metadata(),
+            callId = call.getCallId(),
+            idToken = idTokenProvider.getIdToken(call)
+        )
+
+        call.respond(HttpStatusCode.Accepted)
+    }
+
 }

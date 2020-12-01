@@ -10,8 +10,7 @@ import no.nav.common.KafkaEnvironment
 import no.nav.helse.dusseldorf.testsupport.wiremock.WireMockBuilder
 import no.nav.helse.getAuthCookie
 import no.nav.omsorgsdagermeldingapi.felles.SØKER_URL
-import no.nav.omsorgsdagermeldingapi.felles.SØKNAD_URL
-import no.nav.omsorgsdagermeldingapi.felles.VALIDERING_URL
+import no.nav.omsorgsdagermeldingapi.felles.MELDING_URL_OVERFØRE
 import no.nav.omsorgsdagermeldingapi.felles.somJson
 import no.nav.omsorgsdagermeldingapi.kafka.Topics
 import no.nav.omsorgsdagermeldingapi.redis.RedisMockUtil
@@ -24,7 +23,6 @@ import org.junit.BeforeClass
 import org.skyscreamer.jsonassert.JSONAssert
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.time.LocalDate
 import java.util.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -147,26 +145,13 @@ class ApplicationTest {
     }
 
     @Test
-    fun `Sende gyldig melding til validering`(){
-        val søknad = SøknadUtils.gyldigSøknad.somJson()
-
-        requestAndAssert(
-            httpMethod = HttpMethod.Post,
-            path = SØKNAD_URL,
-            expectedResponse = null,
-            expectedCode = HttpStatusCode.Accepted,
-            requestEntity = søknad
-        )
-    }
-
-    @Test
     fun `Sende gyldig søknad og plukke opp fra kafka topic`() {
         val søknadID = UUID.randomUUID().toString()
         val søknad = SøknadUtils.gyldigSøknad.copy(søknadId = søknadID).somJson()
 
         requestAndAssert(
             httpMethod = HttpMethod.Post,
-            path = SØKNAD_URL,
+            path = MELDING_URL_OVERFØRE,
             expectedResponse = null,
             expectedCode = HttpStatusCode.Accepted,
             requestEntity = søknad
@@ -182,7 +167,7 @@ class ApplicationTest {
 
         requestAndAssert(
             httpMethod = HttpMethod.Post,
-            path = SØKNAD_URL,
+            path = MELDING_URL_OVERFØRE,
             expectedResponse = """
                 {
                     "type": "/problem-details/unauthorized",
