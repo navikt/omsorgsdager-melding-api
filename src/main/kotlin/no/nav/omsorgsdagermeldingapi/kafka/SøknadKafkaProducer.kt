@@ -19,7 +19,7 @@ class SøknadKafkaProducer(
 ) : HealthCheck {
     private companion object {
         private val NAME = "SøknadProducer"
-        private val OMS_MIDLERTIDIG_ALENE_MOTTATT_TOPIC = TopicUse(
+        private val OMSORGDAGER_MELDING_MOTTATT_TOPIC = TopicUse(
             name = Topics.MOTTATT_OMSORGSDAGER_MELDING,
             valueSerializer = SøknadSerializer()
         )
@@ -29,8 +29,8 @@ class SøknadKafkaProducer(
 
     private val producer = KafkaProducer<String, TopicEntry<JSONObject>>(
         kafkaConfig.producer(NAME),
-        OMS_MIDLERTIDIG_ALENE_MOTTATT_TOPIC.keySerializer(),
-        OMS_MIDLERTIDIG_ALENE_MOTTATT_TOPIC.valueSerializer
+        OMSORGDAGER_MELDING_MOTTATT_TOPIC.keySerializer(),
+        OMSORGDAGER_MELDING_MOTTATT_TOPIC.valueSerializer
     )
 
     internal fun produce(
@@ -41,7 +41,7 @@ class SøknadKafkaProducer(
 
         val recordMetaData = producer.send(
             ProducerRecord(
-                OMS_MIDLERTIDIG_ALENE_MOTTATT_TOPIC.name,
+                OMSORGDAGER_MELDING_MOTTATT_TOPIC.name,
                 søknad.søknadId,
                 TopicEntry(
                     metadata = metadata,
@@ -50,14 +50,14 @@ class SøknadKafkaProducer(
             )
         ).get()
 
-        logger.info(formaterStatuslogging(søknad.søknadId, "sendes til topic ${OMS_MIDLERTIDIG_ALENE_MOTTATT_TOPIC.name} med offset '${recordMetaData.offset()}' til partition '${recordMetaData.partition()}'"))
+        logger.info(formaterStatuslogging(søknad.søknadId, "sendes til topic ${OMSORGDAGER_MELDING_MOTTATT_TOPIC.name} med offset '${recordMetaData.offset()}' til partition '${recordMetaData.partition()}'"))
     }
 
     internal fun stop() = producer.close()
 
     override suspend fun check(): Result {
         return try {
-            producer.partitionsFor(OMS_MIDLERTIDIG_ALENE_MOTTATT_TOPIC.name)
+            producer.partitionsFor(OMSORGDAGER_MELDING_MOTTATT_TOPIC.name)
             Healthy(NAME, "Tilkobling til Kafka OK!")
         } catch (cause: Throwable) {
             logger.error("Feil ved tilkobling til Kafka", cause)
