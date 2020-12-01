@@ -24,4 +24,4 @@ spec:
   accessPolicy:
     inbound:
       rules:
-        - application: omsorgsdager-melding-api-api
+        - application: omsorgsdager-melding-api
