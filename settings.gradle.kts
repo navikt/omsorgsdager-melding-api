@@ -1,1 +1,1 @@
-rootProject.name = "omsorgspenger-midlertidig-alene-api"
+rootProject.name = "omsorgsdager-melding-api"

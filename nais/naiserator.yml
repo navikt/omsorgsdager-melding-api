@@ -15,7 +15,7 @@ spec:
   accessPolicy:
     outbound:
       rules:
-        - application: omsorgspenger-midlertidig-alene-api-redis
+        - application: omsorgsdager-melding-api-redis
       external:
         {{#each externalHosts as |host|}}
         - host: {{host}}
@@ -51,9 +51,9 @@ spec:
   vault:
     enabled: false
   envFrom:
-    - secret: omsorgspenger-midlertidig-alene-api.apigw-apikey
-    - secret: omsorgspenger-midlertidig-alene-api.sts-credentials
-    - secret: omsorgspenger-midlertidig-alene-api.storage-redis
+    - secret: omsorgsdager-melding-api.apigw-apikey
+    - secret: omsorgsdager-melding-api.sts-credentials
+    - secret: omsorgsdager-melding-api.storage-redis
     - configmap: loginservice-idporten
   env:
   {{#each env}}

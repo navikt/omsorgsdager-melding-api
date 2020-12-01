@@ -3,7 +3,7 @@ kind: "Application"
 metadata:
   labels:
     team: dusseldorf
-  name: omsorgspenger-midlertidig-alene-api-redis
+  name: omsorgsdager-melding-api-redis
   namespace: dusseldorf
 spec:
   image: redis:5-alpine # or a custom Redis-image
@@ -24,4 +24,4 @@ spec:
   accessPolicy:
     inbound:
       rules:
-        - application: omsorgspenger-midlertidig-alene-api
+        - application: omsorgsdager-melding-api-api
