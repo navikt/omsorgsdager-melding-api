@@ -37,45 +37,6 @@ internal fun Søknad.valider() {
         )
     }
 
-    if(antallBarn < 1){
-        mangler.add(
-            Violation(
-                parameterName = "antallBarn",
-                parameterType = ParameterType.ENTITY,
-                reason = "antallBarn kan ikke være mindre enn 1",
-                invalidValue = antallBarn
-            )
-        )
-    }
-
-    if(arbeidssituasjon.isEmpty()){
-        mangler.add(
-            Violation(
-                parameterName = "arbeidssituasjon",
-                parameterType = ParameterType.ENTITY,
-                reason = "arbeidssituasjon kan ikke være tom",
-                invalidValue = arbeidssituasjon
-            )
-        )
-    }
-
-    fødselsårBarn.forEachIndexed{ index: Int, fødselsår: Int ->
-        val årstallNå = LocalDate.now().year
-        if(fødselsår > årstallNå){
-            mangler.add(
-                Violation(
-                    parameterName = "fødselsårBarn[$index]",
-                    parameterType = ParameterType.ENTITY,
-                    reason = "Årstall på barnet kan ikke være større enn $årstallNå",
-                    invalidValue = fødselsår
-                )
-            )
-        }
-    }
-
-    mangler.addAll(annenForelder.valider())
-    mangler.addAll(medlemskap.valider())
-
     if (mangler.isNotEmpty()) {
         throw Throwblem(ValidationProblemDetails(mangler))
     }
