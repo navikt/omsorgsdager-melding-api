@@ -19,7 +19,7 @@ import no.nav.omsorgsdagermeldingapi.søknad.søknad.AnnenForelder
 import no.nav.omsorgsdagermeldingapi.søknad.søknad.Medlemskap
 import no.nav.omsorgsdagermeldingapi.søknad.søknad.Situasjon
 import no.nav.omsorgsdagermeldingapi.søknad.søknad.Utenlandsopphold
-import no.nav.omsorgsdagermeldingapi.wiremock.omsorgspengerMidlertidigAleneApiConfig
+import no.nav.omsorgsdagermeldingapi.wiremock.omsorgsdagerMeldingApiConfig
 import no.nav.omsorgsdagermeldingapi.wiremock.stubK9OppslagSoker
 import no.nav.omsorgsdagermeldingapi.wiremock.stubOppslagHealth
 import org.json.JSONObject
@@ -48,7 +48,7 @@ class ApplicationTest {
             .withAzureSupport()
             .withNaisStsSupport()
             .withLoginServiceSupport()
-            .omsorgspengerMidlertidigAleneApiConfig()
+            .omsorgsdagerMeldingApiConfig()
             .build()
             .stubOppslagHealth()
             .stubK9OppslagSoker()
@@ -464,7 +464,7 @@ class ApplicationTest {
     }
 
     private fun hentSøknadSendtTilProsessering(soknadId: String): JSONObject {
-        return kafkaTestConsumer.hentSøknad(soknadId, topic = Topics.MOTTATT_OMS_MIDLERTIDIG_ALENE).data
+        return kafkaTestConsumer.hentSøknad(soknadId, topic = Topics.MOTTATT_OMSORGSDAGER_MELDING).data
     }
 
     private fun verifiserAtInnholdetErLikt(

@@ -26,7 +26,7 @@ object KafkaWrapper {
             withSchemaRegistry = false,
             withSecurity = true,
             topicNames= listOf(
-                Topics.MOTTATT_OMS_MIDLERTIDIG_ALENE
+                Topics.MOTTATT_OMSORGSDAGER_MELDING
             )
         )
         return kafkaEnvironment
@@ -39,7 +39,7 @@ private fun KafkaEnvironment.testConsumerProperties() : MutableMap<String, Any>?
         put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SASL_PLAINTEXT")
         put(SaslConfigs.SASL_MECHANISM, "PLAIN")
         put(SaslConfigs.SASL_JAAS_CONFIG, "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"$username\" password=\"$password\";")
-        put(ConsumerConfig.GROUP_ID_CONFIG, "omsorgspenger-midlertidig-alene-api")
+        put(ConsumerConfig.GROUP_ID_CONFIG, "omsorgsdager-melding-api")
     }
 }
 
@@ -49,7 +49,7 @@ internal fun KafkaEnvironment.testConsumer() : KafkaConsumer<String, TopicEntry<
         StringDeserializer(),
         SoknadV1OutgoingDeserialiser()
     )
-    consumer.subscribe(listOf(Topics.MOTTATT_OMS_MIDLERTIDIG_ALENE))
+    consumer.subscribe(listOf(Topics.MOTTATT_OMSORGSDAGER_MELDING))
     return consumer
 }
 

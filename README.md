@@ -1,7 +1,7 @@
-# Omsorgspenger midlertidig alene API
+# Omsorgsdager-melding-api
 
-![CI / CD](https://github.com/navikt/omsorgspenger-midlertidig-alene-api/workflows/CI%20/%20CD/badge.svg)
-![NAIS Alerts](https://github.com/navikt/omsorgspenger-midlertidig-alene-api/workflows/Alerts/badge.svg)
+![CI / CD](https://github.com/navikt/omsorgsdager-melding-api/workflows/CI%20/%20CD/badge.svg)
+![NAIS Alerts](https://github.com/navikt/omsorgsdager-melding-api/workflows/Alerts/badge.svg)
 
 # Innholdsoversikt
 * [1. Kontekst](#1-kontekst)
@@ -12,13 +12,13 @@
 * [6. Drift og støtte](#11-drift-og-sttte)
 
 # 1. Kontekst
-API for søknad om å bli regnet som midlertidig alene og Kafka producer. 
+API for koronaoverføring, deling og fordeling av dager
 
 # 2. Funksjonelle Krav
 Denne tjenesten understøtter søknadsprosessen, samt eksponerer endepunkt for innsending av søknad.
 
-API mottar søknaden, validerer og legger den videre på en kafka-topic som 
-omsorgspenger-midlertidig-alene-prosessering konsumerer.
+API mottar meldingene, validerer og legger dem videre på en kafka-topic som 
+omsorgsdager-melding-prosessering konsumerer.
 
 # 3. Endepunkter
 **GET @/soker --> Gir 200 respons med json av søker**
@@ -114,7 +114,7 @@ Eksempel json;
 
 # 4. Distribusjon av tjenesten (deployment)
 Distribusjon av tjenesten er gjort med bruk av Github Actions.
-[Omsorgspenger-midlertidig-alene-API CI / CD](https://github.com/navikt/omsorgspenger-midlertidig-alene-api/actions)
+[Omsorgsdager-melding-api CI / CD](https://github.com/navikt/omsorgsdager-melding-api/actions)
 
 Push til dev-* brancher vil teste, bygge og deploye til dev/staging miljø.
 Push/merge til master branche vil teste, bygge og deploye til produksjonsmiljø.

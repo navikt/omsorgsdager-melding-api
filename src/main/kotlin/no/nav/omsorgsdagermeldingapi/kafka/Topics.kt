@@ -17,5 +17,5 @@ internal data class TopicUse<V>(
 }
 
 object Topics {
-    const val MOTTATT_OMS_MIDLERTIDIG_ALENE = "privat-omsorgspenger-midlertidig-alene-mottatt"
+    const val MOTTATT_OMSORGSDAGER_MELDING = "privat-omsorgsdager-melding-api-mottatt"
 }

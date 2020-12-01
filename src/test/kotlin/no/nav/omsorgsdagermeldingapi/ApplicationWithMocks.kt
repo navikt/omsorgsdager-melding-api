@@ -3,7 +3,7 @@ package no.nav.omsorgsdagermeldingapi
 import io.ktor.server.testing.*
 import no.nav.helse.dusseldorf.testsupport.asArguments
 import no.nav.helse.dusseldorf.testsupport.wiremock.WireMockBuilder
-import no.nav.omsorgsdagermeldingapi.wiremock.omsorgspengerMidlertidigAleneApiConfig
+import no.nav.omsorgsdagermeldingapi.wiremock.omsorgsdagerMeldingApiConfig
 import no.nav.omsorgsdagermeldingapi.wiremock.stubK9OppslagSoker
 import no.nav.omsorgsdagermeldingapi.wiremock.stubOppslagHealth
 import org.slf4j.Logger
@@ -22,7 +22,7 @@ class ApplicationWithMocks {
                 .withAzureSupport()
                 .withNaisStsSupport()
                 .withLoginServiceSupport()
-                .omsorgspengerMidlertidigAleneApiConfig()
+                .omsorgsdagerMeldingApiConfig()
                 .build()
                 .stubOppslagHealth()
                 .stubK9OppslagSoker()
