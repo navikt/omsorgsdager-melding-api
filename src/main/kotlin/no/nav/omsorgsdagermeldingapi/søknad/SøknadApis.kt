@@ -6,8 +6,8 @@ import io.ktor.locations.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
-import no.nav.omsorgsdagermeldingapi.felles.MELDING_URL_DELE
 import no.nav.omsorgsdagermeldingapi.felles.MELDING_URL_FORDELE
+import no.nav.omsorgsdagermeldingapi.felles.MELDING_URL_KORONAOVERFØRE
 import no.nav.omsorgsdagermeldingapi.felles.MELDING_URL_OVERFØRE
 import no.nav.omsorgsdagermeldingapi.felles.formaterStatuslogging
 import no.nav.omsorgsdagermeldingapi.general.auth.IdTokenProvider
@@ -26,10 +26,10 @@ fun Route.søknadApis(
     idTokenProvider: IdTokenProvider
 ) {
 
-    @Location(MELDING_URL_OVERFØRE)
+    @Location(MELDING_URL_KORONAOVERFØRE)
     class sendSøknadForOverføring
     post { _ : sendSøknadForOverføring ->
-        logger.info("Mottatt ny melding om overføring av omsorgsdager.")
+        logger.info("Mottatt ny melding om koronaoverføring av omsorgsdager.")
 
         logger.trace("Mapper melding")
         val søknad = call.receive<Melding>()
@@ -51,10 +51,10 @@ fun Route.søknadApis(
         call.respond(HttpStatusCode.Accepted)
     }
 
-    @Location(MELDING_URL_DELE)
+    @Location(MELDING_URL_OVERFØRE)
     class sendSøknadForDeling
     post { _ : sendSøknadForDeling ->
-        logger.info("Mottatt ny melding om deling av omsorgsdager.")
+        logger.info("Mottatt ny melding om overføring av omsorgsdager.")
 
         logger.trace("Mapper melding")
         val søknad = call.receive<Melding>()

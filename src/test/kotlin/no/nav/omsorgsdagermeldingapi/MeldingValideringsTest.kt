@@ -20,14 +20,14 @@ internal class MeldingValideringsTest {
 
     @Test
     fun `Gyldig søknad`() {
-        val søknad = MeldingUtils.gyldigMelding
+        val søknad = MeldingUtils.gyldigMeldingKoronaoverføre
         søknad.valider()
     }
 
 
     @Test(expected = Throwblem::class)
     fun `Feiler dersom harForståttRettigheterOgPlikter er false`(){
-        val søknad = MeldingUtils.gyldigMelding.copy(
+        val søknad = MeldingUtils.gyldigMeldingKoronaoverføre.copy(
             harForståttRettigheterOgPlikter = false
         )
         søknad.valider()
@@ -35,7 +35,7 @@ internal class MeldingValideringsTest {
 
     @Test(expected = Throwblem::class)
     fun `Feiler dersom harBekreftetOpplysninger er false`(){
-        val søknad = MeldingUtils.gyldigMelding.copy(
+        val søknad = MeldingUtils.gyldigMeldingKoronaoverføre.copy(
             harBekreftetOpplysninger = false
         )
         søknad.valider()

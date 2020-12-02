@@ -200,15 +200,15 @@ class ApplicationTest {
         wireMockServer.stubK9OppslagBarn()
     }
 
-    //Overføring
+    //Koronaoverføring
     @Test
-    fun `Sende gyldig melding om overføring av omsorgsdager og plukke opp fra kafka topic`() {
+    fun `Sende gyldig melding om koronaoverføring av omsorgsdager og plukke opp fra kafka topic`() {
         val søknadID = UUID.randomUUID().toString()
-        val søknad = MeldingUtils.gyldigMelding.copy(søknadId = søknadID).somJson()
+        val søknad = MeldingUtils.gyldigMeldingKoronaoverføre.copy(søknadId = søknadID).somJson()
 
         requestAndAssert(
             httpMethod = HttpMethod.Post,
-            path = MELDING_URL_OVERFØRE,
+            path = MELDING_URL_KORONAOVERFØRE,
             expectedResponse = null,
             expectedCode = HttpStatusCode.Accepted,
             requestEntity = søknad
@@ -224,7 +224,7 @@ class ApplicationTest {
 
         requestAndAssert(
             httpMethod = HttpMethod.Post,
-            path = MELDING_URL_OVERFØRE,
+            path = MELDING_URL_KORONAOVERFØRE,
             expectedResponse = """
                 {
                     "type": "/problem-details/unauthorized",
@@ -236,19 +236,19 @@ class ApplicationTest {
             """.trimIndent(),
             expectedCode = HttpStatusCode.Forbidden,
             cookie = cookie,
-            requestEntity = MeldingUtils.gyldigMelding.somJson()
+            requestEntity = MeldingUtils.gyldigMeldingKoronaoverføre.somJson()
         )
     }
 
-    //Dele
+    //Overføring
     @Test
-    fun `Sende gyldig melding om deling av omsorgsdager og plukke opp fra kafka topic`() {
+    fun `Sende gyldig melding om overføring av omsorgsdager og plukke opp fra kafka topic`() {
         val søknadID = UUID.randomUUID().toString()
-        val søknad = MeldingUtils.gyldigMelding.copy(søknadId = søknadID).somJson()
+        val søknad = MeldingUtils.gyldigMeldingOverføre.copy(søknadId = søknadID).somJson()
 
         requestAndAssert(
             httpMethod = HttpMethod.Post,
-            path = MELDING_URL_DELE,
+            path = MELDING_URL_OVERFØRE,
             expectedResponse = null,
             expectedCode = HttpStatusCode.Accepted,
             requestEntity = søknad
@@ -258,11 +258,11 @@ class ApplicationTest {
         verifiserAtInnholdetErLikt(JSONObject(søknad), søknadSendtTilProsessering)
     }
 
-    //Fordele
+    //Fordeling
     @Test
     fun `Sende gyldig melding om fordeling av omsorgsdager og plukke opp fra kafka topic`() {
         val søknadID = UUID.randomUUID().toString()
-        val søknad = MeldingUtils.gyldigMelding.copy(søknadId = søknadID).somJson()
+        val søknad = MeldingUtils.gyldigMeldingFordele.copy(søknadId = søknadID).somJson()
 
         requestAndAssert(
             httpMethod = HttpMethod.Post,
