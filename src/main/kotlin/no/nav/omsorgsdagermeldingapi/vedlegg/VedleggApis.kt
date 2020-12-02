@@ -23,6 +23,7 @@ private val hasToBeMultupartTypeProblemDetails = DefaultProblemDetails(title = "
 private val vedleggNotFoundProblemDetails = DefaultProblemDetails(title = "attachment-not-found", status = 404, detail = "Inget vedlegg funnet med etterspurt ID.")
 private val vedleggNotAttachedProblemDetails = DefaultProblemDetails(title = "attachment-not-attached", status = 400, detail = "Fant ingen 'part' som er en fil, har 'name=vedlegg' og har Content-Type header satt.")
 private val vedleggTooLargeProblemDetails = DefaultProblemDetails(title = "attachment-too-large", status = 413, detail = "vedlegget var over maks tillatt størrelse på 8MB.")
+private val finnerIkkeSubject = DefaultProblemDetails(title = "fant-ikke-subject", status = 413, detail = "Fant ikke subject på idToken")
 private val vedleggContentTypeNotSupportedProblemDetails = DefaultProblemDetails(title = "attachment-content-type-not-supported", status = 400, detail = "Vedleggets type må være en av $supportedContentTypes")
 
 
@@ -76,7 +77,13 @@ fun Route.vedleggApis(
             call.respondProblemDetails(hasToBeMultupartTypeProblemDetails)
         } else {
             val multipart = call.receiveMultipart()
-            val vedlegg = multipart.getVedlegg()
+            var vedlegg: Vedlegg? = null
+            var eier = idTokenProvider.getIdToken(call).getSubject()
+            if(eier == null){
+                call.respondProblemDetails(finnerIkkeSubject)
+            } else {
+                vedlegg = multipart.getVedlegg(DokumentEier(eier))
+            }
 
             if (vedlegg == null) {
                 call.respondProblemDetails(vedleggNotAttachedProblemDetails)
@@ -100,13 +107,14 @@ fun Route.vedleggApis(
 }
 
 
-private suspend fun MultiPartData.getVedlegg() : Vedlegg? {
+private suspend fun MultiPartData.getVedlegg(eier: DokumentEier) : Vedlegg? {
     for (partData in readAllParts()) {
         if (partData is PartData.FileItem && "vedlegg".equals(partData.name, ignoreCase = true) && partData.contentType != null) {
             val vedlegg = Vedlegg(
                 content = partData.streamProvider().readBytes(),
                 contentType = partData.contentType.toString(),
-                title = partData.originalFileName?: "Ingen tittel tilgjengelig"
+                title = partData.originalFileName?: "Ingen tittel tilgjengelig",
+                eier = eier
             )
             partData.dispose()
             return vedlegg

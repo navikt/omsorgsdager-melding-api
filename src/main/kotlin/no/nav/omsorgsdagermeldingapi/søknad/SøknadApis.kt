@@ -92,6 +92,8 @@ fun Route.søknadApis(
 
         logger.info(formaterStatuslogging(søknad.søknadId, "validert OK"))
 
+        //TODO Her må samværsavtale loopes gjennom og sette hold på alle vedleggene.
+
         søknadService.registrer(
             melding = søknad,
             metadata = call.metadata(),

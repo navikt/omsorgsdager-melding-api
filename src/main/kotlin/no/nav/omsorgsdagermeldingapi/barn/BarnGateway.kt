@@ -11,11 +11,11 @@ import no.nav.helse.dusseldorf.ktor.health.Healthy
 import no.nav.helse.dusseldorf.ktor.health.Result
 import no.nav.helse.dusseldorf.ktor.health.UnHealthy
 import no.nav.helse.dusseldorf.ktor.metrics.Operation
+import no.nav.omsorgsdagermeldingapi.felles.k9SelvbetjeningOppslagKonfigurert
 import no.nav.omsorgsdagermeldingapi.general.CallId
 import no.nav.omsorgsdagermeldingapi.general.auth.ApiGatewayApiKey
 import no.nav.omsorgsdagermeldingapi.general.auth.IdToken
 import no.nav.omsorgsdagermeldingapi.general.oppslag.K9OppslagGateway
-import no.nav.omsorgsdagermeldingapi.k9SelvbetjeningOppslagKonfigurert
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.net.URI

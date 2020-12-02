@@ -54,6 +54,4 @@ object MeldingUtils {
             samværsavtale = listOf(URL("http://localhost:8080/vedlegg/1"))
         )
     )
-
-
 }

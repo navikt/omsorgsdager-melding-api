@@ -1,10 +1,12 @@
 package no.nav.omsorgsdagermeldingapi.vedlegg
 
+import com.fasterxml.jackson.annotation.JsonProperty
+
 data class Vedlegg(
     val content: ByteArray,
     val contentType: String,
-    val title: String
-
+    val title: String,
+    val eier: DokumentEier
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -29,3 +31,7 @@ data class Vedlegg(
 }
 
 data class VedleggId(val value: String)
+
+data class DokumentEier(
+    @JsonProperty("eiers_fødselsnummer") val eiersFødselsnummer: String
+)

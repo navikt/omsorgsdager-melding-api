@@ -6,7 +6,7 @@ import com.github.tomakehurst.wiremock.common.FileSource
 import com.github.tomakehurst.wiremock.extension.Parameters
 import com.github.tomakehurst.wiremock.extension.ResponseTransformer
 import com.github.tomakehurst.wiremock.http.*
-import no.nav.omsorgsdagermeldingapi.k9MellomlagringKonfigurert
+import no.nav.omsorgsdagermeldingapi.felles.k9MellomlagringKonfigurert
 import no.nav.omsorgsdagermeldingapi.vedlegg.Vedlegg
 import no.nav.omsorgsdagermeldingapi.vedlegg.VedleggId
 import java.util.*
