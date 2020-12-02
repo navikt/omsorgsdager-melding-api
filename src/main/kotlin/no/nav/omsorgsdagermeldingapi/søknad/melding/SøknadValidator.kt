@@ -1,10 +1,9 @@
-package no.nav.omsorgsdagermeldingapi.søknad.søknad
+package no.nav.omsorgsdagermeldingapi.søknad.melding
 
 import no.nav.helse.dusseldorf.ktor.core.ParameterType
 import no.nav.helse.dusseldorf.ktor.core.Throwblem
 import no.nav.helse.dusseldorf.ktor.core.ValidationProblemDetails
 import no.nav.helse.dusseldorf.ktor.core.Violation
-import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 private val KUN_SIFFER = Regex("\\d+")
@@ -12,7 +11,7 @@ internal val vekttallProviderFnr1: (Int) -> Int = { arrayOf(3, 7, 6, 1, 8, 9, 4,
 internal val vekttallProviderFnr2: (Int) -> Int = { arrayOf(5, 4, 3, 2, 7, 6, 5, 4, 3, 2).reversedArray()[it] }
 private val fnrDateFormat = DateTimeFormatter.ofPattern("ddMMyy")
 
-internal fun Søknad.valider() {
+internal fun Melding.valider() {
     val mangler: MutableSet<Violation> = mutableSetOf()
 
     if (harBekreftetOpplysninger er false) {

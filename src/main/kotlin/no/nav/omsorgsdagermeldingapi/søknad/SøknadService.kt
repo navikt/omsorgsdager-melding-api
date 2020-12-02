@@ -8,7 +8,7 @@ import no.nav.omsorgsdagermeldingapi.kafka.SøknadKafkaProducer
 import no.nav.omsorgsdagermeldingapi.søker.Søker
 import no.nav.omsorgsdagermeldingapi.søker.SøkerService
 import no.nav.omsorgsdagermeldingapi.søker.validate
-import no.nav.omsorgsdagermeldingapi.søknad.søknad.Søknad
+import no.nav.omsorgsdagermeldingapi.søknad.melding.Melding
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -23,12 +23,12 @@ class SøknadService(
     }
 
     suspend fun registrer(
-        søknad: Søknad,
+        melding: Melding,
         metadata: Metadata,
         idToken: IdToken,
         callId: CallId
     ) {
-        logger.info(formaterStatuslogging(søknad.søknadId, "registreres"))
+        logger.info(formaterStatuslogging(melding.søknadId, "registreres"))
 
         logger.trace("Henter søker")
         val søker: Søker = søkerService.getSøker(idToken = idToken, callId = callId)
@@ -38,8 +38,8 @@ class SøknadService(
         søker.validate()
         logger.trace("Søker OK.")
 
-        val komplettSøknad = søknad.tilKomplettSøknad(søker)
+        val komplettMelding = melding.tilKomplettMelding(søker)
 
-        kafkaProducer.produce(søknad = komplettSøknad, metadata = metadata)
+        kafkaProducer.produce(komplettMelding = komplettMelding, metadata = metadata)
     }
 }

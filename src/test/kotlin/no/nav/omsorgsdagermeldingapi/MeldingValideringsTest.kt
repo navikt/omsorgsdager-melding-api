@@ -1,13 +1,12 @@
 package no.nav.omsorgsdagermeldingapi
 
 import no.nav.helse.dusseldorf.ktor.core.Throwblem
-import no.nav.omsorgsdagermeldingapi.søknad.søknad.starterMedFodselsdato
-import no.nav.omsorgsdagermeldingapi.søknad.søknad.valider
+import no.nav.omsorgsdagermeldingapi.søknad.melding.starterMedFodselsdato
+import no.nav.omsorgsdagermeldingapi.søknad.melding.valider
 import org.junit.Test
-import java.time.LocalDate
 import kotlin.test.assertTrue
 
-internal class SøknadValideringsTest {
+internal class MeldingValideringsTest {
 
     companion object {
         private val ugyldigFødselsnummer = "12345678900"
@@ -21,14 +20,14 @@ internal class SøknadValideringsTest {
 
     @Test
     fun `Gyldig søknad`() {
-        val søknad = SøknadUtils.gyldigSøknad
+        val søknad = MeldingUtils.gyldigMelding
         søknad.valider()
     }
 
 
     @Test(expected = Throwblem::class)
     fun `Feiler dersom harForståttRettigheterOgPlikter er false`(){
-        val søknad = SøknadUtils.gyldigSøknad.copy(
+        val søknad = MeldingUtils.gyldigMelding.copy(
             harForståttRettigheterOgPlikter = false
         )
         søknad.valider()
@@ -36,7 +35,7 @@ internal class SøknadValideringsTest {
 
     @Test(expected = Throwblem::class)
     fun `Feiler dersom harBekreftetOpplysninger er false`(){
-        val søknad = SøknadUtils.gyldigSøknad.copy(
+        val søknad = MeldingUtils.gyldigMelding.copy(
             harBekreftetOpplysninger = false
         )
         søknad.valider()

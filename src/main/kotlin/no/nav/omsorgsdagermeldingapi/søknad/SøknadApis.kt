@@ -13,8 +13,8 @@ import no.nav.omsorgsdagermeldingapi.felles.formaterStatuslogging
 import no.nav.omsorgsdagermeldingapi.general.auth.IdTokenProvider
 import no.nav.omsorgsdagermeldingapi.general.getCallId
 import no.nav.omsorgsdagermeldingapi.general.metadata
-import no.nav.omsorgsdagermeldingapi.søknad.søknad.Søknad
-import no.nav.omsorgsdagermeldingapi.søknad.søknad.valider
+import no.nav.omsorgsdagermeldingapi.søknad.melding.Melding
+import no.nav.omsorgsdagermeldingapi.søknad.melding.valider
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -32,7 +32,7 @@ fun Route.søknadApis(
         logger.info("Mottatt ny melding om overføring av omsorgsdager.")
 
         logger.trace("Mapper melding")
-        val søknad = call.receive<Søknad>()
+        val søknad = call.receive<Melding>()
         logger.trace("Melding mappet.")
 
         logger.trace("Validerer melding")
@@ -42,7 +42,7 @@ fun Route.søknadApis(
         logger.info(formaterStatuslogging(søknad.søknadId, "validert OK"))
 
         søknadService.registrer(
-            søknad = søknad,
+            melding = søknad,
             metadata = call.metadata(),
             callId = call.getCallId(),
             idToken = idTokenProvider.getIdToken(call)
@@ -57,7 +57,7 @@ fun Route.søknadApis(
         logger.info("Mottatt ny melding om deling av omsorgsdager.")
 
         logger.trace("Mapper melding")
-        val søknad = call.receive<Søknad>()
+        val søknad = call.receive<Melding>()
         logger.trace("Melding mappet.")
 
         logger.trace("Validerer melding")
@@ -67,7 +67,7 @@ fun Route.søknadApis(
         logger.info(formaterStatuslogging(søknad.søknadId, "validert OK"))
 
         søknadService.registrer(
-            søknad = søknad,
+            melding = søknad,
             metadata = call.metadata(),
             callId = call.getCallId(),
             idToken = idTokenProvider.getIdToken(call)
@@ -83,7 +83,7 @@ fun Route.søknadApis(
         logger.info("Mottatt ny melding om fordeling av omsorgsdager.")
 
         logger.trace("Mapper melding")
-        val søknad = call.receive<Søknad>()
+        val søknad = call.receive<Melding>()
         logger.trace("Melding mappet.")
 
         logger.trace("Validerer melding")
@@ -93,7 +93,7 @@ fun Route.søknadApis(
         logger.info(formaterStatuslogging(søknad.søknadId, "validert OK"))
 
         søknadService.registrer(
-            søknad = søknad,
+            melding = søknad,
             metadata = call.metadata(),
             callId = call.getCallId(),
             idToken = idTokenProvider.getIdToken(call)

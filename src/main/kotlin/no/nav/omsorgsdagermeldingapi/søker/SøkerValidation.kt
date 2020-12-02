@@ -8,7 +8,7 @@ internal fun Søker.validate() {
         throw Throwblem(DefaultProblemDetails(
             title = "unauthorized",
             status = 403,
-            detail = "Søkeren er ikke myndig og kan ikke sende inn søknaden."
+            detail = "Søkeren er ikke myndig og kan ikke sende inn melding."
         ))
     }
 }

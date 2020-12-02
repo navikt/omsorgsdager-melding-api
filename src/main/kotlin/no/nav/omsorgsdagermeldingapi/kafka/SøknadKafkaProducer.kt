@@ -7,7 +7,7 @@ import no.nav.helse.dusseldorf.ktor.health.UnHealthy
 import no.nav.omsorgsdagermeldingapi.felles.Metadata
 import no.nav.omsorgsdagermeldingapi.felles.formaterStatuslogging
 import no.nav.omsorgsdagermeldingapi.felles.somJson
-import no.nav.omsorgsdagermeldingapi.søknad.søknad.KomplettSøknad
+import no.nav.omsorgsdagermeldingapi.søknad.melding.KomplettMelding
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization.Serializer
@@ -34,23 +34,23 @@ class SøknadKafkaProducer(
     )
 
     internal fun produce(
-        søknad: KomplettSøknad,
+        komplettMelding: KomplettMelding,
         metadata: Metadata
     ) {
-        if (metadata.version != 1) throw IllegalStateException("Kan ikke legge søknad med versjon ${metadata.version} til prosessering.")
+        if (metadata.version != 1) throw IllegalStateException("Kan ikke legge melding med versjon ${metadata.version} til prosessering.")
 
         val recordMetaData = producer.send(
             ProducerRecord(
                 OMSORGDAGER_MELDING_MOTTATT_TOPIC.name,
-                søknad.søknadId,
+                komplettMelding.søknadId,
                 TopicEntry(
                     metadata = metadata,
-                    data = JSONObject(søknad.somJson())
+                    data = JSONObject(komplettMelding.somJson())
                 )
             )
         ).get()
 
-        logger.info(formaterStatuslogging(søknad.søknadId, "sendes til topic ${OMSORGDAGER_MELDING_MOTTATT_TOPIC.name} med offset '${recordMetaData.offset()}' til partition '${recordMetaData.partition()}'"))
+        logger.info(formaterStatuslogging(komplettMelding.søknadId, "sendes til topic ${OMSORGDAGER_MELDING_MOTTATT_TOPIC.name} med offset '${recordMetaData.offset()}' til partition '${recordMetaData.partition()}'"))
     }
 
     internal fun stop() = producer.close()

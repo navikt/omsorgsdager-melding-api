@@ -1,9 +1,9 @@
-package no.nav.omsorgsdagermeldingapi.søknad.søknad
+package no.nav.omsorgsdagermeldingapi.søknad.melding
 
 import no.nav.omsorgsdagermeldingapi.søker.Søker
 import java.time.ZonedDateTime
 
-data class KomplettSøknad(
+data class KomplettMelding(
     val mottatt: ZonedDateTime,
     val søker: Søker,
     val søknadId: String,

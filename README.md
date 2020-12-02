@@ -15,7 +15,7 @@
 API for koronaoverføring, deling og fordeling av dager
 
 # 2. Funksjonelle Krav
-Denne tjenesten understøtter søknadsprosessen, samt eksponerer endepunkt for innsending av søknad.
+Denne tjenesten understøtter søknadsprosessen, samt eksponerer endepunkt for innsending av melding.
 
 API mottar meldingene, validerer og legger dem videre på en kafka-topic som 
 omsorgsdager-melding-prosessering konsumerer.

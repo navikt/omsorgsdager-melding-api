@@ -22,6 +22,9 @@ import no.nav.helse.dusseldorf.ktor.jackson.JacksonStatusPages
 import no.nav.helse.dusseldorf.ktor.jackson.dusseldorfConfigured
 import no.nav.helse.dusseldorf.ktor.metrics.MetricsRoute
 import no.nav.helse.dusseldorf.ktor.metrics.init
+import no.nav.omsorgsdagermeldingapi.barn.BarnGateway
+import no.nav.omsorgsdagermeldingapi.barn.BarnService
+import no.nav.omsorgsdagermeldingapi.barn.barnApis
 import no.nav.omsorgsdagermeldingapi.general.auth.IdTokenProvider
 import no.nav.omsorgsdagermeldingapi.general.auth.IdTokenStatusPages
 import no.nav.omsorgsdagermeldingapi.kafka.SøknadKafkaProducer
@@ -110,6 +113,17 @@ fun Application.omsorgpengermidlertidigaleneapi() {
             søkerGateway = søkerGateway
         )
 
+        val barnGateway = BarnGateway(
+            baseUrl = configuration.getK9OppslagUrl(),
+            apiGatewayApiKey = apiGatewayApiKey
+        )
+
+        val barnService = BarnService(
+            barnGateway = barnGateway,
+            cache = configuration.cache()
+        )
+
+
         val søknadKafkaProducer = SøknadKafkaProducer(
             kafkaConfig = configuration.getKafkaConfig()
         )
@@ -124,6 +138,11 @@ fun Application.omsorgpengermidlertidigaleneapi() {
 
             søkerApis(
                 søkerService = søkerService,
+                idTokenProvider = idTokenProvider
+            )
+
+            barnApis(
+                barnService = barnService,
                 idTokenProvider = idTokenProvider
             )
 

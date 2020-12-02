@@ -4,6 +4,7 @@ import io.ktor.server.testing.*
 import no.nav.helse.dusseldorf.testsupport.asArguments
 import no.nav.helse.dusseldorf.testsupport.wiremock.WireMockBuilder
 import no.nav.omsorgsdagermeldingapi.wiremock.omsorgsdagerMeldingApiConfig
+import no.nav.omsorgsdagermeldingapi.wiremock.stubK9OppslagBarn
 import no.nav.omsorgsdagermeldingapi.wiremock.stubK9OppslagSoker
 import no.nav.omsorgsdagermeldingapi.wiremock.stubOppslagHealth
 import org.slf4j.Logger
@@ -26,6 +27,7 @@ class ApplicationWithMocks {
                 .build()
                 .stubOppslagHealth()
                 .stubK9OppslagSoker()
+                .stubK9OppslagBarn()
 
             val testArgs = TestConfiguration.asMap(
                 port = 8082,
