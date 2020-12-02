@@ -6,6 +6,7 @@ import no.nav.helse.dusseldorf.testsupport.jws.ClientCredentials
 import no.nav.helse.dusseldorf.testsupport.jws.LoginService
 import no.nav.helse.dusseldorf.testsupport.wiremock.getAzureV2WellKnownUrl
 import no.nav.helse.dusseldorf.testsupport.wiremock.getLoginServiceV1WellKnownUrl
+import no.nav.omsorgsdagermeldingapi.wiremock.getK9MellomlagringUrl
 import no.nav.omsorgsdagermeldingapi.wiremock.getK9OppslagUrl
 
 object TestConfiguration {
@@ -15,6 +16,7 @@ object TestConfiguration {
         kafkaEnvironment: KafkaEnvironment? = null,
         port : Int = 8080,
         k9OppslagUrl: String? = wireMockServer?.getK9OppslagUrl(),
+        k9MellomlagringUrl: String? = wireMockServer?.getK9MellomlagringUrl(),
         corsAdresses : String = "http://localhost:8080"
     ) : Map<String, String> {
 
@@ -22,6 +24,7 @@ object TestConfiguration {
             Pair("ktor.deployment.port","$port"),
             Pair("nav.authorization.cookie_name", "localhost-idtoken"),
             Pair("nav.gateways.k9_oppslag_url","$k9OppslagUrl"),
+            Pair("nav.gateways.k9_dokument_url","$k9MellomlagringUrl"),
             Pair("nav.cors.addresses", corsAdresses),
             Pair("nav.authorization.api_gateway.api_key", "verysecret")
         )

@@ -7,15 +7,13 @@ import io.ktor.http.*
 import io.ktor.server.testing.*
 import io.ktor.util.*
 import no.nav.common.KafkaEnvironment
+import no.nav.helse.dusseldorf.ktor.core.fromResources
 import no.nav.helse.dusseldorf.testsupport.wiremock.WireMockBuilder
 import no.nav.helse.getAuthCookie
 import no.nav.omsorgsdagermeldingapi.felles.*
 import no.nav.omsorgsdagermeldingapi.kafka.Topics
 import no.nav.omsorgsdagermeldingapi.redis.RedisMockUtil
-import no.nav.omsorgsdagermeldingapi.wiremock.omsorgsdagerMeldingApiConfig
-import no.nav.omsorgsdagermeldingapi.wiremock.stubK9OppslagBarn
-import no.nav.omsorgsdagermeldingapi.wiremock.stubK9OppslagSoker
-import no.nav.omsorgsdagermeldingapi.wiremock.stubOppslagHealth
+import no.nav.omsorgsdagermeldingapi.wiremock.*
 import org.json.JSONObject
 import org.junit.AfterClass
 import org.junit.BeforeClass
@@ -48,6 +46,7 @@ class ApplicationTest {
             .stubOppslagHealth()
             .stubK9OppslagSoker()
             .stubK9OppslagBarn()
+            .stubK9Mellomlagring()
 
         private val kafkaEnvironment = KafkaWrapper.bootstrap()
         private val kafkaTestConsumer = kafkaEnvironment.testConsumer()
@@ -99,6 +98,40 @@ class ApplicationTest {
                         handleRequest(HttpMethod.Get, "/health") {}.apply {
                             assertEquals(HttpStatusCode.OK, response.status())
                         }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Test håndtering av vedlegg`() {
+        val cookie = getAuthCookie(gyldigFodselsnummerA)
+        val jpeg = "vedlegg/iPhone_6.jpg".fromResources().readBytes()
+
+        with(engine) {
+            // LASTER OPP VEDLEGG
+            val url = handleRequestUploadImage(
+                cookie = cookie,
+                vedlegg = jpeg
+            )
+            val path = Url(url).fullPath
+            // HENTER OPPLASTET VEDLEGG
+            handleRequest(HttpMethod.Get, path) {
+                addHeader("Cookie", cookie.toString())
+            }.apply {
+                assertEquals(HttpStatusCode.OK, response.status())
+                assertTrue(Arrays.equals(jpeg, response.byteContent))
+                // SLETTER OPPLASTET VEDLEGG
+                handleRequest(HttpMethod.Delete, path) {
+                    addHeader("Cookie", cookie.toString())
+                }.apply {
+                    assertEquals(HttpStatusCode.NoContent, response.status())
+                    // VERIFISERER AT VEDLEGG ER SLETTET
+                    handleRequest(HttpMethod.Get, path) {
+                        addHeader("Cookie", cookie.toString())
+                    }.apply {
+                        assertEquals(HttpStatusCode.NotFound, response.status())
                     }
                 }
             }

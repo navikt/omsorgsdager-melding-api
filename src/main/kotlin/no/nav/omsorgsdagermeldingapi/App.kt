@@ -1,7 +1,11 @@
 package no.nav.omsorgsdagermeldingapi
 
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.PropertyNamingStrategy
 import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.features.*
@@ -38,6 +42,9 @@ import no.nav.omsorgsdagermeldingapi.søker.SøkerService
 import no.nav.omsorgsdagermeldingapi.søker.søkerApis
 import no.nav.omsorgsdagermeldingapi.søknad.SøknadService
 import no.nav.omsorgsdagermeldingapi.søknad.søknadApis
+import no.nav.omsorgsdagermeldingapi.vedlegg.K9MellomlagringGateway
+import no.nav.omsorgsdagermeldingapi.vedlegg.VedleggService
+import no.nav.omsorgsdagermeldingapi.vedlegg.vedleggApis
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.time.Duration
@@ -123,6 +130,11 @@ fun Application.omsorgpengermidlertidigaleneapi() {
             cache = configuration.cache()
         )
 
+        val vedleggService = VedleggService(
+            k9MellomlagringGateway = K9MellomlagringGateway(
+                baseUrl = configuration.getK9MellomlagringUrl()
+            )
+        )
 
         val søknadKafkaProducer = SøknadKafkaProducer(
             kafkaConfig = configuration.getKafkaConfig()
@@ -155,6 +167,11 @@ fun Application.omsorgpengermidlertidigaleneapi() {
                             )
                         ).redisClient(configuration)
                     ), configuration.getStoragePassphrase()),
+                idTokenProvider = idTokenProvider
+            )
+
+            vedleggApis(
+                vedleggService = vedleggService,
                 idTokenProvider = idTokenProvider
             )
 
@@ -206,5 +223,20 @@ fun Application.omsorgpengermidlertidigaleneapi() {
             try { idTokenProvider.getIdToken(call).getId() }
             catch (cause: Throwable) { null }
         }
+    }
+}
+
+fun ObjectMapper.k9MellomlagringKonfigurert(): ObjectMapper {
+    return jacksonObjectMapper().dusseldorfConfigured().apply {
+        configure(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS, false)
+        propertyNamingStrategy = PropertyNamingStrategy.SNAKE_CASE
+    }
+}
+
+fun ObjectMapper.k9SelvbetjeningOppslagKonfigurert(): ObjectMapper {
+    return jacksonObjectMapper().dusseldorfConfigured().apply {
+        configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+        registerModule(JavaTimeModule())
+        propertyNamingStrategy = PropertyNamingStrategy.SNAKE_CASE
     }
 }

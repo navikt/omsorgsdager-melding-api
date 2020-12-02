@@ -16,6 +16,7 @@ spec:
     outbound:
       rules:
         - application: omsorgsdager-melding-api-redis
+        - application: k9-mellomlagring
       external:
         {{#each externalHosts as |host|}}
         - host: {{host}}

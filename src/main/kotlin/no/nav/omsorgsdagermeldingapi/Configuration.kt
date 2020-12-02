@@ -42,6 +42,7 @@ data class Configuration(val config : ApplicationConfig) {
     }
 
     internal fun getK9OppslagUrl() = URI(config.getRequiredString("nav.gateways.k9_oppslag_url", secret = false))
+    internal fun getK9MellomlagringUrl() = URI(config.getRequiredString("nav.gateways.k9_dokument_url", secret = false))
 
     internal fun getApiGatewayApiKey() : ApiGatewayApiKey {
         val apiKey = config.getRequiredString(key = "nav.authorization.api_gateway.api_key", secret = true)

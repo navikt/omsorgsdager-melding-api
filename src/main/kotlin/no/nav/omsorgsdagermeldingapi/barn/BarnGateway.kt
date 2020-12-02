@@ -1,7 +1,5 @@
 package no.nav.omsorgsdagermeldingapi.barn
 
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.kittinunf.fuel.coroutines.awaitStringResponseResult
@@ -17,6 +15,7 @@ import no.nav.omsorgsdagermeldingapi.general.CallId
 import no.nav.omsorgsdagermeldingapi.general.auth.ApiGatewayApiKey
 import no.nav.omsorgsdagermeldingapi.general.auth.IdToken
 import no.nav.omsorgsdagermeldingapi.general.oppslag.K9OppslagGateway
+import no.nav.omsorgsdagermeldingapi.k9SelvbetjeningOppslagKonfigurert
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.net.URI
@@ -31,10 +30,7 @@ class BarnGateway (
     private companion object {
         private val logger: Logger = LoggerFactory.getLogger("nav.BarnGateway")
         private const val HENTE_BARN_OPERATION = "hente-barn"
-        private val objectMapper = jacksonObjectMapper().apply {
-            configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-            registerModule(JavaTimeModule())
-        }
+        private val objectMapper = jacksonObjectMapper().k9SelvbetjeningOppslagKonfigurert()
 
         private val attributter = Pair("a", listOf("barn[].aktør_id",
             "barn[].fornavn",

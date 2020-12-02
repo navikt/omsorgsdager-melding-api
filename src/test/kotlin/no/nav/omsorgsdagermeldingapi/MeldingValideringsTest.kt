@@ -12,6 +12,7 @@ internal class MeldingValideringsTest {
         private val ugyldigFødselsnummer = "12345678900"
     }
 
+    //Felles
     @Test
     fun `Tester gyldig fødselsdato dersom dnunmer`() {
         val starterMedFodselsdato = "630293".starterMedFodselsdato()
@@ -40,5 +41,11 @@ internal class MeldingValideringsTest {
         )
         søknad.valider()
     }
+
+    //Koronaoverføring
+
+    //Overføring
+
+    //Fordeling
 
 }

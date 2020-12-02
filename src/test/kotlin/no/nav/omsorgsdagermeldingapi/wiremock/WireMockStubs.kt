@@ -9,11 +9,13 @@ import no.nav.helse.dusseldorf.testsupport.wiremock.WireMockBuilder
 import no.nav.omsorgspengermidlertidigalene.wiremock.BarnResponseTransformer
 
 internal const val k9OppslagPath = "/helse-reverse-proxy/k9-selvbetjening-oppslag-mock"
+internal const val k9MellomlagringPath = "/k9-mellomlagring"
 
 internal fun WireMockBuilder.omsorgsdagerMeldingApiConfig() = wireMockConfiguration {
     it
         .extensions(SokerResponseTransformer())
         .extensions(BarnResponseTransformer())
+        .extensions(K9MellomlagringResponseTransformer())
 }
 
 
@@ -58,6 +60,17 @@ internal fun WireMockServer.stubK9OppslagBarn(simulerFeil: Boolean = false) : Wi
     return this
 }
 
+internal fun WireMockServer.stubK9Mellomlagring() : WireMockServer{
+    WireMock.stubFor(
+        WireMock.any(WireMock.urlMatching(".*$k9MellomlagringPath/v1/dokument.*"))
+            .willReturn(
+                WireMock.aResponse()
+                    .withTransformers("K9MellomlagringResponseTransformer")
+            )
+    )
+    return this
+}
+
 private fun WireMockServer.stubHealthEndpointThroughZones(
     path : String
 ) : WireMockServer{
@@ -74,3 +87,4 @@ private fun WireMockServer.stubHealthEndpointThroughZones(
 
 internal fun WireMockServer.stubOppslagHealth() = stubHealthEndpointThroughZones("$k9OppslagPath/isalive")
 internal fun WireMockServer.getK9OppslagUrl() = baseUrl() + k9OppslagPath
+internal fun WireMockServer.getK9MellomlagringUrl() = baseUrl() + k9MellomlagringPath
