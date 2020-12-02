@@ -24,7 +24,7 @@ object TestConfiguration {
             Pair("ktor.deployment.port","$port"),
             Pair("nav.authorization.cookie_name", "localhost-idtoken"),
             Pair("nav.gateways.k9_oppslag_url","$k9OppslagUrl"),
-            Pair("nav.gateways.k9_dokument_url","$k9MellomlagringUrl"),
+            Pair("nav.gateways.k9_mellomlagring_url","$k9MellomlagringUrl"),
             Pair("nav.cors.addresses", corsAdresses),
             Pair("nav.authorization.api_gateway.api_key", "verysecret")
         )
