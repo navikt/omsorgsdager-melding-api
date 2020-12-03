@@ -54,6 +54,20 @@ fun Route.vedleggApis(
         }
     }
 
+    put<EksisterendeVedlegg> { eksisterendeVedlegg ->
+        val vedleggId = VedleggId(eksisterendeVedlegg.vedleggId)
+        logger.info("Prøver å sette hold på vedlegg")
+        var eier = idTokenProvider.getIdToken(call).getSubject()
+        if(eier == null) call.respond(HttpStatusCode.Forbidden) else {
+            vedleggService.settPåHold(
+                vedleggId = vedleggId,
+                callId =  call.getCallId(),
+                eier = DokumentEier(eier)
+            )
+        }
+    }
+
+
     @Location("/vedlegg")
     class NyttVedleg
     post<NyttVedleg> { _ ->

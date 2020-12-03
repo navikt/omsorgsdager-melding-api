@@ -13,6 +13,7 @@ import io.ktor.routing.*
 import io.ktor.util.*
 import io.prometheus.client.hotspot.DefaultExports
 import no.nav.helse.dusseldorf.ktor.auth.allIssuers
+import no.nav.helse.dusseldorf.ktor.auth.clients
 import no.nav.helse.dusseldorf.ktor.auth.multipleJwtIssuers
 import no.nav.helse.dusseldorf.ktor.core.*
 import no.nav.helse.dusseldorf.ktor.health.HealthReporter
@@ -25,6 +26,7 @@ import no.nav.helse.dusseldorf.ktor.metrics.init
 import no.nav.omsorgsdagermeldingapi.barn.BarnGateway
 import no.nav.omsorgsdagermeldingapi.barn.BarnService
 import no.nav.omsorgsdagermeldingapi.barn.barnApis
+import no.nav.omsorgsdagermeldingapi.general.auth.AccessTokenClientResolver
 import no.nav.omsorgsdagermeldingapi.general.auth.IdTokenProvider
 import no.nav.omsorgsdagermeldingapi.general.auth.IdTokenStatusPages
 import no.nav.omsorgsdagermeldingapi.kafka.SøknadKafkaProducer
@@ -107,6 +109,8 @@ fun Application.omsorgpengermidlertidigaleneapi() {
 
     install(Routing) {
 
+        val accessTokenClientResolver = AccessTokenClientResolver(environment.config.clients())
+
         val søkerGateway = SøkerGateway(
             baseUrl = configuration.getK9OppslagUrl(),
             apiGatewayApiKey = apiGatewayApiKey
@@ -126,10 +130,14 @@ fun Application.omsorgpengermidlertidigaleneapi() {
             cache = configuration.cache()
         )
 
+        val k9MellomlagringGateway = K9MellomlagringGateway(
+            baseUrl = configuration.getK9MellomlagringUrl(),
+            accessTokenClient = accessTokenClientResolver.dokumentAccessTokenClient(),
+            lagreDokumentScopes = configuration.getK9MellomlagringCScopes()
+        )
+
         val vedleggService = VedleggService(
-            k9MellomlagringGateway = K9MellomlagringGateway(
-                baseUrl = configuration.getK9MellomlagringUrl()
-            )
+            k9MellomlagringGateway = k9MellomlagringGateway
         )
 
         val søknadKafkaProducer = SøknadKafkaProducer(

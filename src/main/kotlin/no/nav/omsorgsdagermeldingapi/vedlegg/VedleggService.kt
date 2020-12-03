@@ -42,16 +42,16 @@ class VedleggService(
 
     suspend fun settPåHold(
         vedleggUrls: List<URL>,
-        idToken: IdToken,
-        callId: CallId
+        callId: CallId,
+        eier: DokumentEier
     ) {
         coroutineScope {
             val futures = mutableListOf<Deferred<Unit>>()
             vedleggUrls.forEach {
                 futures.add(async { settPåHold(
                     vedleggId = vedleggIdFromUrl(it),
-                    idToken = idToken,
-                    callId = callId
+                    callId = callId,
+                    eier = eier
                 ) })
             }
             futures.awaitAll()
@@ -60,13 +60,13 @@ class VedleggService(
 
     suspend fun settPåHold(
         vedleggId: VedleggId,
-        idToken: IdToken,
-        callId: CallId
-    ) {
+        callId: CallId,
+        eier: DokumentEier
+    ){
         k9MellomlagringGateway.settPåHold(
             vedleggId = vedleggId,
-            idToken = idToken,
-            callId = callId
+            callId = callId,
+            eier = eier
         )
     }
 

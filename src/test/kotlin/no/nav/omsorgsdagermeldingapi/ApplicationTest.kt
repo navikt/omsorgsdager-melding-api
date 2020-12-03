@@ -123,7 +123,7 @@ class ApplicationTest {
     }
 
     @Test
-    fun `Teste sletting av vedlegg som feiler`(){
+    fun `Tester sletting av vedlegg som ikke finnes`(){
         val cookie = getAuthCookie(gyldigFodselsnummerA)
         with(engine){
             handleRequest(HttpMethod.Delete, "/vedlegg/123") {

@@ -5,12 +5,14 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.coroutines.awaitStringResponseResult
 import com.github.kittinunf.fuel.httpDelete
-import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.fuel.httpPost
+import com.github.kittinunf.fuel.httpPut
 import io.ktor.http.*
 import no.nav.helse.dusseldorf.ktor.client.buildURL
 import no.nav.helse.dusseldorf.ktor.core.Retry.Companion.retry
 import no.nav.helse.dusseldorf.ktor.metrics.Operation.Companion.monitored
+import no.nav.helse.dusseldorf.oauth2.client.AccessTokenClient
+import no.nav.helse.dusseldorf.oauth2.client.CachedAccessTokenClient
 import no.nav.omsorgsdagermeldingapi.felles.k9MellomlagringKonfigurert
 import no.nav.omsorgsdagermeldingapi.general.CallId
 import no.nav.omsorgsdagermeldingapi.general.auth.IdToken
@@ -21,6 +23,8 @@ import java.net.URI
 import java.time.Duration
 
 class K9MellomlagringGateway(
+    private val accessTokenClient: AccessTokenClient,
+    private val lagreDokumentScopes: Set<String>,
     baseUrl : URI
 ) {
 
@@ -32,56 +36,12 @@ class K9MellomlagringGateway(
         private const val LAGRE_VEDLEGG_OPERATION = "lagre-vedlegg"
     }
 
+    private val cachedAccessTokenClient = CachedAccessTokenClient(accessTokenClient)
+
     private val url = Url.buildURL(
         baseUrl = baseUrl,
         pathParts = listOf("v1", "dokument")
     )
-
-    suspend fun hentVedlegg(
-        vedleggId: VedleggId,
-        idToken: IdToken,
-        callId: CallId
-    ) : Vedlegg? {
-
-        val urlMedId = Url.buildURL(
-            baseUrl = url,
-            pathParts = listOf(vedleggId.value)
-        )
-
-        val httpRequest = urlMedId
-            .toString()
-            .httpGet()
-            .header(
-                HttpHeaders.Authorization to "Bearer ${idToken.value}",
-                HttpHeaders.Accept to "application/json",
-                HttpHeaders.XCorrelationId to callId.value
-            )
-
-        return retry(
-            operation = HENTE_VEDLEGG_OPERATION,
-            initialDelay = Duration.ofMillis(200),
-            factor = 2.0,
-            logger = logger
-        ) {
-            val (request, response, result) = monitored(
-                app = "omsorgsdager-melding-api",
-                operation = HENTE_VEDLEGG_OPERATION,
-                resultResolver = { 200 == it.second.statusCode }
-            ) { httpRequest.awaitStringResponseResult() }
-
-            result.fold(
-                { success -> ResolvedVedlegg(objectMapper.readValue<Vedlegg>(success)) },
-                { error ->
-                    if (404 == response.statusCode) ResolvedVedlegg()
-                    else {
-                        logger.error("Error response = '${error.response.body().asString("text/plain")}' fra '${request.url}'")
-                        logger.error(error.toString())
-                        throw IllegalStateException("Feil ved henting av vedlegg.")
-                    }
-                }
-            )
-        }.vedlegg
-    }
 
     suspend fun lagreVedlegg(
         vedlegg: Vedlegg,
@@ -179,20 +139,23 @@ class K9MellomlagringGateway(
 
     suspend fun settPåHold(
         vedleggId: VedleggId,
-        idToken: IdToken,
-        callId: CallId
+        callId: CallId,
+        eier: DokumentEier
     ) : Boolean {
+        val authorizationHeader: String = cachedAccessTokenClient.getAccessToken(lagreDokumentScopes).asAuthoriationHeader()
 
         val urlMedId = Url.buildURL(
             baseUrl = url,
-            pathParts = listOf(vedleggId.value)
+            pathParts = listOf(vedleggId.value, "persister")
         )
 
-        val httpRequest = urlMedId
-            .toString()
-            .httpDelete()
+        val body =  objectMapper.writeValueAsBytes(eier)
+
+        val httpRequest = urlMedId.toString()
+            .httpPut()
+            .body(body)
             .header(
-                HttpHeaders.Authorization to "Bearer ${idToken.value}",
+                HttpHeaders.Authorization to authorizationHeader,
                 HttpHeaders.XCorrelationId to callId.value
             )
 
@@ -206,4 +169,3 @@ class K9MellomlagringGateway(
 }
 
 data class CreatedResponseEntity(val id : String)
-private data class ResolvedVedlegg(val vedlegg: Vedlegg? = null)
