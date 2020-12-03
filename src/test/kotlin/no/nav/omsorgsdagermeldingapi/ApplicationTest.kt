@@ -22,10 +22,7 @@ import org.skyscreamer.jsonassert.JSONAssert
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.*
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 private const val gyldigFodselsnummerA = "290990123456"
 private const val ikkeMyndigFnr = "12125012345"
@@ -134,6 +131,18 @@ class ApplicationTest {
                         assertEquals(HttpStatusCode.NotFound, response.status())
                     }
                 }
+            }
+        }
+    }
+
+    @Test
+    fun `Teste sletting av vedlegg som feiler`(){
+        val cookie = getAuthCookie(gyldigFodselsnummerA)
+        with(engine){
+            handleRequest(HttpMethod.Delete, "/vedlegg/123") {
+                addHeader("Cookie", cookie.toString())
+            }.apply {
+                assertNotEquals(HttpStatusCode.NoContent, response.status())
             }
         }
     }

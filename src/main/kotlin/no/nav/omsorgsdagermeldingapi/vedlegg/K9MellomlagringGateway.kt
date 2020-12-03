@@ -147,12 +147,7 @@ class K9MellomlagringGateway(
                 HttpHeaders.XCorrelationId to callId.value,
                 HttpHeaders.ContentType to "application/json"
             )
-
-        return try { requestSlettVedlegg(httpRequest)}
-        catch (cause: Throwable) {
-            logger.error("Fikk ikke slettet vedlegg.")
-            false
-        }
+        return requestSlettVedlegg(httpRequest)
     }
 
     private suspend fun requestSlettVedlegg(
@@ -170,14 +165,16 @@ class K9MellomlagringGateway(
         ) { httpRequest.awaitStringResponseResult() }
 
         result.fold(
-            { true },
-            { error -> {
+            { success ->
+                logger.info("Suksess ved sletting av vedlegg")
+                true
+            },
+            { error ->
                 logger.error("Error response = '${error.response.body().asString("text/plain")}' fra '${request.url}'")
                 logger.error(error.toString())
                 throw IllegalStateException("Feil ved sletting av vedlegg.")
-            }}
+            }
         )
-        false
     }
 
     suspend fun settPåHold(

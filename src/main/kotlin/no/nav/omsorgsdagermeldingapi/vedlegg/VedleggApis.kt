@@ -7,7 +7,7 @@ import io.ktor.http.content.*
 import io.ktor.locations.*
 import io.ktor.request.*
 import io.ktor.response.*
-import io.ktor.routing.Route
+import io.ktor.routing.*
 import no.nav.helse.dusseldorf.ktor.core.DefaultProblemDetails
 import no.nav.helse.dusseldorf.ktor.core.respondProblemDetails
 import no.nav.omsorgsdagermeldingapi.general.auth.IdTokenProvider
@@ -25,6 +25,7 @@ private val vedleggNotAttachedProblemDetails = DefaultProblemDetails(title = "at
 private val vedleggTooLargeProblemDetails = DefaultProblemDetails(title = "attachment-too-large", status = 413, detail = "vedlegget var over maks tillatt størrelse på 8MB.")
 private val finnerIkkeSubject = DefaultProblemDetails(title = "fant-ikke-subject", status = 413, detail = "Fant ikke subject på idToken")
 private val vedleggContentTypeNotSupportedProblemDetails = DefaultProblemDetails(title = "attachment-content-type-not-supported", status = 400, detail = "Vedleggets type må være en av $supportedContentTypes")
+internal val feilVedSlettingAvVedlegg = DefaultProblemDetails(title = "feil-ved-sletting", status = 500, detail = "Feil ved sletting av vedlegg")
 
 
 @KtorExperimentalLocationsAPI
@@ -34,47 +35,27 @@ fun Route.vedleggApis(
 ) {
     @Location("/vedlegg/{vedleggId}")
     data class EksisterendeVedlegg(val vedleggId: String)
-
-    get<EksisterendeVedlegg> { eksisterendeVedlegg ->
-        val vedleggId = VedleggId(eksisterendeVedlegg.vedleggId)
-        logger.info("Henter vedlegg")
-        logger.info("$vedleggId")
-        val vedlegg = vedleggService.hentVedlegg(
-            vedleggId = vedleggId,
-            idToken = idTokenProvider.getIdToken(call),
-            callId = call.getCallId()
-        )
-
-        if (vedlegg == null) {
-            call.respondProblemDetails(vedleggNotFoundProblemDetails)
-        } else {
-            call.respondBytes(
-                bytes = vedlegg.content,
-                contentType = ContentType.parse(vedlegg.contentType),
-                status = HttpStatusCode.OK
-            )
-        }
-    }
-
     delete<EksisterendeVedlegg> { eksisterendeVedlegg ->
         val vedleggId = VedleggId(eksisterendeVedlegg.vedleggId)
         logger.info("Sletter vedlegg")
         logger.info("$vedleggId")
         var eier = idTokenProvider.getIdToken(call).getSubject()
-        if(eier == null) call.respond(HttpStatusCode.Forbidden) else { //TODO Hva er riktig å returnere?
-            vedleggService.slettVedlegg(
+        if(eier == null) call.respond(HttpStatusCode.Forbidden) else {
+            val resultat = vedleggService.slettVedlegg(
                 vedleggId = vedleggId,
                 idToken = idTokenProvider.getIdToken(call),
                 callId = call.getCallId(),
                 eier = DokumentEier(eier)
             )
-            call.respond(HttpStatusCode.NoContent)
+            when(resultat){
+                true -> call.respond(HttpStatusCode.NoContent)
+                false -> call.respondProblemDetails(feilVedSlettingAvVedlegg)
+            }
         }
     }
 
     @Location("/vedlegg")
     class NyttVedleg
-
     post<NyttVedleg> { _ ->
         logger.info("Lagrer vedlegg")
         if (!call.request.isFormMultipart()) {
