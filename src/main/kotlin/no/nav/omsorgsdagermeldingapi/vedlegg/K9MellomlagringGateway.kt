@@ -10,6 +10,10 @@ import com.github.kittinunf.fuel.httpPut
 import io.ktor.http.*
 import no.nav.helse.dusseldorf.ktor.client.buildURL
 import no.nav.helse.dusseldorf.ktor.core.Retry.Companion.retry
+import no.nav.helse.dusseldorf.ktor.health.HealthCheck
+import no.nav.helse.dusseldorf.ktor.health.Healthy
+import no.nav.helse.dusseldorf.ktor.health.Result
+import no.nav.helse.dusseldorf.ktor.health.UnHealthy
 import no.nav.helse.dusseldorf.ktor.metrics.Operation.Companion.monitored
 import no.nav.helse.dusseldorf.oauth2.client.AccessTokenClient
 import no.nav.helse.dusseldorf.oauth2.client.CachedAccessTokenClient
@@ -26,7 +30,7 @@ class K9MellomlagringGateway(
     private val accessTokenClient: AccessTokenClient,
     private val lagreDokumentScopes: Set<String>,
     baseUrl : URI
-) {
+): HealthCheck {
 
     private companion object {
         private val logger: Logger = LoggerFactory.getLogger(K9MellomlagringGateway::class.java)
@@ -42,6 +46,16 @@ class K9MellomlagringGateway(
         baseUrl = baseUrl,
         pathParts = listOf("v1", "dokument")
     )
+
+    override suspend fun check(): Result {
+        return try {
+            accessTokenClient.getAccessToken(lagreDokumentScopes)
+            Healthy("K9MellomlagringGateway", "Henting av access token for å persistere vedlegg.")
+        } catch (cause: Throwable) {
+            logger.error("Feil ved henting av access token for å legge søknad til prosessering", cause)
+            UnHealthy("K9MellomlagringGateway", "Henting av access token for å persistere vedlegg.")
+        }
+    }
 
     suspend fun lagreVedlegg(
         vedlegg: Vedlegg,
@@ -161,7 +175,7 @@ class K9MellomlagringGateway(
 
         return try { requestSlettVedlegg(httpRequest)}
         catch (cause: Throwable) {
-            logger.error("Fikk ikke slettet vedlegg.")
+            logger.error("Fikk ikke satt hold.")
             false
         }
     }

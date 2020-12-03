@@ -26,9 +26,9 @@ import no.nav.helse.dusseldorf.ktor.metrics.init
 import no.nav.omsorgsdagermeldingapi.barn.BarnGateway
 import no.nav.omsorgsdagermeldingapi.barn.BarnService
 import no.nav.omsorgsdagermeldingapi.barn.barnApis
-import no.nav.omsorgsdagermeldingapi.general.auth.AccessTokenClientResolver
 import no.nav.omsorgsdagermeldingapi.general.auth.IdTokenProvider
 import no.nav.omsorgsdagermeldingapi.general.auth.IdTokenStatusPages
+import no.nav.omsorgsdagermeldingapi.general.systemauth.AccessTokenClientResolver
 import no.nav.omsorgsdagermeldingapi.kafka.SøknadKafkaProducer
 import no.nav.omsorgsdagermeldingapi.mellomlagring.MellomlagringService
 import no.nav.omsorgsdagermeldingapi.mellomlagring.mellomlagringApis
@@ -132,7 +132,7 @@ fun Application.omsorgpengermidlertidigaleneapi() {
 
         val k9MellomlagringGateway = K9MellomlagringGateway(
             baseUrl = configuration.getK9MellomlagringUrl(),
-            accessTokenClient = accessTokenClientResolver.dokumentAccessTokenClient(),
+            accessTokenClient = accessTokenClientResolver.accessTokenClient(),
             lagreDokumentScopes = configuration.getK9MellomlagringCScopes()
         )
 
