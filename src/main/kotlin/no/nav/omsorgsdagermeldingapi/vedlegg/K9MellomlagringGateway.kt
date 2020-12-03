@@ -214,8 +214,9 @@ class K9MellomlagringGateway(
         result.fold(
             { success -> logger.info("Vellykket persistering av vedlegg")},
             { error ->
-                logger.warn("Error response = '${error.response.body().asString("text/plain")}' fra '${request.url}'")
+                logger.error("Error response = '${error.response.body().asString("text/plain")}' fra '${request.url}'")
                 logger.error("Feil ved persistering av vedlegg. $error")
+                throw IllegalStateException("Feil ved persistering av vedlegg.")
             }
         )
     }

@@ -36,6 +36,18 @@ class VedleggService(
         )
     }
 
+    internal suspend fun persisterVedleggApi( //Kun for å test med api, metoden under skal  brukes for meldinger
+        vedleggId: VedleggId,
+        callId: CallId,
+        eier: DokumentEier
+    ){
+        k9MellomlagringGateway.persisterVedlegger(
+            vedleggId = listOf(vedleggId),
+            callId = callId,
+            eier = eier
+        )
+    }
+
     internal suspend fun persisterVedlegg(
         vedleggsUrls: List<URL>,
         callId: CallId,
