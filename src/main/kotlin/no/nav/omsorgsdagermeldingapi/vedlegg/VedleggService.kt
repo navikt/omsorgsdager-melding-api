@@ -1,9 +1,5 @@
 package no.nav.omsorgsdagermeldingapi.vedlegg
 
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
 import no.nav.omsorgsdagermeldingapi.general.CallId
 import no.nav.omsorgsdagermeldingapi.general.auth.IdToken
 import java.net.URL
@@ -40,31 +36,16 @@ class VedleggService(
         )
     }
 
-    suspend fun settPåHold(
-        vedleggUrls: List<URL>,
+    internal suspend fun persisterVedlegg(
+        vedleggsUrls: List<URL>,
         callId: CallId,
         eier: DokumentEier
     ) {
-        coroutineScope {
-            val futures = mutableListOf<Deferred<Unit>>()
-            vedleggUrls.forEach {
-                futures.add(async { settPåHold(
-                    vedleggId = vedleggIdFromUrl(it),
-                    callId = callId,
-                    eier = eier
-                ) })
-            }
-            futures.awaitAll()
-        }
-    }
+        val vedleggsId = mutableListOf<VedleggId>()
+        vedleggsUrls.forEach { vedleggsId.add(vedleggIdFromUrl(it)) }
 
-    suspend fun settPåHold(
-        vedleggId: VedleggId,
-        callId: CallId,
-        eier: DokumentEier
-    ){
-        k9MellomlagringGateway.settPåHold(
-            vedleggId = vedleggId,
+        k9MellomlagringGateway.persisterVedlegger(
+            vedleggId = vedleggsId,
             callId = callId,
             eier = eier
         )

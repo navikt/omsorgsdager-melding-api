@@ -8,12 +8,17 @@ import com.github.kittinunf.fuel.httpDelete
 import com.github.kittinunf.fuel.httpPost
 import com.github.kittinunf.fuel.httpPut
 import io.ktor.http.*
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import no.nav.helse.dusseldorf.ktor.client.buildURL
 import no.nav.helse.dusseldorf.ktor.core.Retry.Companion.retry
 import no.nav.helse.dusseldorf.ktor.health.HealthCheck
 import no.nav.helse.dusseldorf.ktor.health.Healthy
 import no.nav.helse.dusseldorf.ktor.health.Result
 import no.nav.helse.dusseldorf.ktor.health.UnHealthy
+import no.nav.helse.dusseldorf.ktor.metrics.Operation
 import no.nav.helse.dusseldorf.ktor.metrics.Operation.Companion.monitored
 import no.nav.helse.dusseldorf.oauth2.client.AccessTokenClient
 import no.nav.helse.dusseldorf.oauth2.client.CachedAccessTokenClient
@@ -36,8 +41,8 @@ class K9MellomlagringGateway(
         private val logger: Logger = LoggerFactory.getLogger(K9MellomlagringGateway::class.java)
         private val objectMapper = jacksonObjectMapper().k9MellomlagringKonfigurert()
         private const val SLETTE_VEDLEGG_OPERATION = "slette-vedlegg"
-        private const val HENTE_VEDLEGG_OPERATION = "hente-vedlegg"
         private const val LAGRE_VEDLEGG_OPERATION = "lagre-vedlegg"
+        private const val PERSISTER_VEDLEGG = "persister-vedlegg"
     }
 
     private val cachedAccessTokenClient = CachedAccessTokenClient(accessTokenClient)
@@ -151,12 +156,35 @@ class K9MellomlagringGateway(
         )
     }
 
-    suspend fun settPåHold(
-        vedleggId: VedleggId,
+    internal suspend fun persisterVedlegger(
+        vedleggId: List<VedleggId>,
         callId: CallId,
         eier: DokumentEier
-    ) : Boolean {
+    ) {
         val authorizationHeader: String = cachedAccessTokenClient.getAccessToken(lagreDokumentScopes).asAuthoriationHeader()
+
+        coroutineScope {
+            val deferred = mutableListOf<Deferred<Unit>>()
+            vedleggId.forEach {
+                deferred.add(async {
+                    requestPersisterVedlegg(
+                        vedleggId = it,
+                        callId = callId,
+                        eier = eier,
+                        authorizationHeader = authorizationHeader
+                    )
+                })
+            }
+            deferred.awaitAll()
+        }
+    }
+
+    private suspend fun requestPersisterVedlegg(
+        vedleggId: VedleggId,
+        callId: CallId,
+        eier: DokumentEier,
+        authorizationHeader: String
+    ) {
 
         val urlMedId = Url.buildURL(
             baseUrl = url,
@@ -174,11 +202,22 @@ class K9MellomlagringGateway(
                 HttpHeaders.ContentType to "application/json"
             )
 
-        return try { requestSlettVedlegg(httpRequest)}
-        catch (cause: Throwable) {
-            logger.error("Fikk ikke satt hold.")
-            false
+        val (request, _, result) = Operation.monitored(
+            app = "omsorgsdager-melding-api",
+            operation = PERSISTER_VEDLEGG,
+            resultResolver = { 204 == it.second.statusCode }
+        ) {
+            httpRequest.awaitStringResponseResult()
         }
+
+
+        result.fold(
+            { success -> logger.info("Vellykket persistering av vedlegg")},
+            { error ->
+                logger.warn("Error response = '${error.response.body().asString("text/plain")}' fra '${request.url}'")
+                logger.error("Feil ved persistering av vedlegg. $error")
+            }
+        )
     }
 
 }

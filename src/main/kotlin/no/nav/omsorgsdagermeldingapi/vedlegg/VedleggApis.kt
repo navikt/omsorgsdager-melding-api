@@ -14,6 +14,7 @@ import no.nav.omsorgsdagermeldingapi.general.auth.IdTokenProvider
 import no.nav.omsorgsdagermeldingapi.general.getCallId
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.net.URL
 
 private val logger: Logger = LoggerFactory.getLogger("nav.vedleggApis")
 private const val MAX_VEDLEGG_SIZE = 8 * 1024 * 1024
@@ -56,11 +57,11 @@ fun Route.vedleggApis(
 
     put<EksisterendeVedlegg> { eksisterendeVedlegg ->
         val vedleggId = VedleggId(eksisterendeVedlegg.vedleggId)
-        logger.info("Prøver å sette hold på vedlegg")
+        logger.info("Prøver å persistere vedlegg")
         var eier = idTokenProvider.getIdToken(call).getSubject()
         if(eier == null) call.respond(HttpStatusCode.Forbidden) else {
-            vedleggService.settPåHold(
-                vedleggId = vedleggId,
+            vedleggService.persisterVedlegg(
+                vedleggsUrls = listOf(URL(vedleggId.value)),
                 callId =  call.getCallId(),
                 eier = DokumentEier(eier)
             )
