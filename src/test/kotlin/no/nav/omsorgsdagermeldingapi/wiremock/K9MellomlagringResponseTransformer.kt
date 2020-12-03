@@ -32,23 +32,6 @@ class K9MellomlagringResponseTransformer() : ResponseTransformer() {
     ): Response {
         return when {
             request == null -> throw IllegalStateException("request == null")
-            request.method == RequestMethod.GET -> {
-
-                val vedleggId = request.getVedleggId()
-                return if (storage.containsKey(vedleggId)) {
-                    Response.Builder.like(response)
-                        .status(200)
-                        .headers(HttpHeaders(
-                            HttpHeader.httpHeader("Content-Type", "application/json")
-                        ))
-                        .body(objectMapper.writeValueAsString(storage[vedleggId]))
-                        .build()
-                } else {
-                    Response.Builder.like(response)
-                        .status(404)
-                        .build()
-                }
-            }
 
             request.method == RequestMethod.POST -> {
                 val vedlegg = objectMapper.readValue<Vedlegg>(request.bodyAsString)

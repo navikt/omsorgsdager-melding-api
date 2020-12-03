@@ -102,7 +102,7 @@ class ApplicationTest {
     }
 
     @Test
-    fun `Test håndtering av vedlegg`() {
+    fun `Tester lagring og sletting av vedlegg`() {
         val cookie = getAuthCookie(gyldigFodselsnummerA)
         val jpeg = "vedlegg/iPhone_6.jpg".fromResources().readBytes()
 
@@ -113,24 +113,11 @@ class ApplicationTest {
                 vedlegg = jpeg
             )
             val path = Url(url).fullPath
-            // HENTER OPPLASTET VEDLEGG
-            handleRequest(HttpMethod.Get, path) {
+            // SLETTER OPPLASTET VEDLEGG
+            handleRequest(HttpMethod.Delete, path) {
                 addHeader("Cookie", cookie.toString())
             }.apply {
-                assertEquals(HttpStatusCode.OK, response.status())
-                assertTrue(Arrays.equals(jpeg, response.byteContent))
-                // SLETTER OPPLASTET VEDLEGG
-                handleRequest(HttpMethod.Delete, path) {
-                    addHeader("Cookie", cookie.toString())
-                }.apply {
-                    assertEquals(HttpStatusCode.NoContent, response.status())
-                    // VERIFISERER AT VEDLEGG ER SLETTET
-                    handleRequest(HttpMethod.Get, path) {
-                        addHeader("Cookie", cookie.toString())
-                    }.apply {
-                        assertEquals(HttpStatusCode.NotFound, response.status())
-                    }
-                }
+                assertEquals(HttpStatusCode.NoContent, response.status())
             }
         }
     }
