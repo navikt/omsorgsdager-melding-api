@@ -33,7 +33,7 @@ import java.time.Duration
 
 class K9MellomlagringGateway(
     private val accessTokenClient: AccessTokenClient,
-    private val lagreDokumentScopes: Set<String>,
+    private val persistereDokumentScope: Set<String>,
     baseUrl : URI
 ): HealthCheck {
 
@@ -54,10 +54,10 @@ class K9MellomlagringGateway(
 
     override suspend fun check(): Result {
         return try {
-            accessTokenClient.getAccessToken(lagreDokumentScopes)
+            accessTokenClient.getAccessToken(persistereDokumentScope)
             Healthy("K9MellomlagringGateway", "Henting av access token for å persistere vedlegg.")
         } catch (cause: Throwable) {
-            logger.error("Feil ved henting av access token for å legge søknad til prosessering", cause)
+            logger.error("Feil ved henting av access token for å persistere vedlegg", cause)
             UnHealthy("K9MellomlagringGateway", "Henting av access token for å persistere vedlegg.")
         }
     }
@@ -161,7 +161,7 @@ class K9MellomlagringGateway(
         callId: CallId,
         eier: DokumentEier
     ) {
-        val authorizationHeader: String = cachedAccessTokenClient.getAccessToken(lagreDokumentScopes).asAuthoriationHeader()
+        val authorizationHeader: String = cachedAccessTokenClient.getAccessToken(persistereDokumentScope).asAuthoriationHeader()
 
         coroutineScope {
             val deferred = mutableListOf<Deferred<Unit>>()

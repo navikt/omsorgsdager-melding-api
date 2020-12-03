@@ -12,7 +12,7 @@
 * [6. Drift og støtte](#11-drift-og-sttte)
 
 # 1. Kontekst
-API for koronaoverføring, deling og fordeling av dager
+API for koronaoverføring, overføring og fordeling av dager
 
 # 2. Funksjonelle Krav
 Denne tjenesten understøtter søknadsprosessen, samt eksponerer endepunkt for innsending av melding.
@@ -32,81 +32,23 @@ omsorgsdager-melding-prosessering konsumerer.
 }
 ```
 
-**POST @/soknad/valider --> 202 respons ved gyldig søknad, ellers 400 og liste over feil. Kan brukes før innsending for å sjekke om søknaden er gyldig**
+**POST @/melding/koronaoverforing --> 202 repons ved gyldig melding om koronaoverføring av omsorgsdager**
 
-**POST @/soknad --> 202 respons ved gyldig søknad. Eventuelt tilbake 400 og liste over valideringsbrudd.**
+**POST @/melding/overforing --> 202 repons ved gyldig melding om overføring av omsorgsdager**
+
+**POST @/melding/fordeling --> 202 repons ved gyldig melding om fordeling av omsorgsdager**
+
+Ved valideringsfeil får man tilbake 400 og liste over valideringsbrudd.
 
 **Validering**
 * harForståttRettigheterOgPliker og harBekreftetOpplysninger må være true
 * Alle bolske verdier hvor vi tillater true og false blir satt til null dersom noe går falt ved deserialisering, for å unngå default false.
-Valideringen sjekker dette og gir feil dersom en bolsk verdi er null.
-* AnnenForelder:
-  * Navn kan ikke være tom eller kun whitespaces.
-  * fnr må være gyldig.
-  * situasjon
-    * INNLAGT_I_HELSEINSTITUSJON --> vetLengdePåInnleggelseperioden må være satt. Basert på det valideres enten at 
-    periodeFraOgMed og periodeTilOgMed er satt, og at fraOgMed er før tilOgMed, eller at periodeOver6Måneder er satt. 
-    Satt = ikke null
-    * UTØVER_VERNEPLIKT og FENGSEL --> Valider dato som beskrevet over.
-    * SYKDOM og ANNET --> Validerer at validerSituasjonBeskrivelse ikke er tom, blank eller null, og dato som beskrevet over.
-  * antallBarn må være minimum 1
-  * fødselsårBarn kan ikke inneholde verdi høyere enn årstallet vi er i.
-* Medlemskap:
-  * harBoddIUtlandetSiste12Mnd må være satt til true eller false
-  * Hvis harBoddIUtlandetSiste12Mnd er true så må utenlandsoppholdSiste12Mnd inneholde elementer.
-  * Hvis harBoddIUtlandetSiste12Mnd er false så må utenlandsoppholdSiste12Mnd være tom.
-  * skalBoIUtlandetNeste12Mnd må være satt til true eller false
-  * Hvis skalBoIUtlandetNeste12Mnd er true så må utenlandsoppholdNeste12Mnd inneholde elementer.
-  * Hvis skalBoIUtlandetNeste12Mnd er false så må utenlandsoppholdNeste12Mnd være tom.
 
 Eksempel json;
 ```
 {
   "id": "123456789",
   "språk": "nb",
-  "arbeidssituasjon": [
-    "FRILANSER"
-  ],
-  "annenForelder": {
-    "navn": "Berit",
-    "fnr": "02119970078",
-    "situasjon": "FENGSEL",
-    "situasjonBeskrivelse": "Sitter i fengsel..",
-    "periodeOver6Måneder": null,
-    "periodeFraOgMed": "2020-01-01",
-    "periodeTilOgMed": "2020-10-01"
-  },
-  "antallBarn": 2,
-  "fødselsårBarn": [
-    2005,
-    2003
-  ],
-  "medlemskap": {
-    "harBoddIUtlandetSiste12Mnd": true,
-    "utenlandsoppholdSiste12Mnd": [
-      {
-        "fraOgMed": "2020-01-01",
-        "tilOgMed": "2020-01-10",
-        "landkode": "DE",
-        "landnavn": "Tyskland"
-      },
-      {
-        "fraOgMed": "2020-01-01",
-        "tilOgMed": "2020-01-10",
-        "landkode": "SWE",
-        "landnavn": "Sverige"
-      }
-    ],
-    "skalBoIUtlandetNeste12Mnd": true,
-    "utenlandsoppholdNeste12Mnd": [
-      {
-        "fraOgMed": "2020-10-01",
-        "tilOgMed": "2020-10-10",
-        "landkode": "BR",
-        "landnavn": "Brasil"
-      }
-    ]
-  },
   "harForståttRettigheterOgPlikter": true,
   "harBekreftetOpplysninger": true
 }

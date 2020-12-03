@@ -133,7 +133,7 @@ fun Application.omsorgpengermidlertidigaleneapi() {
         val k9MellomlagringGateway = K9MellomlagringGateway(
             baseUrl = configuration.getK9MellomlagringUrl(),
             accessTokenClient = accessTokenClientResolver.accessTokenClient(),
-            lagreDokumentScopes = configuration.getK9MellomlagringCScopes()
+            persistereDokumentScope = configuration.getK9MellomlagringCScopes()
         )
 
         val vedleggService = VedleggService(
