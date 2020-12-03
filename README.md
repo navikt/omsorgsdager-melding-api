@@ -32,6 +32,10 @@ omsorgsdager-melding-prosessering konsumerer.
 }
 ```
 
+**POST /vedlegg --> For å lagre vedlegg**
+
+**DELETE /vedlegg/{vedleggsid} --> For å slette vedlegg**
+
 **POST @/melding/koronaoverforing --> 202 repons ved gyldig melding om koronaoverføring av omsorgsdager**
 
 **POST @/melding/overforing --> 202 repons ved gyldig melding om overføring av omsorgsdager**

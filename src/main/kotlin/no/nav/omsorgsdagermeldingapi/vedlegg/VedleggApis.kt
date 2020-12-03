@@ -10,6 +10,8 @@ import io.ktor.response.*
 import io.ktor.routing.*
 import no.nav.helse.dusseldorf.ktor.core.DefaultProblemDetails
 import no.nav.helse.dusseldorf.ktor.core.respondProblemDetails
+import no.nav.omsorgsdagermeldingapi.felles.LAGRE_VEDLEGG
+import no.nav.omsorgsdagermeldingapi.felles.SLETTE_VEDLEGG
 import no.nav.omsorgsdagermeldingapi.general.auth.IdTokenProvider
 import no.nav.omsorgsdagermeldingapi.general.getCallId
 import org.slf4j.Logger
@@ -32,7 +34,7 @@ fun Route.vedleggApis(
     vedleggService: VedleggService,
     idTokenProvider: IdTokenProvider
 ) {
-    @Location("/vedlegg/{vedleggId}")
+    @Location(SLETTE_VEDLEGG)
     data class EksisterendeVedlegg(val vedleggId: String)
     delete<EksisterendeVedlegg> { eksisterendeVedlegg ->
         val vedleggId = VedleggId(eksisterendeVedlegg.vedleggId)
@@ -67,7 +69,7 @@ fun Route.vedleggApis(
     }
 
 
-    @Location("/vedlegg")
+    @Location(LAGRE_VEDLEGG)
     class NyttVedleg
     post<NyttVedleg> { _ ->
         logger.info("Lagrer vedlegg")
