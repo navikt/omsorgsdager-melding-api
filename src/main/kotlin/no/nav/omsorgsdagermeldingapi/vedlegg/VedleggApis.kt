@@ -60,12 +60,16 @@ fun Route.vedleggApis(
         val vedleggId = VedleggId(eksisterendeVedlegg.vedleggId)
         logger.info("Sletter vedlegg")
         logger.info("$vedleggId")
-        vedleggService.slettVedlegg(
-            vedleggId = vedleggId,
-            idToken = idTokenProvider.getIdToken(call),
-            callId = call.getCallId()
-        )
-        call.respond(HttpStatusCode.NoContent)
+        var eier = idTokenProvider.getIdToken(call).getSubject()
+        if(eier == null) call.respond(HttpStatusCode.Forbidden) else { //TODO Hva er riktig å returnere?
+            vedleggService.slettVedlegg(
+                vedleggId = vedleggId,
+                idToken = idTokenProvider.getIdToken(call),
+                callId = call.getCallId(),
+                eier = DokumentEier(eier)
+            )
+            call.respond(HttpStatusCode.NoContent)
+        }
     }
 
     @Location("/vedlegg")

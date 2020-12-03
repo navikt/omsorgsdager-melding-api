@@ -62,19 +62,22 @@ class VedleggService(
     suspend fun slettVedlegg(
         vedleggId: VedleggId,
         idToken: IdToken,
-        callId: CallId
+        callId: CallId,
+        eier: DokumentEier
     ) {
         k9MellomlagringGateway.slettVedlegg(
             vedleggId = vedleggId,
             idToken = idToken,
-            callId = callId
+            callId = callId,
+            eier = eier
         )
     }
 
     suspend fun slettVedlegg(
         vedleggUrls: List<URL>,
         idToken: IdToken,
-        callId: CallId
+        callId: CallId,
+        eier: DokumentEier
     ) {
         coroutineScope {
             val futures = mutableListOf<Deferred<Unit>>()
@@ -82,7 +85,8 @@ class VedleggService(
                 futures.add(async { slettVedlegg(
                     vedleggId = vedleggIdFromUrl(it),
                     idToken = idToken,
-                    callId = callId
+                    callId = callId,
+                    eier = eier
                 )})
 
             }

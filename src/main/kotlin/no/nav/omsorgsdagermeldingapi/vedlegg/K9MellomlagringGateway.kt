@@ -128,8 +128,10 @@ class K9MellomlagringGateway(
     suspend fun slettVedlegg(
         vedleggId: VedleggId,
         idToken: IdToken,
-        callId: CallId
+        callId: CallId,
+        eier: DokumentEier
     ) : Boolean {
+        val body = objectMapper.writeValueAsBytes(eier)
 
         val urlMedId = Url.buildURL(
             baseUrl = url,
@@ -139,6 +141,7 @@ class K9MellomlagringGateway(
         val httpRequest = urlMedId
             .toString()
             .httpDelete()
+            .body(body)
             .header(
                 HttpHeaders.Authorization to "Bearer ${idToken.value}",
                 HttpHeaders.XCorrelationId to callId.value
