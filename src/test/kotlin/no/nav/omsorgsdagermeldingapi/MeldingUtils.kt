@@ -29,18 +29,18 @@ object MeldingUtils {
                 aktørId = "1000000000001"
             )
         ),
-        type = Meldingstype.KORONA_OVERFØRE
+        type = Meldingstype.KORONA
     )
 
     val gyldigMeldingKoronaoverføre = gyldigMeldingMal.copy(
-        type = Meldingstype.KORONA_OVERFØRE,
+        type = Meldingstype.KORONA,
         korona = Koronaoverføre(
             antallDagerSomSkalOverføres = 5
         )
     )
 
     val gyldigMeldingOverføre = gyldigMeldingMal.copy(
-        type = Meldingstype.OVERFØRE,
+        type = Meldingstype.OVERFORING,
         overføring = Overføre(
             mottakerType = Mottaker.EKTEFELLE,
             antallDagerSomSkalOverføres = 7
@@ -48,7 +48,7 @@ object MeldingUtils {
     )
 
     val gyldigMeldingFordele = gyldigMeldingMal.copy(
-        type = Meldingstype.FORDELE,
+        type = Meldingstype.FORDELING,
         fordeling = Fordele(
             mottakerType = Mottaker.SAMVÆRSFORELDER,
             samværsavtale = listOf(URL("http://localhost:8080/vedlegg/1"))

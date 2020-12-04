@@ -86,9 +86,9 @@ internal fun Melding.valider() {
     barn.forEachIndexed { index, barnUtvidet ->  mangler.addAll(barnUtvidet.valider(index))}
 
     when(type){
-        Meldingstype.KORONA_OVERFØRE -> mangler.addAll(validerKoronaOverføre())
-        Meldingstype.OVERFØRE -> mangler.addAll(validerOverføre())
-        Meldingstype.FORDELE -> mangler.addAll(validerFordele())
+        Meldingstype.KORONA -> mangler.addAll(validerKoronaOverføre())
+        Meldingstype.OVERFORING -> mangler.addAll(validerOverføre())
+        Meldingstype.FORDELING -> mangler.addAll(validerFordele())
     }
 
     mangler.addAll(nullSjekk(harAleneomsorg, "harAleneomsorg"))

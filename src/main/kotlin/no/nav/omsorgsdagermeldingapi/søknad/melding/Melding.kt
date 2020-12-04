@@ -81,7 +81,7 @@ enum class Arbeidssituasjon(){
 }
 
 enum class Meldingstype(){
-    @JsonAlias("koronaoverføring") KORONA_OVERFØRE,
-    @JsonAlias("overføring") OVERFØRE,
-    @JsonAlias("fordeling") FORDELE
+    @JsonAlias("koronaoverføring") KORONA,
+    @JsonAlias("overføring") OVERFORING,
+    @JsonAlias("fordeling") FORDELING
 }

@@ -197,7 +197,7 @@ internal class MeldingValideringsTest {
     @Test(expected = Throwblem::class)
     fun `Skal feile type er KORONA_OVERFØRE men korona er null`(){
         val melding = MeldingUtils.gyldigMeldingKoronaoverføre.copy(
-            type = Meldingstype.KORONA_OVERFØRE,
+            type = Meldingstype.KORONA,
             korona = null
         )
         melding.valider()
@@ -206,7 +206,7 @@ internal class MeldingValideringsTest {
     @Test(expected = Throwblem::class)
     fun `Skal feile type er KORONA_OVERFØRE men antallDagerSomSkalOverføres er under MIN_ANTALL_DAGER_MAN_KAN_OVERFØRE `(){
         val melding = MeldingUtils.gyldigMeldingKoronaoverføre.copy(
-            type = Meldingstype.KORONA_OVERFØRE,
+            type = Meldingstype.KORONA,
             korona = Koronaoverføre(
                 antallDagerSomSkalOverføres = 0
             )
@@ -224,7 +224,7 @@ internal class MeldingValideringsTest {
     @Test(expected = Throwblem::class)
     fun `Skal feile hvis type er OVERFØRE men overføring er null`(){
         val melding = MeldingUtils.gyldigMeldingOverføre.copy(
-            type = Meldingstype.OVERFØRE,
+            type = Meldingstype.OVERFORING,
             overføring = null
         )
         melding.valider()
@@ -233,7 +233,7 @@ internal class MeldingValideringsTest {
     @Test(expected = Throwblem::class)
     fun `Skal feile hvis type er OVERFØRE men antallDagerSomSkalOverføres er under MIN_ANTALL_DAGER_MAN_KAN_OVERFØRE `(){
         val melding = MeldingUtils.gyldigMeldingOverføre.copy(
-            type = Meldingstype.OVERFØRE,
+            type = Meldingstype.OVERFORING,
             overføring = Overføre(
                 mottakerType = Mottaker.SAMBOER,
                 antallDagerSomSkalOverføres = 0
@@ -245,7 +245,7 @@ internal class MeldingValideringsTest {
     @Test(expected = Throwblem::class)
     fun `Skal feile hvis type er OVERFØRE men mottakerType er samværsforelder `(){
         val melding = MeldingUtils.gyldigMeldingOverføre.copy(
-            type = Meldingstype.OVERFØRE,
+            type = Meldingstype.OVERFORING,
             overføring = Overføre(
                 mottakerType = Mottaker.SAMVÆRSFORELDER,
                 antallDagerSomSkalOverføres = 1
@@ -264,7 +264,7 @@ internal class MeldingValideringsTest {
     @Test(expected = Throwblem::class)
     fun `Skal feile hvis type er FORDELE men fordeling er null`(){
         val melding = MeldingUtils.gyldigMeldingFordele.copy(
-            type = Meldingstype.FORDELE,
+            type = Meldingstype.FORDELING,
             fordeling = null
         )
         melding.valider()
@@ -273,7 +273,7 @@ internal class MeldingValideringsTest {
     @Test(expected = Throwblem::class)
     fun `Skal feile hvis type er FORDELE men mottakerType ikke er samværsforelder`(){
         val melding = MeldingUtils.gyldigMeldingFordele.copy(
-            type = Meldingstype.FORDELE,
+            type = Meldingstype.FORDELING,
             fordeling = Fordele(
                 mottakerType = Mottaker.SAMBOER,
                 samværsavtale = listOf(URL("http://localhost:8080/vedlegg/1"))
@@ -285,7 +285,7 @@ internal class MeldingValideringsTest {
     @Test(expected = Throwblem::class)
     fun `Skal feile hvis type er FORDELE men samværsavtale er tom`(){
         val melding = MeldingUtils.gyldigMeldingFordele.copy(
-            type = Meldingstype.FORDELE,
+            type = Meldingstype.FORDELING,
             fordeling = Fordele(
                 mottakerType = Mottaker.SAMVÆRSFORELDER,
                 samværsavtale = listOf()
