@@ -21,12 +21,12 @@ object MeldingUtils {
         antallDagerBruktIÅr = 1,
         barn = listOf(
             BarnUtvidet(
-                identitetsnummer = "02047816826",
                 navn = "Kjell",
+                identitetsnummer = "16012099359",
                 aleneOmOmsorgen = true,
                 utvidetRett = true,
                 fødselsdato = LocalDate.parse("2020-01-01"),
-                aktørId = "12345"
+                aktørId = "1000000000001"
             )
         ),
         type = Meldingstype.KORONA_OVERFØRE

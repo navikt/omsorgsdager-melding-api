@@ -4,6 +4,7 @@ import no.nav.helse.dusseldorf.ktor.core.Throwblem
 import no.nav.omsorgsdagermeldingapi.søknad.melding.*
 import org.junit.Test
 import java.net.URL
+import java.time.LocalDate
 import kotlin.test.assertTrue
 
 internal class MeldingValideringsTest {
@@ -89,6 +90,99 @@ internal class MeldingValideringsTest {
     fun `Skal feile dersom arbeidssituasjon er tom`(){
         val melding = MeldingUtils.gyldigMeldingKoronaoverføre.copy(
             arbeidssituasjon = listOf()
+        )
+        melding.valider()
+    }
+
+    @Test(expected = Throwblem::class)
+    fun `Skal feile dersom barn er en tom liste`(){
+        val melding = MeldingUtils.gyldigMeldingKoronaoverføre.copy(
+            barn = listOf()
+        )
+        melding.valider()
+    }
+
+    @Test(expected = Throwblem::class)
+    fun `Skal feile dersom barn ikke har identitetsnummer`(){
+        val melding = MeldingUtils.gyldigMeldingKoronaoverføre.copy(
+            barn = listOf(
+                BarnUtvidet(
+                    navn = "Kjell",
+                    identitetsnummer = null,
+                    aleneOmOmsorgen = true,
+                    utvidetRett = true,
+                    fødselsdato = LocalDate.parse("2020-01-01"),
+                    aktørId = "1000000000001"
+                )
+            )
+        )
+        melding.valider()
+    }
+
+    @Test(expected = Throwblem::class)
+    fun `Skal feile dersom barn identitetsnummer er ugyldig`(){
+        val melding = MeldingUtils.gyldigMeldingKoronaoverføre.copy(
+            barn = listOf(
+                BarnUtvidet(
+                    navn = "Kjell",
+                    identitetsnummer = "ikke gyldig",
+                    aleneOmOmsorgen = true,
+                    utvidetRett = true,
+                    fødselsdato = LocalDate.parse("2020-01-01"),
+                    aktørId = "1000000000001"
+                )
+            )
+        )
+        melding.valider()
+    }
+
+    @Test(expected = Throwblem::class)
+    fun `Skal feile dersom barn navn er ugyldig`(){
+        val melding = MeldingUtils.gyldigMeldingKoronaoverføre.copy(
+            barn = listOf(
+                BarnUtvidet(
+                    navn = " ",
+                    identitetsnummer = "16012099359",
+                    aleneOmOmsorgen = true,
+                    utvidetRett = true,
+                    fødselsdato = LocalDate.parse("2020-01-01"),
+                    aktørId = "1000000000001"
+                )
+            )
+        )
+        melding.valider()
+    }
+
+    @Test(expected = Throwblem::class)
+    fun `Skal feile dersom barn aleneOmOmsorgen er null`(){
+        val melding = MeldingUtils.gyldigMeldingKoronaoverføre.copy(
+            barn = listOf(
+                BarnUtvidet(
+                    navn = "Kjell",
+                    identitetsnummer = "16012099359",
+                    aleneOmOmsorgen = null,
+                    utvidetRett = true,
+                    fødselsdato = LocalDate.parse("2020-01-01"),
+                    aktørId = "1000000000001"
+                )
+            )
+        )
+        melding.valider()
+    }
+
+    @Test(expected = Throwblem::class)
+    fun `Skal feile dersom barn utvidetRett er null`(){
+        val melding = MeldingUtils.gyldigMeldingKoronaoverføre.copy(
+            barn = listOf(
+                BarnUtvidet(
+                    navn = "Kjell",
+                    identitetsnummer = "16012099359",
+                    aleneOmOmsorgen = true,
+                    utvidetRett = null,
+                    fødselsdato = LocalDate.parse("2020-01-01"),
+                    aktørId = "1000000000001"
+                )
+            )
         )
         melding.valider()
     }

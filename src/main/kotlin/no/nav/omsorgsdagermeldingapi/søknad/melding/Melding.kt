@@ -1,6 +1,7 @@
 package no.nav.omsorgsdagermeldingapi.søknad.melding
 
 import com.fasterxml.jackson.annotation.JsonAlias
+import no.nav.omsorgsdagermeldingapi.barn.Barn
 import no.nav.omsorgsdagermeldingapi.søker.Søker
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
@@ -27,6 +28,15 @@ data class Melding(
     val overføring: Overføre? = null,
     val fordeling: Fordele? = null
 ) {
+
+    fun oppdaterBarnMedFnr(listeOverBarn: List<Barn>){
+        barn.forEach { barn ->
+            if(barn.manglerIdentitetsnummer()){
+                barn oppdaterIdentitetsnummerMed listeOverBarn.hentIdentitetsnummerForBarn(barn.aktørId)
+            }
+        }
+    }
+
     fun tilKomplettMelding(søker: Søker): KomplettMelding = KomplettMelding(
         mottatt = ZonedDateTime.now(ZoneOffset.UTC),
         søker = søker,
@@ -49,6 +59,13 @@ data class Melding(
         overføring = overføring,
         fordeling = fordeling
     )
+}
+
+private fun List<Barn>.hentIdentitetsnummerForBarn(aktørId: String?): String?{
+    this.forEach {
+        if(it.aktørId == aktørId) return it.identitetsnummer
+    }
+    return null
 }
 
 enum class Mottaker() {

@@ -11,7 +11,7 @@ internal val vekttallProviderFnr1: (Int) -> Int = { arrayOf(3, 7, 6, 1, 8, 9, 4,
 internal val vekttallProviderFnr2: (Int) -> Int = { arrayOf(5, 4, 3, 2, 7, 6, 5, 4, 3, 2).reversedArray()[it] }
 private val fnrDateFormat = DateTimeFormatter.ofPattern("ddMMyy")
 
-internal val MAX_ANTALL_DAGER_MAN_KAN_OVERFØRE = 999
+internal val MAX_ANTALL_DAGER_MAN_KAN_OVERFØRE = 10
 internal val MIN_ANTALL_DAGER_MAN_KAN_OVERFØRE = 1
 
 internal fun Melding.valider() {
@@ -71,6 +71,19 @@ internal fun Melding.valider() {
             )
         )
     }
+
+    if(barn.isEmpty()){
+        mangler.add(
+            Violation(
+                parameterName = "barn",
+                parameterType = ParameterType.ENTITY,
+                reason = "barn kan ikke være en tom liste",
+                invalidValue = barn
+            )
+        )
+    }
+
+    barn.forEachIndexed { index, barnUtvidet ->  mangler.addAll(barnUtvidet.valider(index))}
 
     when(type){
         Meldingstype.KORONA_OVERFØRE -> mangler.addAll(validerKoronaOverføre())

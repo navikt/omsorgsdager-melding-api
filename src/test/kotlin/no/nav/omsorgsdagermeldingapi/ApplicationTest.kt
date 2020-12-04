@@ -13,6 +13,7 @@ import no.nav.helse.getAuthCookie
 import no.nav.omsorgsdagermeldingapi.felles.*
 import no.nav.omsorgsdagermeldingapi.kafka.Topics
 import no.nav.omsorgsdagermeldingapi.redis.RedisMockUtil
+import no.nav.omsorgsdagermeldingapi.søknad.melding.BarnUtvidet
 import no.nav.omsorgsdagermeldingapi.wiremock.*
 import org.json.JSONObject
 import org.junit.AfterClass
@@ -20,6 +21,7 @@ import org.junit.BeforeClass
 import org.skyscreamer.jsonassert.JSONAssert
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.time.LocalDate
 import java.util.*
 import kotlin.test.*
 
@@ -284,6 +286,35 @@ class ApplicationTest {
 
         val søknadSendtTilProsessering = hentMeldingSendtTilProsessering(søknadID)
         verifiserAtInnholdetErLikt(JSONObject(søknad), søknadSendtTilProsessering)
+    }
+
+    @Test
+    fun `Teste at identitetsnummer blir satt på barn etter innsending`(){
+        val søknadID = UUID.randomUUID().toString()
+        val søknad = MeldingUtils.gyldigMeldingOverføre.copy(
+            søknadId = søknadID,
+            barn = listOf(
+                BarnUtvidet(
+                    navn = "Kjell",
+                    aleneOmOmsorgen = true,
+                    utvidetRett = true,
+                    fødselsdato = LocalDate.parse("2020-01-01"),
+                    aktørId = "1000000000001"
+                )
+            )
+        ).somJson()
+
+        requestAndAssert(
+            httpMethod = HttpMethod.Post,
+            path = MELDING_URL_OVERFØRE,
+            expectedResponse = null,
+            expectedCode = HttpStatusCode.Accepted,
+            requestEntity = søknad
+        )
+
+        val meldingSendtTilProsessering = hentMeldingSendtTilProsessering(søknadID)
+        val barn = meldingSendtTilProsessering.getJSONArray("barn").getJSONObject(0)
+        JSONAssert.assertEquals(barn.getString("identitetsnummer"), "16012099359", true)
     }
 
     //Fordeling

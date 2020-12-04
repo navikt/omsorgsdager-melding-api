@@ -6,6 +6,7 @@ import io.ktor.locations.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
+import no.nav.omsorgsdagermeldingapi.barn.BarnService
 import no.nav.omsorgsdagermeldingapi.felles.MELDING_URL_FORDELE
 import no.nav.omsorgsdagermeldingapi.felles.MELDING_URL_KORONAOVERFØRE
 import no.nav.omsorgsdagermeldingapi.felles.MELDING_URL_OVERFØRE
@@ -23,7 +24,8 @@ private val logger: Logger = LoggerFactory.getLogger("nav.soknadApis")
 @KtorExperimentalLocationsAPI
 fun Route.søknadApis(
     søknadService: SøknadService,
-    idTokenProvider: IdTokenProvider
+    idTokenProvider: IdTokenProvider,
+    barnService: BarnService
 ) {
 
     @Location(MELDING_URL_KORONAOVERFØRE)
@@ -32,17 +34,22 @@ fun Route.søknadApis(
         logger.info("Mottatt ny melding om koronaoverføring av omsorgsdager.")
 
         logger.trace("Mapper melding")
-        val søknad = call.receive<Melding>()
+        val melding = call.receive<Melding>()
         logger.trace("Melding mappet.")
 
+        logger.trace("Oppdaterer barn med identitetsnummer")
+        val listeOverBarnMedFnr = barnService.hentNåværendeBarn(idTokenProvider.getIdToken(call), call.getCallId())
+        melding.oppdaterBarnMedFnr(listeOverBarnMedFnr)
+        logger.info("Oppdatering av identitetsnummer på barn OK")
+
         logger.trace("Validerer melding")
-        søknad.valider()
+        melding.valider()
         logger.trace("Validering OK.")
 
-        logger.info(formaterStatuslogging(søknad.søknadId, "validert OK"))
+        logger.info(formaterStatuslogging(melding.søknadId, "validert OK"))
 
         søknadService.registrer(
-            melding = søknad,
+            melding = melding,
             metadata = call.metadata(),
             callId = call.getCallId(),
             idToken = idTokenProvider.getIdToken(call)
@@ -57,17 +64,22 @@ fun Route.søknadApis(
         logger.info("Mottatt ny melding om overføring av omsorgsdager.")
 
         logger.trace("Mapper melding")
-        val søknad = call.receive<Melding>()
+        val melding = call.receive<Melding>()
         logger.trace("Melding mappet.")
 
+        logger.trace("Oppdaterer barn med identitetsnummer")
+        val listeOverBarnMedFnr = barnService.hentNåværendeBarn(idTokenProvider.getIdToken(call), call.getCallId())
+        melding.oppdaterBarnMedFnr(listeOverBarnMedFnr)
+        logger.info("Oppdatering av identitetsnummer på barn OK")
+
         logger.trace("Validerer melding")
-        søknad.valider()
+        melding.valider()
         logger.trace("Validering OK.")
 
-        logger.info(formaterStatuslogging(søknad.søknadId, "validert OK"))
+        logger.info(formaterStatuslogging(melding.søknadId, "validert OK"))
 
         søknadService.registrer(
-            melding = søknad,
+            melding = melding,
             metadata = call.metadata(),
             callId = call.getCallId(),
             idToken = idTokenProvider.getIdToken(call)
@@ -83,19 +95,24 @@ fun Route.søknadApis(
         logger.info("Mottatt ny melding om fordeling av omsorgsdager.")
 
         logger.trace("Mapper melding")
-        val søknad = call.receive<Melding>()
+        val melding = call.receive<Melding>()
         logger.trace("Melding mappet.")
 
+        logger.trace("Oppdaterer barn med identitetsnummer")
+        val listeOverBarnMedFnr = barnService.hentNåværendeBarn(idTokenProvider.getIdToken(call), call.getCallId())
+        melding.oppdaterBarnMedFnr(listeOverBarnMedFnr)
+        logger.info("Oppdatering av identitetsnummer på barn OK")
+
         logger.trace("Validerer melding")
-        søknad.valider()
+        melding.valider()
         logger.trace("Validering OK.")
 
-        logger.info(formaterStatuslogging(søknad.søknadId, "validert OK"))
+        logger.info(formaterStatuslogging(melding.søknadId, "validert OK"))
 
         //TODO Her må samværsavtale loopes gjennom og sette hold på alle vedleggene.
 
         søknadService.registrer(
-            melding = søknad,
+            melding = melding,
             metadata = call.metadata(),
             callId = call.getCallId(),
             idToken = idTokenProvider.getIdToken(call)
