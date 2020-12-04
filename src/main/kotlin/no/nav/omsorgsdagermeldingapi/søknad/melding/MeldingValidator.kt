@@ -11,6 +11,9 @@ internal val vekttallProviderFnr1: (Int) -> Int = { arrayOf(3, 7, 6, 1, 8, 9, 4,
 internal val vekttallProviderFnr2: (Int) -> Int = { arrayOf(5, 4, 3, 2, 7, 6, 5, 4, 3, 2).reversedArray()[it] }
 private val fnrDateFormat = DateTimeFormatter.ofPattern("ddMMyy")
 
+internal val MAX_ANTALL_DAGER_MAN_KAN_OVERFØRE = 999
+internal val MIN_ANTALL_DAGER_MAN_KAN_OVERFØRE = 1
+
 internal fun Melding.valider() {
     val mangler: MutableSet<Violation> = mutableSetOf()
 
@@ -35,6 +38,50 @@ internal fun Melding.valider() {
             )
         )
     }
+
+    if(mottakerNavn.isNullOrBlank()){
+        mangler.add(
+            Violation(
+                parameterName = "mottakerNavn",
+                parameterType = ParameterType.ENTITY,
+                reason = "mottakerNavn kan ikke være null, tom eller bare mellomrom",
+                invalidValue = mottakerNavn
+            )
+        )
+    }
+
+    if(mottakerFnr.erGyldigNorskIdentifikator() er false){
+        mangler.add(
+            Violation(
+                parameterName = "mottakerFnr",
+                parameterType = ParameterType.ENTITY,
+                reason = "mottakerFnr må være gyldig norsk identifikator",
+                invalidValue = mottakerFnr
+            )
+        )
+    }
+
+    if(arbeidssituasjon.isEmpty()){
+        mangler.add(
+            Violation(
+                parameterName = "arbeidssituasjon",
+                parameterType = ParameterType.ENTITY,
+                reason = "arbeidssituasjon kan ikke være en tom liste",
+                invalidValue = arbeidssituasjon
+            )
+        )
+    }
+
+    when(type){
+        Meldingstype.KORONA_OVERFØRE -> mangler.addAll(validerKoronaOverføre())
+        Meldingstype.OVERFØRE -> mangler.addAll(validerOverføre())
+        Meldingstype.FORDELE -> mangler.addAll(validerFordele())
+    }
+
+    mangler.addAll(nullSjekk(harAleneomsorg, "harAleneomsorg"))
+    mangler.addAll(nullSjekk(harUtvidetRett, "harUtvidetRett"))
+    mangler.addAll(nullSjekk(erYrkesaktiv, "erYrkesaktiv"))
+    mangler.addAll(nullSjekk(arbeiderINorge, "arbeiderINorge"))
 
     if (mangler.isNotEmpty()) {
         throw Throwblem(ValidationProblemDetails(mangler))
@@ -62,7 +109,7 @@ fun String.starterMedFodselsdato(): Boolean {
     }
 }
 
-fun String.gyldigNorskIdentifikator(): Boolean {
+fun String.erGyldigNorskIdentifikator(): Boolean {
     if (length != 11 || !erKunSiffer() || !starterMedFodselsdato()) return false
 
     val forventetKontrollsifferEn = get(9)

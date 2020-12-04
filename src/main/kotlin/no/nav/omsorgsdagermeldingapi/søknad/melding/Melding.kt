@@ -2,7 +2,6 @@ package no.nav.omsorgsdagermeldingapi.søknad.melding
 
 import com.fasterxml.jackson.annotation.JsonAlias
 import no.nav.omsorgsdagermeldingapi.søker.Søker
-import java.net.URL
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.util.*
@@ -15,12 +14,13 @@ data class Melding(
     val harBekreftetOpplysninger: Boolean,
     val mottakerFnr: String,
     val mottakerNavn: String,
-    val harAleneomsorg: Boolean,
-    val harUtvidetRett: Boolean,
-    val erYrkesaktiv: Boolean,
-    val arbeiderINorge: Boolean,
+    val harAleneomsorg: Boolean? = null,
+    val harUtvidetRett: Boolean? = null,
+    val erYrkesaktiv: Boolean? = null,
+    val arbeiderINorge: Boolean? = null,
     val arbeidssituasjon: List<Arbeidssituasjon>,
-    val antallDagerBruktEtter1Juli: Int,
+    @JsonAlias("antallDagerBruktEtter1Juli")
+    val antallDagerBruktIÅr: Int? = null,
     val barn: List<BarnUtvidet>,
     val type: Meldingstype,
     val korona: Koronaoverføre? = null,
@@ -37,12 +37,12 @@ data class Melding(
         harForståttRettigheterOgPlikter = harForståttRettigheterOgPlikter,
         mottakerFnr = mottakerFnr,
         mottakerNavn = mottakerNavn,
-        harUtvidetRett = harUtvidetRett,
-        harAleneomsorg = harAleneomsorg,
-        erYrkesaktiv = erYrkesaktiv,
-        arbeiderINorge = arbeiderINorge,
+        harUtvidetRett = harUtvidetRett!!,
+        harAleneomsorg = harAleneomsorg!!,
+        erYrkesaktiv = erYrkesaktiv!!,
+        arbeiderINorge = arbeiderINorge!!,
         arbeidssituasjon = arbeidssituasjon,
-        antallDagerBruktEtter1Juli = antallDagerBruktEtter1Juli,
+        antallDagerBruktIÅr = antallDagerBruktIÅr,
         barn = barn,
         type = type,
         korona = korona,
@@ -50,20 +50,6 @@ data class Melding(
         fordeling = fordeling
     )
 }
-
-data class Koronaoverføre(
-    val antallDagerSomSkalOverføres: Int
-)
-
-data class Overføre(
-    val mottakerType: Mottaker,
-    val antallDagerSomSkalOverføres: Int
-)
-
-data class Fordele(
-    val mottakerType: Mottaker,
-    val samværsavtale: List<URL>? = null
-)
 
 enum class Mottaker() {
     @JsonAlias("ektefelle") EKTEFELLE,

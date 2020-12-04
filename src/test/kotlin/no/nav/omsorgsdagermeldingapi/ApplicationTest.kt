@@ -17,7 +17,6 @@ import no.nav.omsorgsdagermeldingapi.wiremock.*
 import org.json.JSONObject
 import org.junit.AfterClass
 import org.junit.BeforeClass
-import org.junit.Ignore
 import org.skyscreamer.jsonassert.JSONAssert
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -25,6 +24,7 @@ import java.util.*
 import kotlin.test.*
 
 private const val gyldigFodselsnummerA = "290990123456"
+private const val gyldigFodselsnummerB = "25118921464"
 private const val ikkeMyndigFnr = "12125012345"
 
 @KtorExperimentalAPI
@@ -212,7 +212,6 @@ class ApplicationTest {
     }
 
     @Test
-    @Ignore //TODO Finne ut hvorfor denne feiler ved felleskjøring
     fun `Feil ved henting av barn skal returnere tom liste`() {
         wireMockServer.stubK9OppslagBarn(simulerFeil = true)
         requestAndAssert(
@@ -224,7 +223,7 @@ class ApplicationTest {
                 "barn": []
             }
             """.trimIndent(),
-            cookie = getAuthCookie(gyldigFodselsnummerA)
+            cookie = getAuthCookie(gyldigFodselsnummerB)
         )
         wireMockServer.stubK9OppslagBarn()
     }
@@ -243,7 +242,7 @@ class ApplicationTest {
             requestEntity = søknad
         )
 
-        val søknadSendtTilProsessering = hentSøknadSendtTilProsessering(søknadID)
+        val søknadSendtTilProsessering = hentMeldingSendtTilProsessering(søknadID)
         verifiserAtInnholdetErLikt(JSONObject(søknad), søknadSendtTilProsessering)
     }
 
@@ -283,7 +282,7 @@ class ApplicationTest {
             requestEntity = søknad
         )
 
-        val søknadSendtTilProsessering = hentSøknadSendtTilProsessering(søknadID)
+        val søknadSendtTilProsessering = hentMeldingSendtTilProsessering(søknadID)
         verifiserAtInnholdetErLikt(JSONObject(søknad), søknadSendtTilProsessering)
     }
 
@@ -301,7 +300,7 @@ class ApplicationTest {
             requestEntity = søknad
         )
 
-        val søknadSendtTilProsessering = hentSøknadSendtTilProsessering(søknadID)
+        val søknadSendtTilProsessering = hentMeldingSendtTilProsessering(søknadID)
         verifiserAtInnholdetErLikt(JSONObject(søknad), søknadSendtTilProsessering)
     }
 
@@ -337,8 +336,8 @@ class ApplicationTest {
         return respons
     }
 
-    private fun hentSøknadSendtTilProsessering(soknadId: String): JSONObject {
-        return kafkaTestConsumer.hentSøknad(soknadId, topic = Topics.MOTTATT_OMSORGSDAGER_MELDING).data
+    private fun hentMeldingSendtTilProsessering(soknadId: String): JSONObject {
+        return kafkaTestConsumer.hentMelding(soknadId, topic = Topics.MOTTATT_OMSORGSDAGER_MELDING).data
     }
 
     private fun verifiserAtInnholdetErLikt(

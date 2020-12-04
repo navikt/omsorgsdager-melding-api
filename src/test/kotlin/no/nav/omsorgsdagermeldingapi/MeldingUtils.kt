@@ -18,7 +18,7 @@ object MeldingUtils {
         erYrkesaktiv = true,
         arbeiderINorge = true,
         arbeidssituasjon = listOf(Arbeidssituasjon.ARBEIDSTAKER, Arbeidssituasjon.SELVSTENDIG_NÆRINGSDRIVENDE),
-        antallDagerBruktEtter1Juli = 1,
+        antallDagerBruktIÅr = 1,
         barn = listOf(
             BarnUtvidet(
                 identitetsnummer = "02047816826",

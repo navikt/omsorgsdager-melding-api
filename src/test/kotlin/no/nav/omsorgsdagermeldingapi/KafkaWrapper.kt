@@ -53,7 +53,7 @@ internal fun KafkaEnvironment.testConsumer() : KafkaConsumer<String, TopicEntry<
     return consumer
 }
 
-internal fun KafkaConsumer<String, TopicEntry<JSONObject>>.hentSøknad(
+internal fun KafkaConsumer<String, TopicEntry<JSONObject>>.hentMelding(
     søknadId: String,
     maxWaitInSeconds: Long = 20,
     topic: String
@@ -70,7 +70,7 @@ internal fun KafkaConsumer<String, TopicEntry<JSONObject>>.hentSøknad(
             return entries.first().value()
         }
     }
-    throw IllegalStateException("Fant ikke opprettet oppgave for søknad $søknadId etter $maxWaitInSeconds sekunder.")
+    throw IllegalStateException("Fant ikke opprettet oppgave for melding med søknadsId $søknadId etter $maxWaitInSeconds sekunder.")
 }
 
 fun KafkaEnvironment.username() = username
