@@ -51,6 +51,24 @@ class K9MellomlagringResponseTransformer() : ResponseTransformer() {
                     .build()
 
             }
+
+            request.method == RequestMethod.PUT -> {
+                val vedleggId = VedleggId(UUID.randomUUID().toString())
+                Response.Builder.like(response)
+                    .status(201)
+                    .headers(HttpHeaders(
+                        HttpHeader.httpHeader("Location", "http://localhost:8080/v1/dokument/${vedleggId.value}"),
+                        HttpHeader.httpHeader("Content-Type", "application/json")
+                    ))
+                    .body("""
+                        {
+                            "id" : "${vedleggId.value}"
+                        }
+                    """.trimIndent())
+                    .build()
+
+            }
+
             request.method == RequestMethod.DELETE -> {
                 val vedleggId = request.getVedleggId()
                 if (storage.containsKey(vedleggId)) {

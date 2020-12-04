@@ -22,7 +22,7 @@ internal fun Melding.valider() {
             Violation(
                 parameterName = "harBekreftetOpplysninger",
                 parameterType = ParameterType.ENTITY,
-                reason = "Opplysningene må bekreftes for å sende inn søknad.",
+                reason = "Opplysningene må bekreftes for å sende inn melding.",
                 invalidValue = harBekreftetOpplysninger
             )
         )
@@ -33,7 +33,7 @@ internal fun Melding.valider() {
             Violation(
                 parameterName = "harForståttRettigheterOgPlikter",
                 parameterType = ParameterType.ENTITY,
-                reason = "Må ha forstått rettigheter og plikter for å sende inn søknad.",
+                reason = "Må ha forstått rettigheter og plikter for å sende inn melding.",
                 invalidValue = harForståttRettigheterOgPlikter
             )
         )

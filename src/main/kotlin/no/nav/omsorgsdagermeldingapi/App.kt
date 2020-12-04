@@ -185,7 +185,8 @@ fun Application.omsorgpengermidlertidigaleneapi() {
                     søkerService = søkerService,
                     kafkaProducer = søknadKafkaProducer
                 ),
-                barnService = barnService
+                barnService = barnService,
+                vedleggService = vedleggService
             )
         }
 

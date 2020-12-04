@@ -24,7 +24,7 @@ private val supportedContentTypes = listOf("application/pdf", "image/jpeg", "ima
 private val hasToBeMultupartTypeProblemDetails = DefaultProblemDetails(title = "multipart-form-required", status = 400, detail = "Requesten må være en 'multipart/form-data' request hvor en 'part' er en fil, har 'name=vedlegg' og har Content-Type header satt.")
 private val vedleggNotAttachedProblemDetails = DefaultProblemDetails(title = "attachment-not-attached", status = 400, detail = "Fant ingen 'part' som er en fil, har 'name=vedlegg' og har Content-Type header satt.")
 private val vedleggTooLargeProblemDetails = DefaultProblemDetails(title = "attachment-too-large", status = 413, detail = "vedlegget var over maks tillatt størrelse på 8MB.")
-private val finnerIkkeSubject = DefaultProblemDetails(title = "fant-ikke-subject", status = 413, detail = "Fant ikke subject på idToken")
+private val fantIkkeSubjectPaaToken = DefaultProblemDetails(title = "fant-ikke-subject", status = 413, detail = "Fant ikke subject på idToken")
 private val vedleggContentTypeNotSupportedProblemDetails = DefaultProblemDetails(title = "attachment-content-type-not-supported", status = 400, detail = "Vedleggets type må være en av $supportedContentTypes")
 internal val feilVedSlettingAvVedlegg = DefaultProblemDetails(title = "feil-ved-sletting", status = 500, detail = "Feil ved sletting av vedlegg")
 
@@ -80,7 +80,7 @@ fun Route.vedleggApis(
             var vedlegg: Vedlegg? = null
             var eier = idTokenProvider.getIdToken(call).getSubject()
             if(eier == null){
-                call.respondProblemDetails(finnerIkkeSubject)
+                call.respondProblemDetails(fantIkkeSubjectPaaToken)
             } else {
                 vedlegg = multipart.getVedlegg(DokumentEier(eier))
             }

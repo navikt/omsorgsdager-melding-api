@@ -16,6 +16,8 @@ import no.nav.omsorgsdagermeldingapi.general.getCallId
 import no.nav.omsorgsdagermeldingapi.general.metadata
 import no.nav.omsorgsdagermeldingapi.søknad.melding.Melding
 import no.nav.omsorgsdagermeldingapi.søknad.melding.valider
+import no.nav.omsorgsdagermeldingapi.vedlegg.DokumentEier
+import no.nav.omsorgsdagermeldingapi.vedlegg.VedleggService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -25,7 +27,8 @@ private val logger: Logger = LoggerFactory.getLogger("nav.soknadApis")
 fun Route.søknadApis(
     søknadService: SøknadService,
     idTokenProvider: IdTokenProvider,
-    barnService: BarnService
+    barnService: BarnService,
+    vedleggService: VedleggService
 ) {
 
     @Location(MELDING_URL_KORONAOVERFØRE)
@@ -91,34 +94,42 @@ fun Route.søknadApis(
 
     @Location(MELDING_URL_FORDELE)
     class sendSøknadForFordeling
-    post { _ : sendSøknadForFordeling ->
-        logger.info("Mottatt ny melding om fordeling av omsorgsdager.")
+        post { _ : sendSøknadForFordeling ->
+            logger.info("Mottatt ny melding om fordeling av omsorgsdager.")
 
-        logger.trace("Mapper melding")
-        val melding = call.receive<Melding>()
-        logger.trace("Melding mappet.")
+            logger.trace("Mapper melding")
+            val melding = call.receive<Melding>()
+            logger.trace("Melding mappet.")
 
-        logger.trace("Oppdaterer barn med identitetsnummer")
-        val listeOverBarnMedFnr = barnService.hentNåværendeBarn(idTokenProvider.getIdToken(call), call.getCallId())
-        melding.oppdaterBarnMedFnr(listeOverBarnMedFnr)
-        logger.info("Oppdatering av identitetsnummer på barn OK")
+            logger.trace("Oppdaterer barn med identitetsnummer")
+            val listeOverBarnMedFnr = barnService.hentNåværendeBarn(idTokenProvider.getIdToken(call), call.getCallId())
+            melding.oppdaterBarnMedFnr(listeOverBarnMedFnr)
+            logger.info("Oppdatering av identitetsnummer på barn OK")
 
-        logger.trace("Validerer melding")
-        melding.valider()
-        logger.trace("Validering OK.")
+            logger.trace("Validerer melding")
+            melding.valider()
+            logger.trace("Validering OK.")
 
-        logger.info(formaterStatuslogging(melding.søknadId, "validert OK"))
+            logger.info(formaterStatuslogging(melding.søknadId, "validert OK"))
 
-        //TODO Her må samværsavtale loopes gjennom og sette hold på alle vedleggene.
+            if(melding.fordeling == null) call.respond(HttpStatusCode.Forbidden) else {
+                var eier = idTokenProvider.getIdToken(call).getSubject()!!
+                logger.info("Persisterer samværsavtale")
+                vedleggService.persisterVedlegg(
+                    vedleggsUrls = melding.fordeling.samværsavtale,
+                    callId = call.getCallId(),
+                    eier = DokumentEier(eier)
+                )
+            }
+            //TODO Vi må ha håndtere at ting kan feile når vi legger på kø. Hvis det skjer så må vedlegget som er persistert slettes
+            søknadService.registrer(
+                melding = melding,
+                metadata = call.metadata(),
+                callId = call.getCallId(),
+                idToken = idTokenProvider.getIdToken(call)
+            )
 
-        søknadService.registrer(
-            melding = melding,
-            metadata = call.metadata(),
-            callId = call.getCallId(),
-            idToken = idTokenProvider.getIdToken(call)
-        )
-
-        call.respond(HttpStatusCode.Accepted)
+            call.respond(HttpStatusCode.Accepted)
     }
 
 }

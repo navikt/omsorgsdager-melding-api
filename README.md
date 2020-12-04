@@ -93,36 +93,3 @@ n/a
 ### Redis
 Vi bruker Redis for mellomlagring. En instanse av Redis må være kjørene før deploy av applikasjonen. 
 Dette gjøres manuelt med kubectl både i preprod og prod. Se [nais/doc](https://github.com/nais/doc/blob/master/content/redis.md)
-
-## Kafka oneshot
-```
-{
-  "topics": [
-    {
-      "topicName": "privat-omsorgsdager-melding-api-mottatt",
-      "configEntries": {
-        "retention.ms": 2628000000
-      },
-      "members": [
-        {
-          "member": "srv-omd-melding-mtk",
-          "role": "PRODUCER"
-        },
-        {
-          "member": "O158190",
-          "role": "MANAGER"
-        },
-        {
-          "member": "E157419",
-          "role": "MANAGER"
-        },
-        {
-          "member": "F154868",
-          "role": "MANAGER"
-        }
-      ],
-      "numPartitions": 3
-    }
-  ]
-}
-```
