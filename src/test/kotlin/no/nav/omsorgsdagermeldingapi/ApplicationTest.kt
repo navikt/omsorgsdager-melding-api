@@ -14,6 +14,8 @@ import no.nav.omsorgsdagermeldingapi.felles.*
 import no.nav.omsorgsdagermeldingapi.kafka.Topics
 import no.nav.omsorgsdagermeldingapi.redis.RedisMockUtil
 import no.nav.omsorgsdagermeldingapi.søknad.melding.BarnUtvidet
+import no.nav.omsorgsdagermeldingapi.søknad.melding.Fordele
+import no.nav.omsorgsdagermeldingapi.søknad.melding.Mottaker
 import no.nav.omsorgsdagermeldingapi.wiremock.*
 import org.json.JSONObject
 import org.junit.AfterClass
@@ -21,6 +23,7 @@ import org.junit.BeforeClass
 import org.skyscreamer.jsonassert.JSONAssert
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.net.URL
 import java.time.LocalDate
 import java.util.*
 import kotlin.test.*
@@ -321,7 +324,13 @@ class ApplicationTest {
     @Test
     fun `Sende gyldig melding om fordeling av omsorgsdager og plukke opp fra kafka topic`() {
         val søknadID = UUID.randomUUID().toString()
-        val søknad = MeldingUtils.gyldigMeldingFordele.copy(søknadId = søknadID).somJson()
+        val søknad = MeldingUtils.gyldigMeldingFordele.copy(
+                søknadId = søknadID,
+                fordeling = Fordele(
+                        Mottaker.SAMVÆRSFORELDER,
+                        samværsavtale = listOf(URL("${wireMockServer.getK9MellomlagringUrl()}/1"))
+                )
+        ).somJson()
 
         requestAndAssert(
             httpMethod = HttpMethod.Post,
