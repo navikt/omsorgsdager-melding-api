@@ -6,7 +6,7 @@ import java.net.URL
 
 data class Fordele(
     val mottakerType: Mottaker,
-    val samværsavtale: List<URL>
+    val samværsavtale: List<URL> = listOf()
 )
 
 
@@ -32,17 +32,7 @@ internal fun Melding.validerFordele(): MutableSet<Violation> {
                 )
             )
         }
-
-        if(fordeling.samværsavtale.isEmpty()){
-            mangler.add(
-                Violation(
-                    parameterName = "fordeling.samværsavtale",
-                    parameterType = ParameterType.ENTITY,
-                    reason = "samværsavtale kan ikke være en tom liste",
-                    invalidValue = fordeling.samværsavtale
-                )
-            )
-        }
     }
+
     return mangler
 }
