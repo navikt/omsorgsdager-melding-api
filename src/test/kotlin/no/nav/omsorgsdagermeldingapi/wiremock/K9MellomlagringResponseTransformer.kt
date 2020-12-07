@@ -57,7 +57,7 @@ class K9MellomlagringResponseTransformer() : ResponseTransformer() {
                 Response.Builder.like(response)
                     .status(201)
                     .headers(HttpHeaders(
-                        HttpHeader.httpHeader("Location", "http://localhost:8080/v1/dokument/${vedleggId.value}"),
+                        HttpHeader.httpHeader("Location", "http://localhost:8080/v1/dokument/${vedleggId.value}/persister"),
                         HttpHeader.httpHeader("Content-Type", "application/json")
                     ))
                     .body("""
