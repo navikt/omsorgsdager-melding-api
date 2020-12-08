@@ -34,7 +34,7 @@ import java.time.Duration
 class K9MellomlagringGateway(
     private val accessTokenClient: AccessTokenClient,
     private val persistereDokumentScope: Set<String>,
-    baseUrl : URI
+    private val baseUrl : URI
 ): HealthCheck {
 
     private companion object {
@@ -46,11 +46,6 @@ class K9MellomlagringGateway(
     }
 
     private val cachedAccessTokenClient = CachedAccessTokenClient(accessTokenClient)
-
-    private val url = Url.buildURL(
-        baseUrl = baseUrl,
-        pathParts = listOf("v1", "dokument")
-    )
 
     override suspend fun check(): Result {
         return try {
@@ -82,7 +77,7 @@ class K9MellomlagringGateway(
             ) {
                 val contentStream = { ByteArrayInputStream(body) }
 
-                url
+                baseUrl
                     .toString()
                     .httpPost()
                     .body(contentStream)
@@ -113,7 +108,7 @@ class K9MellomlagringGateway(
         val body = objectMapper.writeValueAsBytes(eier)
 
         val urlMedId = Url.buildURL(
-            baseUrl = url,
+            baseUrl = baseUrl,
             pathParts = listOf(vedleggId.value)
         )
 
@@ -187,7 +182,7 @@ class K9MellomlagringGateway(
     ) {
 
         val urlMedId = Url.buildURL(
-            baseUrl = url,
+            baseUrl = baseUrl,
             pathParts = listOf(vedleggId.value, "persister")
         )
 

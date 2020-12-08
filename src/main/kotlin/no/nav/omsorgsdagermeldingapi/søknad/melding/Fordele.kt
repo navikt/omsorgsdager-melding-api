@@ -9,10 +9,9 @@ data class Fordele(
     val samværsavtale: List<URL> = listOf()
 )
 
-
 internal fun Melding.validerFordele(): MutableSet<Violation> {
     val mangler: MutableSet<Violation> = mutableSetOf()
-    if(fordeling == null){
+    if (fordeling == null) {
         mangler.add(
             Violation(
                 parameterName = "fordeling",
@@ -22,7 +21,7 @@ internal fun Melding.validerFordele(): MutableSet<Violation> {
             )
         )
     } else {
-        if(fordeling.mottakerType != Mottaker.SAMVÆRSFORELDER){
+        if (fordeling.mottakerType != Mottaker.SAMVÆRSFORELDER) {
             mangler.add(
                 Violation(
                     parameterName = "fordeling.mottakerType",

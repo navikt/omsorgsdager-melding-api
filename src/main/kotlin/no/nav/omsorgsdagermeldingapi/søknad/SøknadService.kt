@@ -11,11 +11,13 @@ import no.nav.omsorgsdagermeldingapi.søker.validate
 import no.nav.omsorgsdagermeldingapi.søknad.melding.Melding
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.net.URI
 
 
 class SøknadService(
-    private val søkerService: SøkerService,
-    private val kafkaProducer: SøknadKafkaProducer
+        private val søkerService: SøkerService,
+        private val kafkaProducer: SøknadKafkaProducer,
+        private val k9MellomLagringIngress: URI,
 ) {
 
     private companion object {
@@ -23,10 +25,10 @@ class SøknadService(
     }
 
     suspend fun registrer(
-        melding: Melding,
-        metadata: Metadata,
-        idToken: IdToken,
-        callId: CallId
+            melding: Melding,
+            metadata: Metadata,
+            idToken: IdToken,
+            callId: CallId,
     ) {
         logger.info(formaterStatuslogging(melding.søknadId, "registreres"))
 
@@ -38,7 +40,7 @@ class SøknadService(
         søker.validate()
         logger.trace("Søker OK.")
 
-        val komplettMelding = melding.tilKomplettMelding(søker)
+        val komplettMelding = melding.tilKomplettMelding(søker, k9MellomLagringIngress)
 
         kafkaProducer.produce(komplettMelding = komplettMelding, metadata = metadata)
     }
