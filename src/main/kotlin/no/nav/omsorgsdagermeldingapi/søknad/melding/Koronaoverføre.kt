@@ -11,8 +11,8 @@ data class Koronaoverføre(
 )
 
 data class KoronaStengingsperiode(
-    @JsonFormat(pattern = "yyyy-MM-dd") val fom: LocalDate,
-    @JsonFormat(pattern = "yyyy-MM-dd") val tom: LocalDate
+    @JsonFormat(pattern = "yyyy-MM-dd") val fraOgMed: LocalDate,
+    @JsonFormat(pattern = "yyyy-MM-dd") val tilOgMed: LocalDate
 )
 
 internal fun Melding.validerKoronaOverføre(): MutableSet<Violation> {

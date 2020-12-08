@@ -37,8 +37,8 @@ object MeldingUtils {
         korona = Koronaoverføre(
             antallDagerSomSkalOverføres = 5,
             stengingsperiode = KoronaStengingsperiode(
-                fom = LocalDate.parse("2020-03-13"),
-                tom = LocalDate.parse("2020-06-30")
+                fraOgMed = LocalDate.parse("2020-03-13"),
+                tilOgMed = LocalDate.parse("2020-06-30")
             )
         )
     )
