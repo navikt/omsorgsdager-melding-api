@@ -208,7 +208,11 @@ internal class MeldingValideringsTest {
         val melding = MeldingUtils.gyldigMeldingKoronaoverføre.copy(
             type = Meldingstype.KORONA,
             korona = Koronaoverføre(
-                antallDagerSomSkalOverføres = 0
+                antallDagerSomSkalOverføres = 0,
+                stengingsperiode = KoronaStengingsperiode(
+                    fom = LocalDate.parse("2020-03-13"),
+                    tom = LocalDate.parse("2020-06-30")
+                )
             )
         )
         melding.valider()

@@ -1,10 +1,18 @@
 package no.nav.omsorgsdagermeldingapi.søknad.melding
 
+import com.fasterxml.jackson.annotation.JsonFormat
 import no.nav.helse.dusseldorf.ktor.core.ParameterType
 import no.nav.helse.dusseldorf.ktor.core.Violation
+import java.time.LocalDate
 
 data class Koronaoverføre(
-    val antallDagerSomSkalOverføres: Int
+    val antallDagerSomSkalOverføres: Int,
+    val stengingsperiode: KoronaStengingsperiode
+)
+
+data class KoronaStengingsperiode(
+    @JsonFormat(pattern = "yyyy-MM-dd") val fom: LocalDate,
+    @JsonFormat(pattern = "yyyy-MM-dd") val tom: LocalDate
 )
 
 internal fun Melding.validerKoronaOverføre(): MutableSet<Violation> {
