@@ -35,7 +35,11 @@ object MeldingUtils {
     val gyldigMeldingKoronaoverføre = gyldigMeldingMal.copy(
         type = Meldingstype.KORONA,
         korona = Koronaoverføre(
-            antallDagerSomSkalOverføres = 5
+            antallDagerSomSkalOverføres = 5,
+            stengingsperiode = KoronaStengingsPeriode(
+                fom = LocalDate.parse("2020-03-13"),
+                tom = LocalDate.parse("2020-06-30")
+            )
         )
     )
 
