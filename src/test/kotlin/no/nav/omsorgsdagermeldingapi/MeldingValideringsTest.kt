@@ -282,16 +282,4 @@ internal class MeldingValideringsTest {
         melding.valider()
     }
 
-    @Test(expected = Throwblem::class)
-    fun `Skal feile hvis type er FORDELE men samværsavtale er tom`(){
-        val melding = MeldingUtils.gyldigMeldingFordele.copy(
-            type = Meldingstype.FORDELING,
-            fordeling = Fordele(
-                mottakerType = Mottaker.SAMVÆRSFORELDER,
-                samværsavtale = listOf()
-            )
-        )
-        melding.valider()
-    }
-
 }
