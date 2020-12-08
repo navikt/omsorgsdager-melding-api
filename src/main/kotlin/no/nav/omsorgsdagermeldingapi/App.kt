@@ -184,7 +184,7 @@ fun Application.omsorgpengermidlertidigaleneapi() {
                     søknadService = SøknadService(
                             søkerService = søkerService,
                             kafkaProducer = søknadKafkaProducer,
-                            k9MellomLagringBaseUrl = configuration.getK9MellomlagringUrl()
+                            k9MellomLagringIngress = configuration.getK9MellomlagringIngress()
                     ),
                     barnService = barnService,
                     vedleggService = vedleggService

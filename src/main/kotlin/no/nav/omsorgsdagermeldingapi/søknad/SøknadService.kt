@@ -17,7 +17,7 @@ import java.net.URI
 class SøknadService(
         private val søkerService: SøkerService,
         private val kafkaProducer: SøknadKafkaProducer,
-        private val k9MellomLagringBaseUrl: URI,
+        private val k9MellomLagringIngress: URI,
 ) {
 
     private companion object {
@@ -40,7 +40,7 @@ class SøknadService(
         søker.validate()
         logger.trace("Søker OK.")
 
-        val komplettMelding = melding.tilKomplettMelding(søker, k9MellomLagringBaseUrl)
+        val komplettMelding = melding.tilKomplettMelding(søker, k9MellomLagringIngress)
 
         kafkaProducer.produce(komplettMelding = komplettMelding, metadata = metadata)
     }
