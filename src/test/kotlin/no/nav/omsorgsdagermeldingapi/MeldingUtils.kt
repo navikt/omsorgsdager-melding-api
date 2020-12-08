@@ -36,7 +36,7 @@ object MeldingUtils {
         type = Meldingstype.KORONA,
         korona = Koronaoverføre(
             antallDagerSomSkalOverføres = 5,
-            stengingsperiode = KoronaStengingsPeriode(
+            stengingsperiode = KoronaStengingsperiode(
                 fom = LocalDate.parse("2020-03-13"),
                 tom = LocalDate.parse("2020-06-30")
             )

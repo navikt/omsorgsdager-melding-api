@@ -7,10 +7,10 @@ import java.time.LocalDate
 
 data class Koronaoverføre(
     val antallDagerSomSkalOverføres: Int,
-    val stengingsperiode: KoronaStengingsPeriode
+    val stengingsperiode: KoronaStengingsperiode
 )
 
-data class KoronaStengingsPeriode(
+data class KoronaStengingsperiode(
     @JsonFormat(pattern = "yyyy-MM-dd") val fom: LocalDate,
     @JsonFormat(pattern = "yyyy-MM-dd") val tom: LocalDate
 )
