@@ -33,7 +33,7 @@ import java.time.Duration
 
 class K9MellomlagringGateway(
     private val accessTokenClient: AccessTokenClient,
-    private val persistereDokumentScope: Set<String>,
+    private val k9MellomlagringScope: Set<String>,
     private val baseUrl : URI
 ): HealthCheck {
 
@@ -43,13 +43,14 @@ class K9MellomlagringGateway(
         private const val SLETTE_VEDLEGG_OPERATION = "slette-vedlegg"
         private const val LAGRE_VEDLEGG_OPERATION = "lagre-vedlegg"
         private const val PERSISTER_VEDLEGG = "persister-vedlegg"
+        private const val SLETT_PERSISTERT_VEDLEGG = "slett-persistert-vedlegg"
     }
 
     private val cachedAccessTokenClient = CachedAccessTokenClient(accessTokenClient)
 
     override suspend fun check(): Result {
         return try {
-            accessTokenClient.getAccessToken(persistereDokumentScope)
+            accessTokenClient.getAccessToken(k9MellomlagringScope)
             Healthy("K9MellomlagringGateway", "Henting av access token for å persistere vedlegg.")
         } catch (cause: Throwable) {
             logger.error("Feil ved henting av access token for å persistere vedlegg", cause)
@@ -151,12 +152,77 @@ class K9MellomlagringGateway(
         )
     }
 
+    internal suspend fun slettPersistertVedlegg(
+        vedleggId: List<VedleggId>,
+        callId: CallId,
+        eier: DokumentEier
+    ) {
+        val authorizationHeader: String = cachedAccessTokenClient.getAccessToken(k9MellomlagringScope).asAuthoriationHeader()
+
+        coroutineScope {
+            val deferred = mutableListOf<Deferred<Unit>>()
+            vedleggId.forEach {
+                deferred.add(async {
+                    requestSlettPersisterVedlegg(
+                        vedleggId = it,
+                        callId = callId,
+                        eier = eier,
+                        authorizationHeader = authorizationHeader
+                    )
+                })
+            }
+            deferred.awaitAll()
+        }
+    }
+
+    private suspend fun requestSlettPersisterVedlegg(
+        vedleggId: VedleggId,
+        callId: CallId,
+        eier: DokumentEier,
+        authorizationHeader: String
+    ) {
+
+        val urlMedId = Url.buildURL(
+            baseUrl = baseUrl,
+            pathParts = listOf(vedleggId.value)
+        )
+
+        val body =  objectMapper.writeValueAsBytes(eier)
+
+        val httpRequest = urlMedId.toString()
+            .httpDelete()
+            .body(body)
+            .header(
+                HttpHeaders.Authorization to authorizationHeader,
+                HttpHeaders.XCorrelationId to callId.value,
+                HttpHeaders.ContentType to "application/json"
+            )
+
+        val (request, _, result) = Operation.monitored(
+            app = "omsorgsdager-melding-api",
+            operation = SLETT_PERSISTERT_VEDLEGG,
+            resultResolver = { 204 == it.second.statusCode }
+        ) {
+            httpRequest.awaitStringResponseResult()
+        }
+
+
+        result.fold(
+            { success -> logger.info("Vellykket sletting av persistert vedlegg")},
+            { error ->
+                logger.error("Error response = '${error.response.body().asString("text/plain")}' fra '${request.url}'")
+                logger.error("Feil ved sletting av persistert vedlegg. $error")
+                throw IllegalStateException("Feil ved sletting av persistert vedlegg.")
+            }
+        )
+    }
+
     internal suspend fun persisterVedlegger(
         vedleggId: List<VedleggId>,
         callId: CallId,
         eier: DokumentEier
     ) {
-        val authorizationHeader: String = cachedAccessTokenClient.getAccessToken(persistereDokumentScope).asAuthoriationHeader()
+        val authorizationHeader: String = cachedAccessTokenClient.getAccessToken(k9MellomlagringScope).asAuthoriationHeader()
 
         coroutineScope {
             val deferred = mutableListOf<Deferred<Unit>>()

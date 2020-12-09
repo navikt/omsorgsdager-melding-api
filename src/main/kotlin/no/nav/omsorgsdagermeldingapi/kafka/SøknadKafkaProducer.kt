@@ -38,7 +38,6 @@ class SøknadKafkaProducer(
         metadata: Metadata
     ) {
         if (metadata.version != 1) throw IllegalStateException("Kan ikke legge melding med versjon ${metadata.version} til prosessering.")
-
         val recordMetaData = producer.send(
             ProducerRecord(
                 OMSORGDAGER_MELDING_MOTTATT_TOPIC.name,

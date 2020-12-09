@@ -9,15 +9,17 @@ import no.nav.omsorgsdagermeldingapi.søker.Søker
 import no.nav.omsorgsdagermeldingapi.søker.SøkerService
 import no.nav.omsorgsdagermeldingapi.søker.validate
 import no.nav.omsorgsdagermeldingapi.søknad.melding.Melding
+import no.nav.omsorgsdagermeldingapi.vedlegg.DokumentEier
+import no.nav.omsorgsdagermeldingapi.vedlegg.VedleggService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.net.URI
-
 
 class SøknadService(
         private val søkerService: SøkerService,
         private val kafkaProducer: SøknadKafkaProducer,
         private val k9MellomLagringIngress: URI,
+        private val vedleggService: VedleggService
 ) {
 
     private companion object {
@@ -44,6 +46,21 @@ class SøknadService(
 
         val komplettMelding = melding.tilKomplettMelding(søker, k9MellomLagringIngress)
 
-        kafkaProducer.produce(komplettMelding = komplettMelding, metadata = metadata)
+        try {
+            kafkaProducer.produce(komplettMelding = komplettMelding, metadata = metadata)
+        } catch (exception: Exception) {
+            logger.info("Feilet ved å legge melding på Kafka. Sletter persistert samværsavtale hvis det eksisterer")
+
+            if(melding.fordeling != null && !melding.fordeling.samværsavtale.isEmpty())
+                vedleggService.slettPersistertVedlegg(
+                    vedleggsUrls = melding.fordeling.samværsavtale,
+                    callId = callId,
+                    eier = DokumentEier(søker.fødselsnummer)
+            )
+
+            throw MeldingRegistreringFeiletException("Feilet ved å legge melding på Kafka")
+        }
     }
 }
+
+class MeldingRegistreringFeiletException(s: String) : Throwable(s)

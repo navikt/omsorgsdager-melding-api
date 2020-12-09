@@ -6,6 +6,7 @@ import io.ktor.config.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
 import io.ktor.util.*
+import io.mockk.impl.annotations.InjectMockKs
 import no.nav.common.KafkaEnvironment
 import no.nav.helse.dusseldorf.ktor.core.fromResources
 import no.nav.helse.dusseldorf.testsupport.wiremock.WireMockBuilder
@@ -33,6 +34,7 @@ private const val gyldigFodselsnummerB = "25118921464"
 private const val ikkeMyndigFnr = "12125012345"
 
 @KtorExperimentalAPI
+@InjectMockKs
 class ApplicationTest {
 
     private companion object {
@@ -53,7 +55,7 @@ class ApplicationTest {
         private val kafkaEnvironment = KafkaWrapper.bootstrap()
         private val kafkaTestConsumer = kafkaEnvironment.testConsumer()
 
-        fun getConfig(kafkaEnvironment: KafkaEnvironment): ApplicationConfig {
+        fun getConfig(kafkaEnvironment: KafkaEnvironment?): ApplicationConfig {
             val fileConfig = ConfigFactory.load()
             val testConfig = ConfigFactory.parseMap(
                 TestConfiguration.asMap(
@@ -67,7 +69,7 @@ class ApplicationTest {
         }
 
 
-        val engine = TestApplicationEngine(createTestEnvironment {
+        var engine = TestApplicationEngine(createTestEnvironment {
             config = getConfig(kafkaEnvironment)
         })
 
@@ -75,6 +77,7 @@ class ApplicationTest {
         @BeforeClass
         @JvmStatic
         fun buildUp() {
+
             engine.start(wait = true)
         }
 
@@ -86,6 +89,7 @@ class ApplicationTest {
             RedisMockUtil.stopRedisMocked()
             logger.info("Tear down complete")
         }
+
     }
 
     @Test

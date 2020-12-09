@@ -55,20 +55,6 @@ fun Route.vedleggApis(
         }
     }
 
-    put<EksisterendeVedlegg> { eksisterendeVedlegg ->
-        val vedleggId = VedleggId(eksisterendeVedlegg.vedleggId)
-        logger.info("Prøver å persistere vedlegg")
-        var eier = idTokenProvider.getIdToken(call).getSubject()
-        if(eier == null) call.respond(HttpStatusCode.Forbidden) else {
-            vedleggService.persisterVedleggApi(
-                vedleggId = vedleggId,
-                callId =  call.getCallId(),
-                eier = DokumentEier(eier)
-            )
-        }
-    }
-
-
     @Location(LAGRE_VEDLEGG)
     class NyttVedleg
     post<NyttVedleg> { _ ->

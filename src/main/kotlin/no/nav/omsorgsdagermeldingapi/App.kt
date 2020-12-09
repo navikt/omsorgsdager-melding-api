@@ -133,7 +133,7 @@ fun Application.omsorgpengermidlertidigaleneapi() {
         val k9MellomlagringGateway = K9MellomlagringGateway(
                 baseUrl = configuration.getK9MellomlagringUrl(),
                 accessTokenClient = accessTokenClientResolver.accessTokenClient(),
-                persistereDokumentScope = configuration.getK9MellomlagringCScopes()
+                k9MellomlagringScope = configuration.getK9MellomlagringCScopes()
         )
 
         val vedleggService = VedleggService(
@@ -184,7 +184,8 @@ fun Application.omsorgpengermidlertidigaleneapi() {
                     søknadService = SøknadService(
                             søkerService = søkerService,
                             kafkaProducer = søknadKafkaProducer,
-                            k9MellomLagringIngress = configuration.getK9MellomlagringIngress()
+                            k9MellomLagringIngress = configuration.getK9MellomlagringIngress(),
+                            vedleggService = vedleggService
                     ),
                     barnService = barnService,
                     vedleggService = vedleggService
