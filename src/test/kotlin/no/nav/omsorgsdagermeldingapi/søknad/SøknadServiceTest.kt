@@ -73,6 +73,5 @@ internal class SøknadServiceTest{
         }
 
         coVerify(exactly = 1) { vedleggService.slettPersistertVedlegg(any(), any(), any()) }
-
     }
 }
