@@ -9,7 +9,7 @@ import java.time.LocalDate
 val kjentePerioder = listOf(
     Pair(LocalDate.parse("2020-03-13"), LocalDate.parse("2020-06-30")),
     Pair(LocalDate.parse("2020-08-10"), LocalDate.parse("2020-12-31")),
-    Pair(LocalDate.parse("2021-01-01"), LocalDate.parse("2021-06-30"))
+    Pair(LocalDate.parse("2021-01-01"), LocalDate.parse("2021-12-31"))
 )
 
 data class Koronaoverføre(

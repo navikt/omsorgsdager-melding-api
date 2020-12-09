@@ -289,7 +289,7 @@ class ApplicationTest {
                     {
                       "type": "entity",
                       "name": "korona.stengingsperiode",
-                      "reason": "stengingsperiode er ikke en kjent periode. Kjente perioder er: [(2020-03-13, 2020-06-30), (2020-08-10, 2020-12-31), (2021-01-01, 2021-06-30)]",
+                      "reason": "stengingsperiode er ikke en kjent periode. Kjente perioder er: [(2020-03-13, 2020-06-30), (2020-08-10, 2020-12-31), (2021-01-01, 2021-12-31)]",
                       "invalid_value": {
                         "fraOgMed": "2020-03-13",
                         "tilOgMed": "2020-06-29"
