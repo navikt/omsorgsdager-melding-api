@@ -13,6 +13,9 @@ spec:
       tenant: {{ tenant }}
   port: 8080
   accessPolicy:
+    inbound:
+      rules:
+        - application: dele-omsorgsdager
     outbound:
       rules:
         - application: omsorgsdager-melding-api-redis
