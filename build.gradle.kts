@@ -38,6 +38,7 @@ dependencies {
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion") {
         exclude(group = "org.eclipse.jetty")
     }
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.3.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.3.1")
     testImplementation("io.mockk:mockk:1.10.3-jdk8")
     testImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2")
