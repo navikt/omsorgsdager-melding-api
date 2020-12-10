@@ -1,0 +1,32 @@
+{
+  "app": "omsorgsdager-melding-api",
+  "cluster": "dev-gcp",
+  "namespace": "dusseldorf",
+  "team": "dusseldorf",
+  "minReplicas": "1",
+  "maxReplicas": "2",
+  "tenant" : "nav.no",
+  "ingresses": [
+    "https://omsorgsdager-melding-api.nav.no"
+  ],
+  "externalHosts": [
+    "api-gw-q1.oera.no",
+    "oauth2.googleapis.com",
+    "login.microsoftonline.com"
+  ],
+  "env": {
+    "REDIS_HOST": "omsorgsdager-melding-api-redis.dusseldorf.svc.cluster.local",
+    "CORS_ADDRESSES": "https://www.nav.no",
+    "LOGIN_SERVICE_V1_DISCOVERY_ENDPOINT": "https://login.microsoftonline.com/navnob2c.onmicrosoft.com/discovery/v2.0/.well-known/openid-configuration?p=b2c_1a_idporten",
+    "COOKIE_NAME": "selvbetjening-idtoken",
+    "K9_OPPSLAG_REGISTER_URL": "https://api-gw.oera.no/helse-reverse-proxy/k9-selvbetjening-oppslag",
+    "K9_MELLOMLAGRING_SERVICE_DISCOVERY": "http://k9-mellomlagring/v1/dokument",
+    "K9_MELLOMLAGRING_INGRESS": "https://k9-mellomlagring.dev.intern.nav.no/v1/dokument",
+    "K9_MELLOMLAGRING_CLIENT_ID": "8d0460bd-ea81-4b08-b524-cf04874a794c/.default",
+    "AZURE_V2_DISCOVERY_ENDPOINT": "https://login.microsoftonline.com/62366534-1ec3-4962-8869-9b5535279d0b/v2.0/.well-known/openid-configuration",
+    "KAFKA_BOOTSTRAP_SERVERS": "a01apvl00145.adeo.no:8443,a01apvl00146.adeo.no:8443,a01apvl00147.adeo.no:8443,a01apvl00148.adeo.no:8443,a01apvl00149.adeo.no:8443,a01apvl00150.adeo.no:8443"
+  },
+  "slack-channel": "sif-alerts",
+  "slack-notify-type": "<!here> | omsorgsdager-melding-api | ",
+  "app-alert-ingress": "https://omsorgsdager-melding-api.nav.no"
+}
