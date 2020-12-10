@@ -195,10 +195,40 @@ internal class MeldingValideringsTest {
     }
 
     @Test(expected = Throwblem::class)
-    fun `Skal feile type er KORONA_OVERFØRE men korona er null`(){
+    fun `Skal feile hvis type er KORONA_OVERFØRE men korona er null`(){
         val melding = MeldingUtils.gyldigMeldingKoronaoverføre.copy(
             type = Meldingstype.KORONA,
             korona = null
+        )
+        melding.valider()
+    }
+
+    @Test(expected = Throwblem::class)
+    fun `Skal feile hvis type er KORONA_OVERFØRE og man ønsker å overføre 1000 dager`(){
+        val melding = MeldingUtils.gyldigMeldingKoronaoverføre.copy(
+            type = Meldingstype.KORONA,
+            korona = Koronaoverføre(
+                antallDagerSomSkalOverføres = 1000,
+                stengingsperiode = KoronaStengingsperiode(
+                    fraOgMed = LocalDate.parse("2020-03-13"),
+                    tilOgMed = LocalDate.parse("2020-06-30")
+                )
+            )
+        )
+        melding.valider()
+    }
+
+    @Test(expected = Throwblem::class)
+    fun `Skal feile hvis type er KORONA_OVERFØRE og man ønsker å overføre 0 dager`(){
+        val melding = MeldingUtils.gyldigMeldingKoronaoverføre.copy(
+            type = Meldingstype.KORONA,
+            korona = Koronaoverføre(
+                antallDagerSomSkalOverføres = 0,
+                stengingsperiode = KoronaStengingsperiode(
+                    fraOgMed = LocalDate.parse("2020-03-13"),
+                    tilOgMed = LocalDate.parse("2020-06-30")
+                )
+            )
         )
         melding.valider()
     }
@@ -208,7 +238,7 @@ internal class MeldingValideringsTest {
         val melding = MeldingUtils.gyldigMeldingKoronaoverføre.copy(
             type = Meldingstype.KORONA,
             korona = Koronaoverføre(
-                antallDagerSomSkalOverføres = 0,
+                antallDagerSomSkalOverføres = 1,
                 stengingsperiode = KoronaStengingsperiode(
                     fraOgMed = LocalDate.parse("2020-03-13"),
                     tilOgMed = LocalDate.parse("2020-06-30")

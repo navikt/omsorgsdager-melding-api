@@ -34,12 +34,12 @@ internal fun Melding.validerKoronaOverføre(): MutableSet<Violation> {
             )
         )
     } else {
-        if (korona.antallDagerSomSkalOverføres !in MIN_ANTALL_DAGER_MAN_KAN_OVERFØRE..MAX_ANTALL_DAGER_MAN_KAN_OVERFØRE) {
+        if (korona.antallDagerSomSkalOverføres !in MIN_ANTALL_DAGER_MAN_KAN_OVERFØRE..MAX_ANTALL_DAGER_MAN_KAN_KORONA_OVERFØRE) {
             mangler.add(
                 Violation(
                     parameterName = "korona.antallDagerSomSkalOverføres",
                     parameterType = ParameterType.ENTITY,
-                    reason = "antallDagerSomSkalOverføres må være mellom $MIN_ANTALL_DAGER_MAN_KAN_OVERFØRE og $MAX_ANTALL_DAGER_MAN_KAN_OVERFØRE",
+                    reason = "antallDagerSomSkalOverføres må være mellom $MIN_ANTALL_DAGER_MAN_KAN_OVERFØRE og $MAX_ANTALL_DAGER_MAN_KAN_KORONA_OVERFØRE",
                     invalidValue = korona.antallDagerSomSkalOverføres
                 )
             )

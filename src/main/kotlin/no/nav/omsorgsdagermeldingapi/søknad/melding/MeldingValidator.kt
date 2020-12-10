@@ -12,6 +12,7 @@ internal val vekttallProviderFnr2: (Int) -> Int = { arrayOf(5, 4, 3, 2, 7, 6, 5,
 private val fnrDateFormat = DateTimeFormatter.ofPattern("ddMMyy")
 
 internal val MAX_ANTALL_DAGER_MAN_KAN_OVERFØRE = 10
+internal val MAX_ANTALL_DAGER_MAN_KAN_KORONA_OVERFØRE = 999
 internal val MIN_ANTALL_DAGER_MAN_KAN_OVERFØRE = 1
 
 internal fun Melding.valider() {
