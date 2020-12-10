@@ -20,6 +20,9 @@ Denne tjenesten understøtter søknadsprosessen, samt eksponerer endepunkt for i
 API mottar meldingene, validerer og legger dem videre på en kafka-topic som 
 omsorgsdager-melding-prosessering konsumerer.
 
+Vedlegg blir persistert når meldingen blir sendt inn til api. Dersom noe skulle gå galt i api
+som gjør at meldingen ikke blir lagt på Kafka, så slettes vedlegget. 
+
 # 3. Endepunkter
 **GET @/soker --> Gir 200 respons med json av søker**
 ```
@@ -45,8 +48,8 @@ omsorgsdager-melding-prosessering konsumerer.
 Ved valideringsfeil får man tilbake 400 og liste over valideringsbrudd.
 
 **Validering**
-* harForståttRettigheterOgPliker og harBekreftetOpplysninger må være true
-* Alle bolske verdier hvor vi tillater true og false blir satt til null dersom noe går falt ved deserialisering, for å unngå default false.
+
+Se [MeldingValidator.kt](https://github.com/navikt/omsorgsdager-melding-api/blob/master/src/main/kotlin/no/nav/omsorgsdagermeldingapi/s%C3%B8knad/melding/MeldingValidator.kt)
 
 Eksempel json;
 ```
