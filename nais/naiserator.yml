@@ -52,9 +52,7 @@ spec:
   vault:
     enabled: false
   envFrom:
-    - secret: omsorgsdager-melding-api.apigw-apikey
-    - secret: omsorgsdager-melding-api.sts-credentials
-    - secret: omsorgsdager-melding-api.storage-redis
+    - secret: omsorgsdager-melding-api
     - configmap: loginservice-idporten
   env:
   {{#each env}}
