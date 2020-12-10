@@ -7,7 +7,7 @@
   "maxReplicas": "2",
   "tenant" : "nav.no",
   "ingresses": [
-    "https://omsorgsdager-melding-api.intern.nav.no"
+    "https://omsorgsdager-melding-api.nav.no"
   ],
   "externalHosts": [
     "api-gw-q1.oera.no",
@@ -28,5 +28,5 @@
   },
   "slack-channel": "sif-alerts",
   "slack-notify-type": "<!here> | omsorgsdager-melding-api | ",
-  "app-alert-ingress": "https://omsorgsdager-melding-api.intern.nav.no"
+  "app-alert-ingress": "https://omsorgsdager-melding-api.nav.no"
 }
