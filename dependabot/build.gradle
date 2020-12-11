@@ -17,7 +17,7 @@ dependencies {
     testCompile 'io.ktor:ktor-server-test-host:1.4.3'
     testCompile 'org.junit.jupiter:junit-jupiter-api:5.3.1'
     testCompile 'io.mockk:mockk:1.10.3-jdk8'
-    testCompile 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2'
+    testCompile 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2-native-mt'
     testCompile 'org.skyscreamer:jsonassert:1.5.0'
     testCompile 'no.nav.helse:dusseldorf-ktor-core:1.4.3.2ff5308'
     testCompile 'no.nav.helse:dusseldorf-ktor-jackson:1.4.3.2ff5308'
