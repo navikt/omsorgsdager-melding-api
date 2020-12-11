@@ -4,8 +4,10 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 val dusseldorfKtorVersion = "1.4.3.2ff5308"
 val ktorVersion = ext.get("ktorVersion").toString()
 val mainClass = "no.nav.omsorgsdagermeldingapi.AppKt"
-val kafkaEmbeddedEnvVersion = "2.2.0"
-val kafkaVersion = "2.3.0" // Alligned med version fra kafka-embedded-env
+val kafkaEmbeddedEnvVersion = "2.4.0"
+val kafkaVersion = "2.4.0" // Alligned med version fra kafka-embedded-env
+val junitJupiterVersion = "5.7.0"
+val kotlinxCoroutinesVersion = "1.4.2-native-mt"
 
 plugins {
     kotlin("jvm") version "1.4.10"
@@ -16,7 +18,6 @@ buildscript {
     // Henter ut diverse dependency versjoner, i.e. ktorVersion.
     apply("https://raw.githubusercontent.com/navikt/dusseldorf-ktor/2ff5308c07ac7c0ef8a127ea47fec8707d9f6944/gradle/dusseldorf-ktor.gradle.kts")
 }
-
 dependencies {
     // Server
     implementation ( "no.nav.helse:dusseldorf-ktor-core:$dusseldorfKtorVersion")
@@ -38,10 +39,10 @@ dependencies {
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion") {
         exclude(group = "org.eclipse.jetty")
     }
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.3.1")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.3.1")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
     testImplementation("io.mockk:mockk:1.10.3-jdk8")
-    testImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2")
+    testImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion")
 
 
     // kafka
@@ -54,6 +55,7 @@ repositories {
     maven("https://dl.bintray.com/kotlin/ktor")
     maven("https://kotlin.bintray.com/kotlinx")
     maven("http://packages.confluent.io/maven/")
+    maven("https://jitpack.io")
 
     maven {
         name = "GitHubPackages"
