@@ -140,7 +140,7 @@ class K9MellomlagringGateway(
         ) { httpRequest.awaitStringResponseResult() }
 
         result.fold(
-            { success ->
+            { _ ->
                 logger.info("Suksess ved sletting av vedlegg")
                 true
             },
@@ -208,7 +208,7 @@ class K9MellomlagringGateway(
 
 
         result.fold(
-            { success -> logger.info("Vellykket sletting av persistert vedlegg")},
+            { _ -> logger.info("Vellykket sletting av persistert vedlegg")},
             { error ->
                 logger.error("Error response = '${error.response.body().asString("text/plain")}' fra '${request.url}'")
                 logger.error("Feil ved sletting av persistert vedlegg. $error")
@@ -273,7 +273,7 @@ class K9MellomlagringGateway(
 
 
         result.fold(
-            { success -> logger.info("Vellykket persistering av vedlegg")},
+            { _ -> logger.info("Vellykket persistering av vedlegg")},
             { error ->
                 logger.error("Error response = '${error.response.body().asString("text/plain")}' fra '${request.url}'")
                 logger.error("Feil ved persistering av vedlegg. $error")

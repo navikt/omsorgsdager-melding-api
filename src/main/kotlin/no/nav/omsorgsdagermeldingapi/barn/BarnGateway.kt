@@ -103,14 +103,14 @@ class BarnGateway (
                 apiGatewayApiKey.headerKey to apiGatewayApiKey.value
             )
 
-        val (request, _, result) = Operation.monitored(
+        val (_, _, result) = Operation.monitored(
             app = "omsorgsdager-melding-api",
             operation = BarnGateway.HENTE_BARN_OPERATION,
             resultResolver = { 200 == it.second.statusCode }
         ) { httpRequest.awaitStringResponseResult() }
 
         return result.fold(
-            { success -> Healthy("k9-selvbetjent-oppslag", "Helsesjekk mot k9-selvbetjent-oppslag OK.") },
+            { _ -> Healthy("k9-selvbetjent-oppslag", "Helsesjekk mot k9-selvbetjent-oppslag OK.") },
             { error ->
                 logger.error("Feil ved helsesjekk mot k9-selvbetjent-oppslag", error)
                 UnHealthy("k9-selvbetjent-oppslag", "Helsesjekk mot k9-selvbetjent-oppslag feiler")
