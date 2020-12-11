@@ -1,6 +1,6 @@
 package no.nav.omsorgsdagermeldingapi
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategy
+import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.SerializationFeature
 import io.ktor.application.*
 import io.ktor.auth.*
@@ -67,7 +67,7 @@ fun Application.omsorgpengermidlertidigaleneapi() {
     install(ContentNegotiation) {
         jackson {
             dusseldorfConfigured()
-                    .setPropertyNamingStrategy(PropertyNamingStrategy.LOWER_CAMEL_CASE)
+                    .setPropertyNamingStrategy(PropertyNamingStrategies.LOWER_CAMEL_CASE )
                     .configure(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS, false)
         }
     }
