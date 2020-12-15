@@ -21,8 +21,8 @@
     "COOKIE_NAME": "selvbetjening-idtoken",
     "K9_OPPSLAG_REGISTER_URL": "https://api-gw.oera.no/helse-reverse-proxy/k9-selvbetjening-oppslag",
     "K9_MELLOMLAGRING_SERVICE_DISCOVERY": "http://k9-mellomlagring/v1/dokument",
-    "K9_MELLOMLAGRING_INGRESS": "https://k9-mellomlagring.dev.intern.nav.no/v1/dokument",
-    "K9_MELLOMLAGRING_CLIENT_ID": "8d0460bd-ea81-4b08-b524-cf04874a794c/.default",
+    "K9_MELLOMLAGRING_INGRESS": "https://k9-mellomlagring.intern.nav.no/v1/dokument",
+    "K9_MELLOMLAGRING_CLIENT_ID": "19aaf0b2-f40a-4a64-bf7f-fd2dd62f0552/.default",
     "AZURE_V2_DISCOVERY_ENDPOINT": "https://login.microsoftonline.com/62366534-1ec3-4962-8869-9b5535279d0b/v2.0/.well-known/openid-configuration",
     "KAFKA_BOOTSTRAP_SERVERS": "a01apvl00145.adeo.no:8443,a01apvl00146.adeo.no:8443,a01apvl00147.adeo.no:8443,a01apvl00148.adeo.no:8443,a01apvl00149.adeo.no:8443,a01apvl00150.adeo.no:8443"
   },
