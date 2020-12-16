@@ -1,10 +1,16 @@
 package no.nav.omsorgsdagermeldingapi.søknad.melding
 
-import no.nav.helse.dusseldorf.ktor.core.ParameterType
-import no.nav.helse.dusseldorf.ktor.core.Throwblem
-import no.nav.helse.dusseldorf.ktor.core.ValidationProblemDetails
-import no.nav.helse.dusseldorf.ktor.core.Violation
+import no.nav.helse.dusseldorf.ktor.core.*
+import no.nav.omsorgsdagermeldingapi.vedlegg.Vedlegg
+import java.net.URL
 import java.time.format.DateTimeFormatter
+
+private const val MAX_VEDLEGG_SIZE = 24 * 1024 * 1024 // 24 MB
+private val vedleggTooLargeProblemDetails = DefaultProblemDetails(
+    title = "attachments-too-large",
+    status = 413,
+    detail = "Totale størreslsen på alle vedlegg overstiger maks på 24 MB."
+)
 
 private val KUN_SIFFER = Regex("\\d+")
 internal val vekttallProviderFnr1: (Int) -> Int = { arrayOf(3, 7, 6, 1, 8, 9, 4, 5, 2).reversedArray()[it] }
@@ -189,3 +195,28 @@ internal fun nullSjekk(verdi: Boolean?, navn: String): MutableSet<Violation>{
 }
 
 internal infix fun Boolean?.er(forventetVerdi: Boolean?): Boolean = this == forventetVerdi
+
+internal fun List<Vedlegg>.validerVedlegg(vedleggUrler: List<URL>) {
+    if (size != vedleggUrler.size) {
+        throw Throwblem(
+            ValidationProblemDetails(
+                violations = setOf(
+                    Violation(
+                        parameterName = "vedlegg",
+                        parameterType = ParameterType.ENTITY,
+                        reason = "Mottok referanse til ${vedleggUrler.size} vedlegg, men fant kun $size vedlegg.",
+                        invalidValue = vedleggUrler
+                    )
+                )
+            )
+        )
+    }
+    validerTotalStorresle()
+}
+
+private fun List<Vedlegg>.validerTotalStorresle() {
+    val totalSize = sumBy { it.content.size }
+    if (totalSize > MAX_VEDLEGG_SIZE) {
+        throw Throwblem(vedleggTooLargeProblemDetails)
+    }
+}

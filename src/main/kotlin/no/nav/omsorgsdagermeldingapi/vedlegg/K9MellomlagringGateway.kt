@@ -5,6 +5,7 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.coroutines.awaitStringResponseResult
 import com.github.kittinunf.fuel.httpDelete
+import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.fuel.httpPost
 import com.github.kittinunf.fuel.httpPut
 import io.ktor.http.*
@@ -34,13 +35,14 @@ import java.time.Duration
 class K9MellomlagringGateway(
     private val accessTokenClient: AccessTokenClient,
     private val k9MellomlagringScope: Set<String>,
-    private val baseUrl : URI
-): HealthCheck {
+    private val baseUrl: URI
+) : HealthCheck {
 
     private companion object {
         private val logger: Logger = LoggerFactory.getLogger(K9MellomlagringGateway::class.java)
         private val objectMapper = jacksonObjectMapper().k9MellomlagringKonfigurert()
         private const val SLETTE_VEDLEGG_OPERATION = "slette-vedlegg"
+        private const val HENTE_VEDLEGG_OPERATION = "hente-vedlegg"
         private const val LAGRE_VEDLEGG_OPERATION = "lagre-vedlegg"
         private const val PERSISTER_VEDLEGG = "persister-vedlegg"
         private const val SLETT_PERSISTERT_VEDLEGG = "slett-persistert-vedlegg"
@@ -93,7 +95,11 @@ class K9MellomlagringGateway(
             result.fold(
                 { success -> VedleggId(objectMapper.readValue<CreatedResponseEntity>(success).id) },
                 { error ->
-                    logger.error("Error response = '${error.response.body().asString("text/plain")}' fra '${request.url}'")
+                    logger.error(
+                        "Error response = '${
+                            error.response.body().asString("text/plain")
+                        }' fra '${request.url}'"
+                    )
                     logger.error(error.toString())
                     throw IllegalStateException("Feil ved lagring av vedlegg.")
                 })
@@ -105,7 +111,7 @@ class K9MellomlagringGateway(
         idToken: IdToken,
         callId: CallId,
         eier: DokumentEier
-    ) : Boolean {
+    ): Boolean {
         val body = objectMapper.writeValueAsBytes(eier)
 
         val urlMedId = Url.buildURL(
@@ -127,11 +133,11 @@ class K9MellomlagringGateway(
 
     private suspend fun requestSlettVedlegg(
         httpRequest: Request
-    ) : Boolean = retry(
-            operation = SLETTE_VEDLEGG_OPERATION,
-            initialDelay = Duration.ofMillis(200),
-            factor = 2.0,
-            logger = logger
+    ): Boolean = retry(
+        operation = SLETTE_VEDLEGG_OPERATION,
+        initialDelay = Duration.ofMillis(200),
+        factor = 2.0,
+        logger = logger
     ) {
         val (request, _, result) = monitored(
             app = "omsorgsdager-melding-api",
@@ -152,12 +158,40 @@ class K9MellomlagringGateway(
         )
     }
 
+    private suspend fun requestHentVedlegg(
+        httpRequest: Request
+    ): Vedlegg? = retry(
+        operation = HENTE_VEDLEGG_OPERATION,
+        initialDelay = Duration.ofMillis(200),
+        factor = 2.0,
+        logger = logger
+    ) {
+        val (request, _, result) = monitored(
+            app = "omsorgsdager-melding-api",
+            operation = HENTE_VEDLEGG_OPERATION,
+            resultResolver = { 200 == it.second.statusCode }
+        ) { httpRequest.awaitStringResponseResult() }
+
+        result.fold(
+            { success ->
+                logger.info("Suksess ved henting av vedlegg")
+                ResolvedVedlegg(objectMapper.readValue<Vedlegg>(success))
+            },
+            { error ->
+                logger.error("Error response = '${error.response.body().asString("text/plain")}' fra '${request.url}'")
+                logger.error(error.toString())
+                throw IllegalStateException("Feil ved henting av vedlegg.")
+            }
+        ).vedlegg
+    }
+
     internal suspend fun slettPersistertVedlegg(
         vedleggId: List<VedleggId>,
         callId: CallId,
         eier: DokumentEier
     ) {
-        val authorizationHeader: String = cachedAccessTokenClient.getAccessToken(k9MellomlagringScope).asAuthoriationHeader()
+        val authorizationHeader: String =
+            cachedAccessTokenClient.getAccessToken(k9MellomlagringScope).asAuthoriationHeader()
 
         coroutineScope {
             val deferred = mutableListOf<Deferred<Unit>>()
@@ -187,7 +221,7 @@ class K9MellomlagringGateway(
             pathParts = listOf(vedleggId.value)
         )
 
-        val body =  objectMapper.writeValueAsBytes(eier)
+        val body = objectMapper.writeValueAsBytes(eier)
 
         val httpRequest = urlMedId.toString()
             .httpDelete()
@@ -208,7 +242,7 @@ class K9MellomlagringGateway(
 
 
         result.fold(
-            { _ -> logger.info("Vellykket sletting av persistert vedlegg")},
+            { _ -> logger.info("Vellykket sletting av persistert vedlegg") },
             { error ->
                 logger.error("Error response = '${error.response.body().asString("text/plain")}' fra '${request.url}'")
                 logger.error("Feil ved sletting av persistert vedlegg. $error")
@@ -222,7 +256,8 @@ class K9MellomlagringGateway(
         callId: CallId,
         eier: DokumentEier
     ) {
-        val authorizationHeader: String = cachedAccessTokenClient.getAccessToken(k9MellomlagringScope).asAuthoriationHeader()
+        val authorizationHeader: String =
+            cachedAccessTokenClient.getAccessToken(k9MellomlagringScope).asAuthoriationHeader()
 
         coroutineScope {
             val deferred = mutableListOf<Deferred<Unit>>()
@@ -252,7 +287,7 @@ class K9MellomlagringGateway(
             pathParts = listOf(vedleggId.value, "persister")
         )
 
-        val body =  objectMapper.writeValueAsBytes(eier)
+        val body = objectMapper.writeValueAsBytes(eier)
 
         val httpRequest = urlMedId.toString()
             .httpPut()
@@ -273,7 +308,7 @@ class K9MellomlagringGateway(
 
 
         result.fold(
-            { _ -> logger.info("Vellykket persistering av vedlegg")},
+            { _ -> logger.info("Vellykket persistering av vedlegg") },
             { error ->
                 logger.error("Error response = '${error.response.body().asString("text/plain")}' fra '${request.url}'")
                 logger.error("Feil ved persistering av vedlegg. $error")
@@ -282,6 +317,27 @@ class K9MellomlagringGateway(
         )
     }
 
+    suspend fun hentVedlegg(vedleggId: VedleggId, idToken: IdToken, eier: DokumentEier, callId: CallId): Vedlegg? {
+        val body = objectMapper.writeValueAsBytes(eier)
+
+        val urlMedId = Url.buildURL(
+            baseUrl = baseUrl,
+            pathParts = listOf(vedleggId.value)
+        )
+
+        val httpRequest = urlMedId
+            .toString()
+            .httpGet()
+            .body(body)
+            .header(
+                HttpHeaders.Authorization to "Bearer ${idToken.value}",
+                HttpHeaders.XCorrelationId to callId.value,
+                HttpHeaders.ContentType to "application/json"
+            )
+        return requestHentVedlegg(httpRequest)
+    }
+
 }
 
-data class CreatedResponseEntity(val id : String)
+data class CreatedResponseEntity(val id: String)
+private data class ResolvedVedlegg(val vedlegg: Vedlegg? = null)
