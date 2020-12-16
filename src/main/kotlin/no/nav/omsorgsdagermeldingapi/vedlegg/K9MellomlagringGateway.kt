@@ -332,7 +332,8 @@ class K9MellomlagringGateway(
             .header(
                 HttpHeaders.Authorization to "Bearer ${idToken.value}",
                 HttpHeaders.XCorrelationId to callId.value,
-                HttpHeaders.ContentType to "application/json"
+                HttpHeaders.ContentType to "application/json",
+                HttpHeaders.Accept to "application/json"
             )
         return requestHentVedlegg(httpRequest)
     }
