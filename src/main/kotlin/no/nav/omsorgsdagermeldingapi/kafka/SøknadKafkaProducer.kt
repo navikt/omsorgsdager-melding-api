@@ -48,7 +48,6 @@ class SøknadKafkaProducer(
                 )
             )
         ).get()
-        logger.info("FOR TEST - Melding sendt {}", komplettMelding.somJson())
         logger.info(formaterStatuslogging(komplettMelding.søknadId, "sendes til topic ${OMSORGDAGER_MELDING_MOTTATT_TOPIC.name} med offset '${recordMetaData.offset()}' til partition '${recordMetaData.partition()}'"))
     }
 
