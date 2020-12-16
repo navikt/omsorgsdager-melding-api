@@ -33,7 +33,7 @@ class K9MellomlagringResponseTransformer() : ResponseTransformer() {
         return when {
             request == null -> throw IllegalStateException("request == null")
 
-            request.method == RequestMethod.GET -> {
+            request.method == RequestMethod.POST -> {
 
                 val vedleggId = request.getVedleggId()
                 return if (storage.containsKey(vedleggId)) {

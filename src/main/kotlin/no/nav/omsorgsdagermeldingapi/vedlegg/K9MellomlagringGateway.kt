@@ -327,7 +327,7 @@ class K9MellomlagringGateway(
 
         val httpRequest = urlMedId
             .toString()
-            .httpGet()
+            .httpPost()
             .body(body)
             .header(
                 HttpHeaders.Authorization to "Bearer ${idToken.value}",
