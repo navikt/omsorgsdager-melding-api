@@ -1,5 +1,9 @@
 package no.nav.omsorgsdagermeldingapi.vedlegg
 
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import no.nav.omsorgsdagermeldingapi.general.CallId
 import no.nav.omsorgsdagermeldingapi.general.auth.IdToken
 import java.net.URL
@@ -12,7 +16,7 @@ class VedleggService(
         vedlegg: Vedlegg,
         idToken: IdToken,
         callId: CallId
-    ) : VedleggId {
+    ): VedleggId {
 
         return k9MellomlagringGateway.lagreVedlegg(
             vedlegg = vedlegg,
@@ -66,7 +70,46 @@ class VedleggService(
         )
     }
 
-    private fun vedleggIdFromUrl(url: URL) : VedleggId {
+    private fun vedleggIdFromUrl(url: URL): VedleggId {
         return VedleggId(url.path.substringAfterLast("/"))
+    }
+
+    suspend fun hentVedlegg(
+        vedleggId: VedleggId,
+        idToken: IdToken,
+        callId: CallId,
+        eier: DokumentEier
+    ): Vedlegg? {
+
+        return k9MellomlagringGateway.hentVedlegg(
+            vedleggId = vedleggId,
+            idToken = idToken,
+            eier = eier,
+            callId = callId
+        )
+    }
+
+    suspend fun hentVedlegg(
+        idToken: IdToken,
+        vedleggUrls: List<URL>,
+        eier: DokumentEier,
+        callId: CallId
+    ): List<Vedlegg> {
+        val vedlegg = coroutineScope {
+            val futures = mutableListOf<Deferred<Vedlegg?>>()
+            vedleggUrls.forEach {
+                futures.add(async {
+                    hentVedlegg(
+                        vedleggId = vedleggIdFromUrl(it),
+                        idToken = idToken,
+                        eier = eier,
+                        callId = callId
+                    )
+                })
+
+            }
+            futures.awaitAll().filter { it != null }
+        }
+        return vedlegg.requireNoNulls()
     }
 }

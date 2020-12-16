@@ -366,25 +366,38 @@ class ApplicationTest {
     //Fordeling
     @Test
     fun `Sende gyldig melding om fordeling av omsorgsdager og plukke opp fra kafka topic`() {
-        val søknadID = UUID.randomUUID().toString()
-        val søknad = MeldingUtils.gyldigMeldingFordele.copy(
+        with(engine) {
+            val søknadID = UUID.randomUUID().toString()
+            val cookie = getAuthCookie(gyldigFodselsnummerA)
+            val jpeg = "vedlegg/iPhone_6.jpg".fromResources().readBytes()
+
+            // LASTER OPP VEDLEGG
+            val vedleggId = handleRequestUploadImage(
+                cookie = cookie,
+                vedlegg = jpeg
+            ).substringAfterLast("/")
+
+            val søknad = MeldingUtils.gyldigMeldingFordele.copy(
                 søknadId = søknadID,
                 fordeling = Fordele(
                         Mottaker.SAMVÆRSFORELDER,
-                        samværsavtale = listOf(URL("${wireMockServer.getK9MellomlagringUrl()}/1"))
+                        samværsavtale = listOf(URL("${wireMockServer.getK9MellomlagringUrl()}/$vedleggId"))
                 )
-        ).somJson()
+            ).somJson()
 
-        requestAndAssert(
-            httpMethod = HttpMethod.Post,
-            path = MELDING_URL_FORDELE,
-            expectedResponse = null,
-            expectedCode = HttpStatusCode.Accepted,
-            requestEntity = søknad
-        )
 
-        val søknadSendtTilProsessering = hentMeldingSendtTilProsessering(søknadID)
-        verifiserAtInnholdetErLikt(JSONObject(søknad), søknadSendtTilProsessering)
+            requestAndAssert(
+                httpMethod = HttpMethod.Post,
+                path = MELDING_URL_FORDELE,
+                expectedResponse = null,
+                expectedCode = HttpStatusCode.Accepted,
+                requestEntity = søknad
+            )
+
+
+            val søknadSendtTilProsessering = hentMeldingSendtTilProsessering(søknadID)
+            verifiserAtInnholdetErLikt(JSONObject(søknad), søknadSendtTilProsessering)
+        }
     }
 
     private fun requestAndAssert(
