@@ -52,11 +52,7 @@ dependencies {
 }
 
 repositories {
-    maven("https://dl.bintray.com/kotlin/ktor")
-    maven("https://kotlin.bintray.com/kotlinx")
-    maven("https://packages.confluent.io/maven/")
-    maven("https://jitpack.io")
-
+    mavenLocal()
     maven {
         name = "GitHubPackages"
         url = uri("https://maven.pkg.github.com/navikt/dusseldorf-ktor")
@@ -67,8 +63,11 @@ repositories {
     }
 
     jcenter()
-    mavenLocal()
     mavenCentral()
+    maven("https://dl.bintray.com/kotlin/ktor")
+    maven("https://kotlin.bintray.com/kotlinx")
+    maven("https://packages.confluent.io/maven/")
+    maven("https://jitpack.io")
 }
 
 
