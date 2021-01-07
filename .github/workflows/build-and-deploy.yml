@@ -80,7 +80,7 @@ jobs:
 
   deploy-prod-gcp:
     name: Deploy to prod-gcp
-    if: startsWith(github.ref, 'refs/heads/dev-') || startsWith(github.ref, 'refs/heads/master') # Deploy if branch is either master or dev-*
+    if: startsWith(github.ref, 'refs/heads/master') # Deploy if branch is master
     needs: build-code-and-push-docker # Depends on build-code-and-push-docker job
     runs-on: ubuntu-latest
     steps:
