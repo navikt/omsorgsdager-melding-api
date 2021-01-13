@@ -8,7 +8,7 @@ dependencies {
     compile 'io.ktor:ktor-locations:1.5.0'
     compile 'no.nav.helse:dusseldorf-ktor-client:1.5.0.3315e68'
     compile 'no.nav.helse:dusseldorf-oauth2-client:1.5.0.3315e68'
-    compile 'io.lettuce:lettuce-core:5.2.1.RELEASE'
+    compile 'io.lettuce:lettuce-core:6.0.2.RELEASE'
     compile 'com.github.fppt:jedis-mock:0.1.16'
     compile 'org.apache.kafka:kafka-clients:2.4.0'
     testCompile 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
