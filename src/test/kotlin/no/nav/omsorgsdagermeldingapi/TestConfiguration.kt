@@ -1,5 +1,6 @@
 package no.nav.omsorgsdagermeldingapi
 
+import com.github.fppt.jedismock.RedisServer
 import com.github.tomakehurst.wiremock.WireMockServer
 import no.nav.common.KafkaEnvironment
 import no.nav.helse.dusseldorf.testsupport.jws.ClientCredentials
@@ -14,10 +15,11 @@ object TestConfiguration {
     fun asMap(
         wireMockServer: WireMockServer? = null,
         kafkaEnvironment: KafkaEnvironment? = null,
-        port : Int = 8080,
+        port: Int = 8080,
         k9OppslagUrl: String? = wireMockServer?.getK9OppslagUrl(),
         k9MellomlagringUrl: String? = wireMockServer?.getK9MellomlagringUrl(),
-        corsAdresses : String = "http://localhost:8080"
+        corsAdresses: String = "http://localhost:8080",
+        redisServer: RedisServer
     ) : Map<String, String> {
 
         val map = mutableMapOf(
@@ -54,8 +56,8 @@ object TestConfiguration {
             map["nav.kafka.password"] = it.password()
         }
 
-        map["nav.redis.host"] = "localhost"
-        map["nav.redis.port"] = "6379"
+        map["nav.redis.host"] = redisServer.host
+        map["nav.redis.port"] = "${redisServer.bindPort}"
         map["nav.storage.passphrase"] = "verySecret"
 
         return map.toMap()

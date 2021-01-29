@@ -1,5 +1,6 @@
 package no.nav.omsorgsdagermeldingapi
 
+import com.github.fppt.jedismock.RedisServer
 import com.github.tomakehurst.wiremock.http.Cookie
 import com.typesafe.config.ConfigFactory
 import io.ktor.config.*
@@ -13,6 +14,7 @@ import no.nav.helse.dusseldorf.testsupport.wiremock.WireMockBuilder
 import no.nav.helse.getAuthCookie
 import no.nav.omsorgsdagermeldingapi.felles.*
 import no.nav.omsorgsdagermeldingapi.kafka.Topics
+import no.nav.omsorgsdagermeldingapi.mellomlagring.started
 import no.nav.omsorgsdagermeldingapi.redis.RedisMockUtil
 import no.nav.omsorgsdagermeldingapi.søknad.melding.BarnUtvidet
 import no.nav.omsorgsdagermeldingapi.søknad.melding.Fordele
@@ -41,6 +43,9 @@ class ApplicationTest {
 
         private val logger: Logger = LoggerFactory.getLogger(ApplicationTest::class.java)
 
+        val redisServer: RedisServer = RedisServer
+            .newRedisServer(6379).started()
+
         val wireMockServer = WireMockBuilder()
             .withAzureSupport()
             .withNaisStsSupport()
@@ -60,6 +65,7 @@ class ApplicationTest {
             val testConfig = ConfigFactory.parseMap(
                 TestConfiguration.asMap(
                     wireMockServer = wireMockServer,
+                    redisServer = redisServer,
                     kafkaEnvironment = kafkaEnvironment
                 )
             )
@@ -77,7 +83,6 @@ class ApplicationTest {
         @BeforeClass
         @JvmStatic
         fun buildUp() {
-
             engine.start(wait = true)
         }
 
@@ -86,7 +91,7 @@ class ApplicationTest {
         fun tearDown() {
             logger.info("Tearing down")
             wireMockServer.stop()
-            RedisMockUtil.stopRedisMocked()
+            redisServer.stop()
             logger.info("Tear down complete")
         }
 
