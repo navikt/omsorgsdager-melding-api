@@ -33,7 +33,6 @@ import no.nav.omsorgsdagermeldingapi.kafka.SøknadKafkaProducer
 import no.nav.omsorgsdagermeldingapi.mellomlagring.MellomlagringService
 import no.nav.omsorgsdagermeldingapi.mellomlagring.mellomlagringApis
 import no.nav.omsorgsdagermeldingapi.redis.RedisConfig
-import no.nav.omsorgsdagermeldingapi.redis.RedisConfigurationProperties
 import no.nav.omsorgsdagermeldingapi.redis.RedisStore
 import no.nav.omsorgsdagermeldingapi.søker.SøkerGateway
 import no.nav.omsorgsdagermeldingapi.søker.SøkerService
@@ -67,8 +66,8 @@ fun Application.omsorgpengermidlertidigaleneapi() {
     install(ContentNegotiation) {
         jackson {
             dusseldorfConfigured()
-                    .setPropertyNamingStrategy(PropertyNamingStrategies.LOWER_CAMEL_CASE )
-                    .configure(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS, false)
+                .setPropertyNamingStrategy(PropertyNamingStrategies.LOWER_CAMEL_CASE)
+                .configure(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS, false)
         }
     }
 
@@ -91,11 +90,11 @@ fun Application.omsorgpengermidlertidigaleneapi() {
 
     install(Authentication) {
         multipleJwtIssuers(
-                issuers = issuers,
-                extractHttpAuthHeader = { call ->
-                    idTokenProvider.getIdToken(call)
-                            .somHttpAuthHeader()
-                }
+            issuers = issuers,
+            extractHttpAuthHeader = { call ->
+                idTokenProvider.getIdToken(call)
+                    .somHttpAuthHeader()
+            }
         )
     }
 
@@ -112,36 +111,36 @@ fun Application.omsorgpengermidlertidigaleneapi() {
         val accessTokenClientResolver = AccessTokenClientResolver(environment.config.clients())
 
         val søkerGateway = SøkerGateway(
-                baseUrl = configuration.getK9OppslagUrl(),
-                apiGatewayApiKey = apiGatewayApiKey
+            baseUrl = configuration.getK9OppslagUrl(),
+            apiGatewayApiKey = apiGatewayApiKey
         )
 
         val søkerService = SøkerService(
-                søkerGateway = søkerGateway
+            søkerGateway = søkerGateway
         )
 
         val barnGateway = BarnGateway(
-                baseUrl = configuration.getK9OppslagUrl(),
-                apiGatewayApiKey = apiGatewayApiKey
+            baseUrl = configuration.getK9OppslagUrl(),
+            apiGatewayApiKey = apiGatewayApiKey
         )
 
         val barnService = BarnService(
-                barnGateway = barnGateway,
-                cache = configuration.cache()
+            barnGateway = barnGateway,
+            cache = configuration.cache()
         )
 
         val k9MellomlagringGateway = K9MellomlagringGateway(
-                baseUrl = configuration.getK9MellomlagringUrl(),
-                accessTokenClient = accessTokenClientResolver.accessTokenClient(),
-                k9MellomlagringScope = configuration.getK9MellomlagringCScopes()
+            baseUrl = configuration.getK9MellomlagringUrl(),
+            accessTokenClient = accessTokenClientResolver.accessTokenClient(),
+            k9MellomlagringScope = configuration.getK9MellomlagringCScopes()
         )
 
         val vedleggService = VedleggService(
-                k9MellomlagringGateway = k9MellomlagringGateway
+            k9MellomlagringGateway = k9MellomlagringGateway
         )
 
         val søknadKafkaProducer = SøknadKafkaProducer(
-                kafkaConfig = configuration.getKafkaConfig()
+            kafkaConfig = configuration.getKafkaConfig()
         )
 
         environment.monitor.subscribe(ApplicationStopping) {
@@ -153,62 +152,63 @@ fun Application.omsorgpengermidlertidigaleneapi() {
         authenticate(*issuers.allIssuers()) {
 
             søkerApis(
-                    søkerService = søkerService,
-                    idTokenProvider = idTokenProvider
+                søkerService = søkerService,
+                idTokenProvider = idTokenProvider
             )
 
             barnApis(
-                    barnService = barnService,
-                    idTokenProvider = idTokenProvider
+                barnService = barnService,
+                idTokenProvider = idTokenProvider
             )
 
             mellomlagringApis(
-                    mellomlagringService = MellomlagringService(
-                            RedisStore(
-                                    RedisConfig(
-                                            RedisConfigurationProperties(
-                                                    configuration.getRedisHost().equals("localhost")
-                                            )
-                                    ).redisClient(configuration)
-                            ), configuration.getStoragePassphrase()),
-                    idTokenProvider = idTokenProvider
+                mellomlagringService = MellomlagringService(
+                    RedisStore(
+                        redisClient = RedisConfig.redisClient(
+                            redisHost = configuration.getRedisHost(),
+                            redisPort = configuration.getRedisPort()
+                        )
+                    ),
+                    passphrase = configuration.getStoragePassphrase(),
+                ),
+                idTokenProvider = idTokenProvider
             )
 
             vedleggApis(
-                    vedleggService = vedleggService,
-                    idTokenProvider = idTokenProvider
+                vedleggService = vedleggService,
+                idTokenProvider = idTokenProvider
             )
 
             søknadApis(
-                    idTokenProvider = idTokenProvider,
-                    søknadService = SøknadService(
-                            søkerService = søkerService,
-                            kafkaProducer = søknadKafkaProducer,
-                            k9MellomLagringIngress = configuration.getK9MellomlagringIngress(),
-                            vedleggService = vedleggService
-                    ),
-                    barnService = barnService,
+                idTokenProvider = idTokenProvider,
+                søknadService = SøknadService(
+                    søkerService = søkerService,
+                    kafkaProducer = søknadKafkaProducer,
+                    k9MellomLagringIngress = configuration.getK9MellomlagringIngress(),
                     vedleggService = vedleggService
+                ),
+                barnService = barnService,
+                vedleggService = vedleggService
             )
         }
 
         val healthService = HealthService(
-                healthChecks = setOf(
-                        søknadKafkaProducer,
-                        søkerGateway
-                )
+            healthChecks = setOf(
+                søknadKafkaProducer,
+                søkerGateway
+            )
         )
 
         HealthReporter(
-                app = appId,
-                healthService = healthService,
-                frequency = Duration.ofMinutes(1)
+            app = appId,
+            healthService = healthService,
+            frequency = Duration.ofMinutes(1)
         )
 
         DefaultProbeRoutes()
         MetricsRoute()
         HealthRoute(
-                healthService = healthService
+            healthService = healthService
         )
     }
 

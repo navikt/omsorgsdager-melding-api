@@ -1,14 +1,8 @@
 package no.nav.omsorgsdagermeldingapi.mellomlagring
 
 import com.github.fppt.jedismock.RedisServer
-import com.typesafe.config.ConfigFactory
-import io.ktor.config.*
 import io.ktor.util.*
-import no.nav.omsorgsdagermeldingapi.Configuration
-import no.nav.omsorgsdagermeldingapi.TestConfiguration
 import no.nav.omsorgsdagermeldingapi.redis.RedisConfig
-import no.nav.omsorgsdagermeldingapi.redis.RedisConfigurationProperties
-import no.nav.omsorgsdagermeldingapi.redis.RedisMockUtil
 import no.nav.omsorgsdagermeldingapi.redis.RedisStore
 import org.junit.AfterClass
 import kotlin.test.Test
@@ -23,14 +17,15 @@ class MellomlagringTest {
             .newRedisServer(6379)
             .started()
 
-        val redisClient = RedisConfig(RedisConfigurationProperties(true)).redisClient(
-            Configuration(
-                HoconApplicationConfig(ConfigFactory.parseMap(TestConfiguration.asMap(redisServer = redisServer)))
-            )
+        val redisClient = RedisConfig.redisClient(
+            redisHost = redisServer.host,
+            redisPort = redisServer.bindPort
         )
+
         val redisStore = RedisStore(
             redisClient
         )
+
         val mellomlagringService = MellomlagringService(
             redisStore,
             "VerySecretPass"
