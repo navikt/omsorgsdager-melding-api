@@ -1,5 +1,6 @@
 package no.nav.omsorgsdagermeldingapi.mellomlagring
 
+import com.github.fppt.jedismock.RedisServer
 import com.typesafe.config.ConfigFactory
 import io.ktor.config.*
 import io.ktor.util.*
@@ -18,9 +19,13 @@ import kotlin.test.assertNotNull
 @KtorExperimentalAPI
 class MellomlagringTest {
     private companion object {
+        val redisServer: RedisServer = RedisServer
+            .newRedisServer(6379)
+            .started()
+
         val redisClient = RedisConfig(RedisConfigurationProperties(true)).redisClient(
             Configuration(
-                HoconApplicationConfig(ConfigFactory.parseMap(TestConfiguration.asMap()))
+                HoconApplicationConfig(ConfigFactory.parseMap(TestConfiguration.asMap(redisServer = redisServer)))
             )
         )
         val redisStore = RedisStore(
@@ -35,7 +40,7 @@ class MellomlagringTest {
         @JvmStatic
         fun teardown() {
             redisClient.shutdown()
-            RedisMockUtil.stopRedisMocked()
+            redisServer.stop()
         }
     }
 

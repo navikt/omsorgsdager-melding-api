@@ -1,8 +1,10 @@
 package no.nav.omsorgsdagermeldingapi
 
+import com.github.fppt.jedismock.RedisServer
 import io.ktor.server.testing.*
 import no.nav.helse.dusseldorf.testsupport.asArguments
 import no.nav.helse.dusseldorf.testsupport.wiremock.WireMockBuilder
+import no.nav.omsorgsdagermeldingapi.mellomlagring.started
 import no.nav.omsorgsdagermeldingapi.wiremock.omsorgsdagerMeldingApiConfig
 import no.nav.omsorgsdagermeldingapi.wiremock.stubK9OppslagBarn
 import no.nav.omsorgsdagermeldingapi.wiremock.stubK9OppslagSoker
@@ -29,15 +31,21 @@ class ApplicationWithMocks {
                 .stubK9OppslagSoker()
                 .stubK9OppslagBarn()
 
+            val redisServer: RedisServer = RedisServer
+                .newRedisServer(6379)
+                .started()
+
             val testArgs = TestConfiguration.asMap(
+                wireMockServer = wireMockServer,
                 port = 8082,
-                wireMockServer = wireMockServer
+                redisServer = redisServer
             ).asArguments()
 
             Runtime.getRuntime().addShutdownHook(object : Thread() {
                 override fun run() {
                     logger.info("Tearing down")
                     wireMockServer.stop()
+                    redisServer.stop()
                     logger.info("Tear down complete")
                 }
             })
