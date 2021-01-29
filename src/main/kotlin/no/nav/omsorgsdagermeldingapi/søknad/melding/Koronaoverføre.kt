@@ -6,15 +6,11 @@ import no.nav.helse.dusseldorf.ktor.core.ParameterType
 import no.nav.helse.dusseldorf.ktor.core.Violation
 import java.time.LocalDate
 
-val kjentePerioder = listOf(
-    Pair(LocalDate.parse("2020-03-13"), LocalDate.parse("2020-06-30")),
-    Pair(LocalDate.parse("2020-08-10"), LocalDate.parse("2020-12-31")),
-    Pair(LocalDate.parse("2021-01-01"), LocalDate.parse("2021-12-31"))
-)
+val STENGINGSPERIODE_2021 = KoronaStengingsperiode(fraOgMed = LocalDate.parse("2021-01-01"), tilOgMed = LocalDate.parse("2021-12-31") )
 
 data class Koronaoverføre(
     val antallDagerSomSkalOverføres: Int,
-    val stengingsperiode: KoronaStengingsperiode
+    val stengingsperiode: KoronaStengingsperiode = STENGINGSPERIODE_2021
 )
 
 data class KoronaStengingsperiode(
@@ -44,20 +40,6 @@ internal fun Melding.validerKoronaOverføre(): MutableSet<Violation> {
                 )
             )
         }
-
-        if (korona.stengingsperiode.ikkeErKjentPeriode()) {
-            mangler.add(
-                Violation(
-                    parameterName = "korona.stengingsperiode",
-                    parameterType = ParameterType.ENTITY,
-                    reason = "stengingsperiode er ikke en kjent periode. Kjente perioder er: ${kjentePerioder}",
-                    invalidValue = korona.stengingsperiode
-                )
-            )
-        }
     }
     return mangler
 }
-
-private fun KoronaStengingsperiode.ikkeErKjentPeriode(): Boolean =
-    kjentePerioder.none { (it.first == fraOgMed && it.second == tilOgMed) }
