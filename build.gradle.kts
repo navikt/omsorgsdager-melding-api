@@ -5,7 +5,7 @@ val dusseldorfKtorVersion = "1.5.0.3315e68"
 val ktorVersion = ext.get("ktorVersion").toString()
 val mainClass = "no.nav.omsorgsdagermeldingapi.AppKt"
 val kafkaEmbeddedEnvVersion = "2.4.0"
-val kafkaVersion = "2.4.0" // Alligned med version fra kafka-embedded-env
+val kafkaVersion = "6.0.1-ce" // Alligned med version fra kafka-embedded-env
 val junitJupiterVersion = "5.7.0"
 val kotlinxCoroutinesVersion = "1.4.2-native-mt"
 
