@@ -17,14 +17,4 @@ object RedisMockUtil {
             redisStarted.set(true)
         }
     }
-
-    @JvmStatic
-    fun stopRedisMocked() {
-        if (redisStarted.get()) {
-            mockedRedisServer.stop()
-            redisStarted.set(false)
-        }
-    }
-
-
 }

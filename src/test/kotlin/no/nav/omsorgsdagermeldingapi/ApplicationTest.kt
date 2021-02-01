@@ -1,5 +1,6 @@
 package no.nav.omsorgsdagermeldingapi
 
+import com.github.fppt.jedismock.RedisServer
 import com.github.tomakehurst.wiremock.http.Cookie
 import com.typesafe.config.ConfigFactory
 import io.ktor.config.*
@@ -13,8 +14,11 @@ import no.nav.helse.dusseldorf.testsupport.wiremock.WireMockBuilder
 import no.nav.helse.getAuthCookie
 import no.nav.omsorgsdagermeldingapi.felles.*
 import no.nav.omsorgsdagermeldingapi.kafka.Topics
+import no.nav.omsorgsdagermeldingapi.mellomlagring.started
 import no.nav.omsorgsdagermeldingapi.redis.RedisMockUtil
-import no.nav.omsorgsdagermeldingapi.søknad.melding.*
+import no.nav.omsorgsdagermeldingapi.søknad.melding.BarnUtvidet
+import no.nav.omsorgsdagermeldingapi.søknad.melding.Fordele
+import no.nav.omsorgsdagermeldingapi.søknad.melding.Mottaker
 import no.nav.omsorgsdagermeldingapi.wiremock.*
 import org.json.JSONObject
 import org.junit.AfterClass
@@ -39,6 +43,9 @@ class ApplicationTest {
 
         private val logger: Logger = LoggerFactory.getLogger(ApplicationTest::class.java)
 
+        val redisServer: RedisServer = RedisServer
+            .newRedisServer(6379).started()
+
         val wireMockServer = WireMockBuilder()
             .withAzureSupport()
             .withNaisStsSupport()
@@ -58,6 +65,7 @@ class ApplicationTest {
             val testConfig = ConfigFactory.parseMap(
                 TestConfiguration.asMap(
                     wireMockServer = wireMockServer,
+                    redisServer = redisServer,
                     kafkaEnvironment = kafkaEnvironment
                 )
             )
@@ -75,7 +83,6 @@ class ApplicationTest {
         @BeforeClass
         @JvmStatic
         fun buildUp() {
-
             engine.start(wait = true)
         }
 
@@ -84,7 +91,7 @@ class ApplicationTest {
         fun tearDown() {
             logger.info("Tearing down")
             wireMockServer.stop()
-            RedisMockUtil.stopRedisMocked()
+            redisServer.stop()
             logger.info("Tear down complete")
         }
 
@@ -272,47 +279,6 @@ class ApplicationTest {
             expectedCode = HttpStatusCode.Forbidden,
             cookie = cookie,
             requestEntity = MeldingUtils.gyldigMeldingKoronaoverføre.somJson()
-        )
-    }
-
-    @Test
-    fun `sende melding om koronaoverføring med ugyldig stengingsperiode`() {
-        val cookie = getAuthCookie(ikkeMyndigFnr)
-
-        requestAndAssert(
-            httpMethod = HttpMethod.Post,
-            path = MELDING_URL_KORONAOVERFØRE,
-            expectedResponse = """
-                {
-                  "type": "/problem-details/invalid-request-parameters",
-                  "title": "invalid-request-parameters",
-                  "status": 400,
-                  "detail": "Requesten inneholder ugyldige paramtere.",
-                  "instance": "about:blank",
-                  "invalid_parameters": [
-                    {
-                      "type": "entity",
-                      "name": "korona.stengingsperiode",
-                      "reason": "stengingsperiode er ikke en kjent periode. Kjente perioder er: [(2020-03-13, 2020-06-30), (2020-08-10, 2020-12-31), (2021-01-01, 2021-12-31)]",
-                      "invalid_value": {
-                        "fraOgMed": "2020-03-13",
-                        "tilOgMed": "2020-06-29"
-                      }
-                    }
-                  ]
-                }
-            """.trimIndent(),
-            expectedCode = HttpStatusCode.BadRequest,
-            cookie = cookie,
-            requestEntity = MeldingUtils.gyldigMeldingKoronaoverføre.copy(
-                korona = Koronaoverføre(
-                    antallDagerSomSkalOverføres = 10,
-                    stengingsperiode = KoronaStengingsperiode(
-                        fraOgMed = LocalDate.parse("2020-03-13"),
-                        tilOgMed = LocalDate.parse("2020-06-29")
-                    )
-                )
-            ).somJson()
         )
     }
 

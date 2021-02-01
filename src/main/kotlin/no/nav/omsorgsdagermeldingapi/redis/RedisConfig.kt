@@ -2,14 +2,12 @@ package no.nav.omsorgsdagermeldingapi.redis
 
 import io.ktor.util.*
 import io.lettuce.core.RedisClient
-import no.nav.omsorgsdagermeldingapi.Configuration
 
-class RedisConfig(private val redisConfigurationProperties: RedisConfigurationProperties) {
+internal object RedisConfig {
 
     @KtorExperimentalAPI
-    fun redisClient(configuration: Configuration): RedisClient {
-        redisConfigurationProperties.startInMemoryRedisIfMocked()
-        return RedisClient.create("redis://${configuration.getRedisHost()}:${configuration.getRedisPort()}")
+    internal fun redisClient(redisHost: String, redisPort: Int): RedisClient {
+        return RedisClient.create("redis://${redisHost}:${redisPort}")
     }
 
 }
