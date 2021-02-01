@@ -210,8 +210,8 @@ internal class MeldingValideringsTest {
             korona = Koronaoverføre(
                 antallDagerSomSkalOverføres = 1000,
                 stengingsperiode = KoronaStengingsperiode(
-                    fraOgMed = LocalDate.parse("2020-03-13"),
-                    tilOgMed = LocalDate.parse("2020-06-30")
+                    fraOgMed = LocalDate.parse("2021-01-01"),
+                    tilOgMed = LocalDate.parse("2021-12-31")
                 )
             )
         )
@@ -225,8 +225,8 @@ internal class MeldingValideringsTest {
             korona = Koronaoverføre(
                 antallDagerSomSkalOverføres = 0,
                 stengingsperiode = KoronaStengingsperiode(
-                    fraOgMed = LocalDate.parse("2020-03-13"),
-                    tilOgMed = LocalDate.parse("2020-06-30")
+                    fraOgMed = LocalDate.parse("2021-01-01"),
+                    tilOgMed = LocalDate.parse("2021-12-31")
                 )
             )
         )
@@ -240,8 +240,23 @@ internal class MeldingValideringsTest {
             korona = Koronaoverføre(
                 antallDagerSomSkalOverføres = 0,
                 stengingsperiode = KoronaStengingsperiode(
-                    fraOgMed = LocalDate.parse("2020-03-13"),
-                    tilOgMed = LocalDate.parse("2020-06-30")
+                    fraOgMed = LocalDate.parse("2021-01-01"),
+                    tilOgMed = LocalDate.parse("2021-12-31")
+                )
+            )
+        )
+        melding.valider()
+    }
+
+    @Test(expected = Throwblem::class)
+    fun `Skal feile type er KORONA_OVERFØRE men stengingsperiode er ikke kjent periode`(){
+        val melding = MeldingUtils.gyldigMeldingKoronaoverføre.copy(
+            type = Meldingstype.KORONA,
+            korona = Koronaoverføre(
+                antallDagerSomSkalOverføres = 0,
+                stengingsperiode = KoronaStengingsperiode(
+                    fraOgMed = LocalDate.parse("2021-01-01"),
+                    tilOgMed = LocalDate.parse("2021-06-01")
                 )
             )
         )
