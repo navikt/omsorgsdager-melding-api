@@ -15,7 +15,6 @@ import no.nav.helse.getAuthCookie
 import no.nav.omsorgsdagermeldingapi.felles.*
 import no.nav.omsorgsdagermeldingapi.kafka.Topics
 import no.nav.omsorgsdagermeldingapi.mellomlagring.started
-import no.nav.omsorgsdagermeldingapi.redis.RedisMockUtil
 import no.nav.omsorgsdagermeldingapi.søknad.melding.BarnUtvidet
 import no.nav.omsorgsdagermeldingapi.søknad.melding.Fordele
 import no.nav.omsorgsdagermeldingapi.søknad.melding.Mottaker
