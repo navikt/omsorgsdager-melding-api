@@ -29,6 +29,13 @@ fun Route.mellomlagringApis(
         call.respond(HttpStatusCode.NoContent)
     }
 
+    put { _: mellomlagring ->
+        val midlertidigSøknad = call.receive<String>()
+        val idToken = idTokenProvider.getIdToken(call)
+        mellomlagringService.updateMellomlagring(idToken.getSubject()!!, midlertidigSøknad)
+        call.respond(HttpStatusCode.NoContent)
+    }
+
     get { _: mellomlagring ->
         val idToken = idTokenProvider.getIdToken(call)
         val mellomlagring = mellomlagringService.getMellomlagring(idToken.getSubject()!!)
