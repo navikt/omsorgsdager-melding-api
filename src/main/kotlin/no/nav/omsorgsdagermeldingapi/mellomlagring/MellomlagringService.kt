@@ -28,7 +28,7 @@ class MellomlagringService @KtorExperimentalAPI constructor(
         fnr: String,
         midlertidigSøknad: String,
         expirationDate: Date = Calendar.getInstance().let {
-            it.add(Calendar.HOUR, 24)
+            it.add(Calendar.MINUTE, 5)
             it.time
         }
     ) {
