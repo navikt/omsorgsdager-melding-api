@@ -10,7 +10,7 @@ val junitJupiterVersion = "5.7.0"
 val kotlinxCoroutinesVersion = "1.4.2-native-mt"
 
 plugins {
-    kotlin("jvm") version "1.4.30"
+    kotlin("jvm") version "1.4.31"
     id("com.github.johnrengelman.shadow") version "6.1.0"
 }
 
