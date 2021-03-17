@@ -5,7 +5,6 @@ import io.ktor.http.*
 import no.nav.helse.dusseldorf.ktor.client.buildURL
 import no.nav.omsorgsdagermeldingapi.barn.Barn
 import no.nav.omsorgsdagermeldingapi.søker.Søker
-import no.nav.omsorgsdagermeldingapi.vedlegg.K9MellomlagringGateway
 import java.net.URI
 import java.net.URL
 import java.time.ZoneOffset
@@ -33,6 +32,9 @@ data class Melding(
         val overføring: Overføre? = null,
         val fordeling: Fordele? = null,
 ) {
+    override fun toString(): String {
+        return "Melding(søknadId='$søknadId', id='$id')"
+    }
 
     fun oppdaterBarnMedFnr(listeOverBarn: List<Barn>) {
         barn.forEach { barn ->

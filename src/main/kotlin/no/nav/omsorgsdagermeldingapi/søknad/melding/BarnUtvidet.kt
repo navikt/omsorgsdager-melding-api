@@ -12,6 +12,10 @@ data class BarnUtvidet(
     val aleneOmOmsorgen: Boolean? = null, //Settes til null for å unngå default false
     val utvidetRett: Boolean ? = null //Settes til null for å unngå default false,
 ){
+    override fun toString(): String {
+        return "BarnUtvidet()"
+    }
+
     fun manglerIdentitetsnummer(): Boolean = identitetsnummer.isNullOrEmpty()
 
     infix fun oppdaterIdentitetsnummerMed(identitetsnummer: String?){
