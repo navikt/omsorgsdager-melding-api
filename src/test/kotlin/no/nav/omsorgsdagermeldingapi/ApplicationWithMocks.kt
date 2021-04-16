@@ -32,7 +32,7 @@ class ApplicationWithMocks {
                 .stubK9OppslagBarn()
 
             val redisServer: RedisServer = RedisServer
-                .newRedisServer(6379)
+                .newRedisServer()
                 .started()
 
             val testArgs = TestConfiguration.asMap(

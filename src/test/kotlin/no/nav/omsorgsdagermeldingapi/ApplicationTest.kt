@@ -43,7 +43,7 @@ class ApplicationTest {
         private val logger: Logger = LoggerFactory.getLogger(ApplicationTest::class.java)
 
         val redisServer: RedisServer = RedisServer
-            .newRedisServer(6379).started()
+            .newRedisServer().started()
 
         val wireMockServer = WireMockBuilder()
             .withAzureSupport()
