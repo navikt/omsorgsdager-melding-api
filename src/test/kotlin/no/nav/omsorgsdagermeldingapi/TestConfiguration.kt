@@ -56,7 +56,7 @@ object TestConfiguration {
             map["nav.kafka.password"] = it.password()
         }
 
-        map["nav.redis.host"] = redisServer.host
+        map["nav.redis.host"] = "localhost"
         map["nav.redis.port"] = "${redisServer.bindPort}"
         map["nav.storage.passphrase"] = "verySecret"
 
