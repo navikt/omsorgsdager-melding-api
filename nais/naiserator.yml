@@ -52,7 +52,7 @@ spec:
   vault:
     enabled: false
   envFrom:
-    - secret: omsorgsdager-melding-api
+    - secret: {{app}}
     - configmap: loginservice-idporten
   env:
   {{#each env}}

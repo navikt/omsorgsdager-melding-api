@@ -61,7 +61,6 @@ fun Application.omsorgpengermidlertidigaleneapi() {
     System.setProperty("dusseldorf.ktor.serializeProblemDetailsWithContentNegotiation", "true")
 
     val configuration = Configuration(environment.config)
-    val apiGatewayApiKey = configuration.getApiGatewayApiKey()
 
     install(ContentNegotiation) {
         jackson {
@@ -112,8 +111,7 @@ fun Application.omsorgpengermidlertidigaleneapi() {
         val accessTokenClientResolver = AccessTokenClientResolver(environment.config.clients())
 
         val søkerGateway = SøkerGateway(
-            baseUrl = configuration.getK9OppslagUrl(),
-            apiGatewayApiKey = apiGatewayApiKey
+            baseUrl = configuration.getK9OppslagUrl()
         )
 
         val søkerService = SøkerService(
@@ -121,8 +119,7 @@ fun Application.omsorgpengermidlertidigaleneapi() {
         )
 
         val barnGateway = BarnGateway(
-            baseUrl = configuration.getK9OppslagUrl(),
-            apiGatewayApiKey = apiGatewayApiKey
+            baseUrl = configuration.getK9OppslagUrl()
         )
 
         val barnService = BarnService(
