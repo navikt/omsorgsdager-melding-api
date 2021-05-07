@@ -8,7 +8,7 @@ import io.ktor.http.*
 import no.nav.helse.dusseldorf.testsupport.wiremock.WireMockBuilder
 import no.nav.omsorgspengermidlertidigalene.wiremock.BarnResponseTransformer
 
-internal const val k9OppslagPath = "/helse-reverse-proxy/k9-selvbetjening-oppslag-mock"
+internal const val k9OppslagPath = "/k9-selvbetjening-oppslag-mock"
 internal const val k9MellomlagringPath = "/k9-mellomlagring/v1/dokument"
 
 internal fun WireMockBuilder.omsorgsdagerMeldingApiConfig() = wireMockConfiguration {
@@ -22,7 +22,6 @@ internal fun WireMockBuilder.omsorgsdagerMeldingApiConfig() = wireMockConfigurat
 internal fun WireMockServer.stubK9OppslagSoker() : WireMockServer {
     WireMock.stubFor(
         WireMock.get(WireMock.urlPathMatching("$k9OppslagPath/.*"))
-            .withHeader("x-nav-apiKey", AnythingPattern())
             .withHeader(HttpHeaders.Authorization, AnythingPattern())
             .withQueryParam("a", equalTo("aktør_id"))
             .withQueryParam("a", equalTo("fornavn"))
@@ -42,7 +41,6 @@ internal fun WireMockServer.stubK9OppslagSoker() : WireMockServer {
 internal fun WireMockServer.stubK9OppslagBarn(simulerFeil: Boolean = false) : WireMockServer {
     WireMock.stubFor(
         WireMock.get(WireMock.urlPathMatching("$k9OppslagPath/.*"))
-            .withHeader("x-nav-apiKey", AnythingPattern())
             .withHeader(HttpHeaders.Authorization, AnythingPattern())
             .withQueryParam("a", equalTo("barn[].aktør_id"))
             .withQueryParam("a", equalTo("barn[].fornavn"))
@@ -76,7 +74,6 @@ private fun WireMockServer.stubHealthEndpointThroughZones(
 ) : WireMockServer{
     WireMock.stubFor(
         WireMock.get(WireMock.urlPathMatching(".*$path"))
-            .withHeader("x-nav-apiKey", AnythingPattern())
             .willReturn(
             WireMock.aResponse()
                 .withStatus(200)

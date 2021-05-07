@@ -14,7 +14,6 @@ import no.nav.helse.dusseldorf.ktor.health.Result
 import no.nav.helse.dusseldorf.ktor.health.UnHealthy
 import no.nav.helse.dusseldorf.ktor.metrics.Operation
 import no.nav.omsorgsdagermeldingapi.general.CallId
-import no.nav.omsorgsdagermeldingapi.general.auth.ApiGatewayApiKey
 import no.nav.omsorgsdagermeldingapi.general.auth.IdToken
 import no.nav.omsorgsdagermeldingapi.general.oppslag.K9OppslagGateway
 import org.slf4j.Logger
@@ -24,9 +23,8 @@ import java.time.Duration
 import java.time.LocalDate
 
 class SøkerGateway (
-    baseUrl: URI,
-    private val apiGatewayApiKey: ApiGatewayApiKey
-) : K9OppslagGateway(baseUrl, apiGatewayApiKey) {
+    baseUrl: URI
+) : K9OppslagGateway(baseUrl) {
 
     private companion object {
         private val logger: Logger = LoggerFactory.getLogger("nav.SokerGateway")
@@ -90,8 +88,7 @@ class SøkerGateway (
         ).toString()
             .httpGet()
             .header(
-                HttpHeaders.Accept to "text/plain",
-                apiGatewayApiKey.headerKey to apiGatewayApiKey.value
+                HttpHeaders.Accept to "text/plain"
             )
 
         val (_, _, result) = Operation.monitored(
