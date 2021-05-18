@@ -10,14 +10,15 @@ val junitJupiterVersion = "5.7.1"
 val kotlinxCoroutinesVersion = ext.get("kotlinxCoroutinesVersion").toString()
 
 plugins {
-    kotlin("jvm") version "1.4.32"
-    id("com.github.johnrengelman.shadow") version "6.1.0"
+    kotlin("jvm") version "1.5.0"
+    id("com.github.johnrengelman.shadow") version "7.0.0"
 }
 
 buildscript {
     // Henter ut diverse dependency versjoner, i.e. ktorVersion.
     apply("https://raw.githubusercontent.com/navikt/dusseldorf-ktor/5b2dff7a11531e487ebdee06b6ae94e0e50287c2/gradle/dusseldorf-ktor.gradle.kts")
 }
+
 dependencies {
     // Server
     implementation ( "no.nav.helse:dusseldorf-ktor-core:$dusseldorfKtorVersion")
@@ -31,7 +32,7 @@ dependencies {
     implementation ( "no.nav.helse:dusseldorf-ktor-client:$dusseldorfKtorVersion")
     implementation ( "no.nav.helse:dusseldorf-oauth2-client:$dusseldorfKtorVersion")
     implementation ("io.lettuce:lettuce-core:5.2.1.RELEASE")
-    implementation("com.github.fppt:jedis-mock:0.1.16")
+    implementation("com.github.fppt:jedis-mock:0.17.0")
 
     // Test
     testImplementation("no.nav.helse:dusseldorf-test-support:$dusseldorfKtorVersion")
@@ -49,7 +50,7 @@ dependencies {
     implementation("org.apache.kafka:kafka-clients:$kafkaVersion")
 
     testImplementation ("org.skyscreamer:jsonassert:1.5.0")
-    testImplementation("org.awaitility:awaitility-kotlin:4.0.3")
+    testImplementation("org.awaitility:awaitility-kotlin:4.1.0")
 }
 
 repositories {
@@ -98,5 +99,5 @@ tasks.withType<ShadowJar> {
 }
 
 tasks.withType<Wrapper> {
-    gradleVersion = "6.8.3"
+    gradleVersion = "7.0.1"
 }
