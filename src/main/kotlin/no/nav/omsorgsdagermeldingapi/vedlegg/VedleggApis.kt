@@ -4,14 +4,13 @@ import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.http.*
 import io.ktor.http.content.*
-import io.ktor.locations.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import no.nav.helse.dusseldorf.ktor.core.DefaultProblemDetails
 import no.nav.helse.dusseldorf.ktor.core.respondProblemDetails
-import no.nav.omsorgsdagermeldingapi.felles.LAGRE_VEDLEGG
-import no.nav.omsorgsdagermeldingapi.felles.SLETTE_VEDLEGG
+import no.nav.omsorgsdagermeldingapi.felles.VEDLEGG_MED_ID_URL
+import no.nav.omsorgsdagermeldingapi.felles.VEDLEGG_URL
 import no.nav.omsorgsdagermeldingapi.general.auth.IdTokenProvider
 import no.nav.omsorgsdagermeldingapi.general.getCallId
 import org.slf4j.Logger
@@ -28,16 +27,13 @@ private val fantIkkeSubjectPaaToken = DefaultProblemDetails(title = "fant-ikke-s
 private val vedleggContentTypeNotSupportedProblemDetails = DefaultProblemDetails(title = "attachment-content-type-not-supported", status = 400, detail = "Vedleggets type må være en av $supportedContentTypes")
 internal val feilVedSlettingAvVedlegg = DefaultProblemDetails(title = "feil-ved-sletting", status = 500, detail = "Feil ved sletting av vedlegg")
 
-
-@KtorExperimentalLocationsAPI
 fun Route.vedleggApis(
     vedleggService: VedleggService,
     idTokenProvider: IdTokenProvider
 ) {
-    @Location(SLETTE_VEDLEGG)
-    data class EksisterendeVedlegg(val vedleggId: String)
-    delete<EksisterendeVedlegg> { eksisterendeVedlegg ->
-        val vedleggId = VedleggId(eksisterendeVedlegg.vedleggId)
+
+    delete(VEDLEGG_MED_ID_URL) {
+        val vedleggId = VedleggId(call.parameters["vedleggId"]!!)
         logger.info("Sletter vedlegg")
         logger.info("$vedleggId")
         var eier = idTokenProvider.getIdToken(call).getSubject()
@@ -55,9 +51,7 @@ fun Route.vedleggApis(
         }
     }
 
-    @Location(LAGRE_VEDLEGG)
-    class NyttVedleg
-    post<NyttVedleg> { _ ->
+    post(VEDLEGG_URL) { _ ->
         logger.info("Lagrer vedlegg")
         if (!call.request.isFormMultipart()) {
             call.respondProblemDetails(hasToBeMultupartTypeProblemDetails)
