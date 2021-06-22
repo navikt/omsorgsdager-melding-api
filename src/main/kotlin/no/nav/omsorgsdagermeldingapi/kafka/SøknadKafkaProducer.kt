@@ -33,7 +33,7 @@ class SøknadKafkaProducer(
         OMSORGDAGER_MELDING_MOTTATT_TOPIC.valueSerializer
     )
 
-    internal fun produce(
+    internal fun produserKafkaMelding(
         komplettMelding: KomplettMelding,
         metadata: Metadata
     ) {
