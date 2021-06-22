@@ -2,7 +2,6 @@ package no.nav.omsorgsdagermeldingapi.søknad
 
 import io.ktor.application.*
 import io.ktor.http.*
-import io.ktor.locations.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
@@ -44,7 +43,6 @@ private val ikkeOverføringmelding = DefaultProblemDetails(
     detail = "Dette endepunktet krever en overføringsmelding"
 )
 
-@KtorExperimentalLocationsAPI
 fun Route.søknadApis(
     søknadService: SøknadService,
     idTokenProvider: IdTokenProvider,
@@ -52,9 +50,7 @@ fun Route.søknadApis(
     vedleggService: VedleggService
 ) {
 
-    @Location(MELDING_URL_KORONAOVERFØRE)
-    class sendSøknadForOverføring
-    post { _: sendSøknadForOverføring ->
+    post(MELDING_URL_KORONAOVERFØRE) {
         logger.info("Mottatt ny melding om koronaoverføring av omsorgsdager.")
 
         logger.trace("Mapper melding")
@@ -87,9 +83,7 @@ fun Route.søknadApis(
        }
     }
 
-    @Location(MELDING_URL_OVERFØRE)
-    class sendSøknadOverføre
-    post { _: sendSøknadOverføre ->
+    post(MELDING_URL_OVERFØRE) {
         logger.info("Mottatt ny melding om overføring av omsorgsdager.")
 
         logger.trace("Mapper melding")
@@ -124,10 +118,7 @@ fun Route.søknadApis(
         }
     }
 
-
-    @Location(MELDING_URL_FORDELE)
-    class sendSøknadForFordeling
-    post { _: sendSøknadForFordeling ->
+    post(MELDING_URL_FORDELE) {
         logger.info("Mottatt ny melding om fordeling av omsorgsdager.")
 
         logger.trace("Mapper melding")
@@ -183,5 +174,4 @@ fun Route.søknadApis(
             }
         }
     }
-
 }

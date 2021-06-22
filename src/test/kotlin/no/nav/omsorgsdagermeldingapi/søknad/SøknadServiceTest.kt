@@ -63,8 +63,7 @@ internal class SøknadServiceTest{
                     melding = MeldingUtils.gyldigMeldingFordele,
                     metadata = Metadata(
                         version = 1,
-                        correlationId = "123",
-                        requestId = "12334"
+                        correlationId = "123"
                     ),
                     idToken = IdToken(Azure.V2_0.generateJwt(clientId = "ikke-authorized-client", audience = "omsorgsdager-melding-api")),
                     callId = CallId("abc")
