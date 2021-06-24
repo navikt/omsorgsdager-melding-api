@@ -9,6 +9,7 @@ import no.nav.omsorgsdagermeldingapi.kafka.SøknadKafkaProducer
 import no.nav.omsorgsdagermeldingapi.søker.Søker
 import no.nav.omsorgsdagermeldingapi.søker.SøkerService
 import no.nav.omsorgsdagermeldingapi.søker.validate
+import no.nav.omsorgsdagermeldingapi.søknad.melding.Fordele
 import no.nav.omsorgsdagermeldingapi.søknad.melding.Melding
 import no.nav.omsorgsdagermeldingapi.søknad.melding.valider
 import no.nav.omsorgsdagermeldingapi.søknad.melding.validerVedlegg
@@ -45,7 +46,10 @@ class SøknadService(
         val søker: Søker = søkerService.getSøker(idToken, callId)
         søker.validate()
 
-        if (melding.fordeling != null) fordelingValiderVedlegg(melding, idToken, callId, søker)
+        if (melding.fordeling != null){
+            logger.info(formaterStatuslogging(melding.søknadId, "håndterer vedlegg"))
+            håndterVedlegg(melding.fordeling, idToken, callId, søker)
+        }
 
         val komplettMelding = melding.tilKomplettMelding(søker, k9MellomLagringIngress)
 
@@ -65,25 +69,31 @@ class SøknadService(
         }
     }
 
-    private suspend fun fordelingValiderVedlegg(
-        melding: Melding,
+    private suspend fun håndterVedlegg(
+        fordele: Fordele,
         idToken: IdToken,
         callId: CallId,
         søker: Søker
     ) {
-        if (melding.fordeling != null) {
-            when (melding.fordeling.samværsavtale.isEmpty()) {
-                true -> listOf()
-                else -> {
-                    vedleggService.hentVedlegg(
-                        idToken = idToken,
-                        vedleggUrls = melding.fordeling.samværsavtale,
-                        eier = DokumentEier(søker.fødselsnummer),
-                        callId = callId
-                    )
-                }
-            }.validerVedlegg(melding.fordeling.samværsavtale)
-        }
+        logger.info("Validerer vedlegg")
+        when (fordele.samværsavtale.isEmpty()) {
+            true -> listOf()
+            else -> {
+                vedleggService.hentVedlegg(
+                    idToken = idToken,
+                    vedleggUrls = fordele.samværsavtale,
+                    eier = DokumentEier(søker.fødselsnummer),
+                    callId = callId
+                )
+            }
+        }.validerVedlegg(fordele.samværsavtale)
+
+        logger.info("Persisterer vedlegg")
+        vedleggService.persisterVedlegg(
+            vedleggsUrls = fordele.samværsavtale,
+            callId = callId,
+            eier = DokumentEier(søker.fødselsnummer)
+        )
     }
 }
 
