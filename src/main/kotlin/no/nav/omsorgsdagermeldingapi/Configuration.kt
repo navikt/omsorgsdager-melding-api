@@ -3,7 +3,6 @@ package no.nav.omsorgsdagermeldingapi
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import io.ktor.config.*
-import io.ktor.util.*
 import no.nav.helse.dusseldorf.ktor.auth.EnforceEqualsOrContains
 import no.nav.helse.dusseldorf.ktor.auth.issuers
 import no.nav.helse.dusseldorf.ktor.auth.withAdditionalClaimRules
@@ -15,7 +14,6 @@ import no.nav.omsorgsdagermeldingapi.kafka.KafkaConfig
 import java.net.URI
 import java.time.Duration
 
-@KtorExperimentalAPI
 data class Configuration(val config : ApplicationConfig) {
 
     private val loginServiceClaimRules = setOf(
@@ -49,16 +47,23 @@ data class Configuration(val config : ApplicationConfig) {
     private fun getScopesFor(operation: String) = config.getRequiredList("nav.auth.scopes.$operation", secret = false, builder = { it }).toSet()
 
     internal fun getKafkaConfig() = config.getRequiredString("nav.kafka.bootstrap_servers", secret = false).let { bootstrapServers ->
-        val trustStore = config.getOptionalString("nav.trust_store.path", secret = false)?.let { trustStorePath ->
-            config.getOptionalString("nav.trust_store.password", secret = true)?.let { trustStorePassword ->
-                Pair(trustStorePath, trustStorePassword)
+        val trustStore =
+            config.getOptionalString("nav.kafka.truststore_path", secret = false)?.let { trustStorePath ->
+                config.getOptionalString("nav.kafka.credstore_password", secret = true)?.let { credstorePassword ->
+                    Pair(trustStorePath, credstorePassword)
+                }
+            }
+
+        val keyStore = config.getOptionalString("nav.kafka.keystore_path", secret = false)?.let { keystorePath ->
+            config.getOptionalString("nav.kafka.credstore_password", secret = true)?.let { credstorePassword ->
+                Pair(keystorePath, credstorePassword)
             }
         }
 
         KafkaConfig(
             bootstrapServers = bootstrapServers,
-            credentials = Pair(config.getRequiredString("nav.kafka.username", secret = false), config.getRequiredString("nav.kafka.password", secret = true)),
-            trustStore = trustStore
+            trustStore = trustStore,
+            keyStore = keyStore
         )
     }
 

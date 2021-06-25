@@ -23,6 +23,8 @@ spec:
         {{#each externalHosts as |host|}}
         - host: {{host}}
         {{/each}}
+  kafka:
+    pool: {{kafka-pool}}
   liveness:
     path: isalive
     initialDelay: 20
