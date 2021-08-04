@@ -6,7 +6,6 @@ import com.typesafe.config.ConfigFactory
 import io.ktor.config.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
-import io.ktor.util.*
 import io.mockk.impl.annotations.InjectMockKs
 import no.nav.common.KafkaEnvironment
 import no.nav.helse.dusseldorf.ktor.core.fromResources
@@ -34,7 +33,6 @@ private const val gyldigFodselsnummerA = "290990123456"
 private const val gyldigFodselsnummerB = "25118921464"
 private const val ikkeMyndigFnr = "12125012345"
 
-@KtorExperimentalAPI
 @InjectMockKs
 class ApplicationTest {
 
