@@ -105,7 +105,7 @@ private suspend fun MultiPartData.getVedlegg(eier: DokumentEier) : Vedlegg? {
 }
 
 
-private fun Vedlegg.isSupportedContentType(): Boolean = supportedContentTypes.contains(contentType.toLowerCase())
+private fun Vedlegg.isSupportedContentType(): Boolean = supportedContentTypes.contains(contentType.lowercase())
 
 private fun ApplicationRequest.isFormMultipart(): Boolean {
     return contentType().withoutParameters().match(ContentType.MultiPart.FormData)
