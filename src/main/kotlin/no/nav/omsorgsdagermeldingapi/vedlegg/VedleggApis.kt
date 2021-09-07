@@ -7,7 +7,6 @@ import io.ktor.http.content.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
-import no.nav.helse.dusseldorf.ktor.core.DefaultProblemDetails
 import no.nav.helse.dusseldorf.ktor.core.respondProblemDetails
 import no.nav.omsorgsdagermeldingapi.felles.VEDLEGG_MED_ID_URL
 import no.nav.omsorgsdagermeldingapi.felles.VEDLEGG_URL
@@ -17,15 +16,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 private val logger: Logger = LoggerFactory.getLogger("nav.vedleggApis")
-private const val MAX_VEDLEGG_SIZE = 8 * 1024 * 1024
-private val supportedContentTypes = listOf("application/pdf", "image/jpeg", "image/png")
-
-private val hasToBeMultupartTypeProblemDetails = DefaultProblemDetails(title = "multipart-form-required", status = 400, detail = "Requesten må være en 'multipart/form-data' request hvor en 'part' er en fil, har 'name=vedlegg' og har Content-Type header satt.")
-private val vedleggNotAttachedProblemDetails = DefaultProblemDetails(title = "attachment-not-attached", status = 400, detail = "Fant ingen 'part' som er en fil, har 'name=vedlegg' og har Content-Type header satt.")
-private val vedleggTooLargeProblemDetails = DefaultProblemDetails(title = "attachment-too-large", status = 413, detail = "vedlegget var over maks tillatt størrelse på 8MB.")
-private val fantIkkeSubjectPaaToken = DefaultProblemDetails(title = "fant-ikke-subject", status = 413, detail = "Fant ikke subject på idToken")
-private val vedleggContentTypeNotSupportedProblemDetails = DefaultProblemDetails(title = "attachment-content-type-not-supported", status = 400, detail = "Vedleggets type må være en av $supportedContentTypes")
-internal val feilVedSlettingAvVedlegg = DefaultProblemDetails(title = "feil-ved-sletting", status = 500, detail = "Feil ved sletting av vedlegg")
 
 fun Route.vedleggApis(
     vedleggService: VedleggService,
@@ -47,6 +37,29 @@ fun Route.vedleggApis(
             when(resultat){
                 true -> call.respond(HttpStatusCode.NoContent)
                 false -> call.respondProblemDetails(feilVedSlettingAvVedlegg)
+            }
+        }
+    }
+
+    get(VEDLEGG_MED_ID_URL) {
+        val vedleggId = VedleggId(call.parameters["vedleggId"]!!)
+        var eier = idTokenProvider.getIdToken(call).getSubject()
+
+        if (eier == null) call.respond(HttpStatusCode.Forbidden) else {
+            val vedlegg = vedleggService.hentVedlegg(
+                vedleggId = vedleggId,
+                idToken = idTokenProvider.getIdToken(call),
+                callId = call.getCallId(),
+                eier = DokumentEier(eier)
+            )
+
+            if(vedlegg == null) call.respondProblemDetails(vedleggNotFoundProblemDetails)
+            else {
+                call.respondBytes(
+                    bytes = vedlegg.content,
+                    contentType = ContentType.parse(vedlegg.contentType),
+                    status = HttpStatusCode.OK
+                )
             }
         }
     }
