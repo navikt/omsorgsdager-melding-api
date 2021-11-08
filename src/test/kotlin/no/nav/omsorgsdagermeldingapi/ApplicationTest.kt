@@ -19,8 +19,8 @@ import no.nav.omsorgsdagermeldingapi.søknad.melding.Fordele
 import no.nav.omsorgsdagermeldingapi.søknad.melding.Mottaker
 import no.nav.omsorgsdagermeldingapi.wiremock.*
 import org.json.JSONObject
-import org.junit.AfterClass
-import org.junit.BeforeClass
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.BeforeAll
 import org.skyscreamer.jsonassert.JSONAssert
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -77,13 +77,13 @@ class ApplicationTest {
         })
 
 
-        @BeforeClass
+        @BeforeAll
         @JvmStatic
         fun buildUp() {
             engine.start(wait = true)
         }
 
-        @AfterClass
+        @AfterAll
         @JvmStatic
         fun tearDown() {
             logger.info("Tearing down")

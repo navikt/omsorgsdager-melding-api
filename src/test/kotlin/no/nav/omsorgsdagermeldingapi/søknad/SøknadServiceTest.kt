@@ -19,8 +19,8 @@ import no.nav.omsorgsdagermeldingapi.søker.SøkerService
 import no.nav.omsorgsdagermeldingapi.vedlegg.DokumentEier
 import no.nav.omsorgsdagermeldingapi.vedlegg.Vedlegg
 import no.nav.omsorgsdagermeldingapi.vedlegg.VedleggService
-import org.junit.Before
 import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.assertThrows
 import java.net.URI
 import java.time.LocalDate
@@ -41,7 +41,7 @@ internal class SøknadServiceTest{
 
     lateinit var søknadService: SøknadService
 
-    @Before
+    @BeforeEach
     internal fun setUp() {
         MockKAnnotations.init(this)
         søknadService = SøknadService(
