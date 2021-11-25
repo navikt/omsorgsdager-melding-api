@@ -3,6 +3,7 @@ package no.nav.omsorgsdagermeldingapi.barn
 import com.github.benmanes.caffeine.cache.Cache
 import no.nav.omsorgsdagermeldingapi.general.CallId
 import no.nav.omsorgsdagermeldingapi.general.auth.IdToken
+import no.nav.omsorgsdagermeldingapi.general.oppslag.TilgangNektetException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -29,8 +30,13 @@ class BarnService(
             cache.put(idToken.getSubject().toString(), barn)
             barn
         } catch (cause: Throwable) {
-            logger.error("Feil ved henting av barn, returnerer en tom liste", cause)
-            emptyList<Barn>()
+            when(cause){
+                is TilgangNektetException -> throw cause
+                else -> {
+                    logger.error("Feil ved henting av barn, returnerer en tom liste", cause)
+                    emptyList()
+                }
+            }
         }
     }
 

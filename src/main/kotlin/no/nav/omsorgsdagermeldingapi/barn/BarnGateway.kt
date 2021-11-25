@@ -15,6 +15,7 @@ import no.nav.omsorgsdagermeldingapi.felles.k9SelvbetjeningOppslagKonfigurert
 import no.nav.omsorgsdagermeldingapi.general.CallId
 import no.nav.omsorgsdagermeldingapi.general.auth.IdToken
 import no.nav.omsorgsdagermeldingapi.general.oppslag.K9OppslagGateway
+import no.nav.omsorgsdagermeldingapi.general.oppslag.throwable
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.net.URI
@@ -69,11 +70,7 @@ class BarnGateway (
 
             result.fold(
                 { success -> objectMapper.readValue<BarnOppslagResponse>(success)},
-                { error ->
-                    logger.error("Error response = '${error.response.body().asString("text/plain")}' fra '${request.url}'")
-                    logger.error(error.toString())
-                    throw IllegalStateException("Feil ved henting av informasjon om søkers barn")
-                }
+                { error -> throw error.throwable(request, logger, "Feil ved henting av informasjon om søkers barn")}
             )
         }
         return oppslagRespons.barn
