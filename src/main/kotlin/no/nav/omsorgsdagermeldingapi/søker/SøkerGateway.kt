@@ -64,7 +64,7 @@ class SøkerGateway (
 
             result.fold(
                 { success -> objectMapper.readValue<SokerOppslagRespons>(success)},
-                { error -> throw error.throwable(request, logger, "Feil ved henting av søkers personinformasjon\"")}
+                { error -> throw error.throwable(request, logger, "Feil ved henting av søkers personinformasjon")}
             )
         }
         return oppslagRespons
