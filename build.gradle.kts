@@ -1,7 +1,7 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val dusseldorfKtorVersion = "3.1.6.5-50b2e34"
+val dusseldorfKtorVersion = "3.1.6.5-0911cdd"
 val ktorVersion = ext.get("ktorVersion").toString()
 val mainClass = "no.nav.omsorgsdagermeldingapi.AppKt"
 val kafkaEmbeddedEnvVersion = ext.get("kafkaEmbeddedEnvVersion").toString()
