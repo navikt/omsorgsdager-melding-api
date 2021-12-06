@@ -16,8 +16,8 @@ spec:
       cpu: 250m
       memory: 256Mi
     requests:
-      cpu: 250m
-      memory: 256Mi
+      cpu: 20m
+      memory: 50Mi
   service:
     port: 6379
     protocol: redis
