@@ -1,0 +1,34 @@
+name: Create or update Redis
+on:
+  push:
+    paths:
+      - "redis-config.yml"
+
+jobs:
+  deploy-redis-dev-gcp:
+    name: Deploy redis to dev-gcp
+    if: startsWith(github.ref, 'refs/heads/dev-') || startsWith(github.ref, 'refs/heads/master') # Deploy if branch is either master or dev-*
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2.4.0
+      - name: Deploy redis to dev-gcp
+        uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: dev-gcp
+          RESOURCE: "redis-config.yml"
+
+  deploy-redis-prod-gcp:
+    name: Deploy redis to prod-gcp
+    if: startsWith(github.ref, 'refs/heads/master') # Deploy if branch is master
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2.4.0
+      - name: Deploy redis to prod-gcp
+        uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: prod-gcp
+          RESOURCE: "redis-config.yml"
