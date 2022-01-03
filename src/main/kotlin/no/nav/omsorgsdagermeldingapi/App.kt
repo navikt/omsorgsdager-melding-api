@@ -10,6 +10,7 @@ import io.ktor.jackson.*
 import io.ktor.metrics.micrometer.*
 import io.ktor.routing.*
 import io.prometheus.client.hotspot.DefaultExports
+import no.nav.helse.dusseldorf.ktor.auth.IdTokenProvider
 import no.nav.helse.dusseldorf.ktor.auth.allIssuers
 import no.nav.helse.dusseldorf.ktor.auth.clients
 import no.nav.helse.dusseldorf.ktor.auth.multipleJwtIssuers
@@ -24,7 +25,6 @@ import no.nav.helse.dusseldorf.ktor.metrics.init
 import no.nav.omsorgsdagermeldingapi.barn.BarnGateway
 import no.nav.omsorgsdagermeldingapi.barn.BarnService
 import no.nav.omsorgsdagermeldingapi.barn.barnApis
-import no.nav.omsorgsdagermeldingapi.general.auth.IdTokenProvider
 import no.nav.omsorgsdagermeldingapi.general.auth.IdTokenStatusPages
 import no.nav.omsorgsdagermeldingapi.general.systemauth.AccessTokenClientResolver
 import no.nav.omsorgsdagermeldingapi.kafka.SøknadKafkaProducer

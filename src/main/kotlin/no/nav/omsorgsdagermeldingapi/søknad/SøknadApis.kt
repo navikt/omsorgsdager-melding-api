@@ -5,13 +5,13 @@ import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
+import no.nav.helse.dusseldorf.ktor.auth.IdTokenProvider
 import no.nav.helse.dusseldorf.ktor.core.DefaultProblemDetails
 import no.nav.helse.dusseldorf.ktor.core.respondProblemDetails
 import no.nav.omsorgsdagermeldingapi.felles.MELDING_URL_FORDELE
 import no.nav.omsorgsdagermeldingapi.felles.MELDING_URL_KORONAOVERFØRE
 import no.nav.omsorgsdagermeldingapi.felles.MELDING_URL_OVERFØRE
 import no.nav.omsorgsdagermeldingapi.felles.formaterStatuslogging
-import no.nav.omsorgsdagermeldingapi.general.auth.IdTokenProvider
 import no.nav.omsorgsdagermeldingapi.general.getCallId
 import no.nav.omsorgsdagermeldingapi.general.metadata
 import no.nav.omsorgsdagermeldingapi.søknad.melding.Melding

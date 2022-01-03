@@ -5,8 +5,8 @@ import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
+import no.nav.helse.dusseldorf.ktor.auth.IdTokenProvider
 import no.nav.omsorgsdagermeldingapi.felles.MELLOMLAGRING_URL
-import no.nav.omsorgsdagermeldingapi.general.auth.IdTokenProvider
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -21,20 +21,20 @@ fun Route.mellomlagringApis(
         post() {
             val midlertidigSøknad = call.receive<String>()
             val idToken = idTokenProvider.getIdToken(call)
-            mellomlagringService.setMellomlagring(idToken.getSubject()!!, midlertidigSøknad)
+            mellomlagringService.setMellomlagring(idToken.getNorskIdentifikasjonsnummer(), midlertidigSøknad)
             call.respond(HttpStatusCode.NoContent)
         }
 
         put() {
             val midlertidigSøknad = call.receive<String>()
             val idToken = idTokenProvider.getIdToken(call)
-            mellomlagringService.updateMellomlagring(idToken.getSubject()!!, midlertidigSøknad)
+            mellomlagringService.updateMellomlagring(idToken.getNorskIdentifikasjonsnummer(), midlertidigSøknad)
             call.respond(HttpStatusCode.NoContent)
         }
 
         get() {
             val idToken = idTokenProvider.getIdToken(call)
-            val mellomlagring = mellomlagringService.getMellomlagring(idToken.getSubject()!!)
+            val mellomlagring = mellomlagringService.getMellomlagring(idToken.getNorskIdentifikasjonsnummer())
             if (mellomlagring != null) {
                 call.respondText(
                     contentType = ContentType.Application.Json,
@@ -52,7 +52,7 @@ fun Route.mellomlagringApis(
 
         delete() {
             val idToken = idTokenProvider.getIdToken(call)
-            mellomlagringService.deleteMellomlagring(idToken.getSubject()!!)
+            mellomlagringService.deleteMellomlagring(idToken.getNorskIdentifikasjonsnummer())
             call.respond(HttpStatusCode.Accepted)
         }
     }

@@ -3,8 +3,8 @@ package no.nav.omsorgsdagermeldingapi.søker
 import io.ktor.application.*
 import io.ktor.response.*
 import io.ktor.routing.*
+import no.nav.helse.dusseldorf.ktor.auth.IdTokenProvider
 import no.nav.omsorgsdagermeldingapi.felles.SØKER_URL
-import no.nav.omsorgsdagermeldingapi.general.auth.IdTokenProvider
 import no.nav.omsorgsdagermeldingapi.general.getCallId
 import no.nav.omsorgsdagermeldingapi.general.oppslag.TilgangNektetException
 import no.nav.omsorgsdagermeldingapi.general.oppslag.respondTilgangNektetProblemDetail

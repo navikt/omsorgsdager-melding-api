@@ -1,8 +1,8 @@
 package no.nav.omsorgsdagermeldingapi.søker
 
 import com.auth0.jwt.JWT
+import no.nav.helse.dusseldorf.ktor.auth.IdToken
 import no.nav.omsorgsdagermeldingapi.general.CallId
-import no.nav.omsorgsdagermeldingapi.general.auth.IdToken
 
 class SøkerService (
     private val søkerGateway: SøkerGateway

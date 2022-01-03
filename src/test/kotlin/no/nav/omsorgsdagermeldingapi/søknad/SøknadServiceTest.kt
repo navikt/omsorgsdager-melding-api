@@ -6,13 +6,13 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import kotlinx.coroutines.runBlocking
+import no.nav.helse.dusseldorf.ktor.auth.IdToken
 import no.nav.helse.dusseldorf.testsupport.jws.Azure
 import no.nav.omsorgsdagermeldingapi.MeldingUtils
 import no.nav.omsorgsdagermeldingapi.barn.Barn
 import no.nav.omsorgsdagermeldingapi.barn.BarnService
 import no.nav.omsorgsdagermeldingapi.felles.Metadata
 import no.nav.omsorgsdagermeldingapi.general.CallId
-import no.nav.omsorgsdagermeldingapi.general.auth.IdToken
 import no.nav.omsorgsdagermeldingapi.kafka.SøknadKafkaProducer
 import no.nav.omsorgsdagermeldingapi.søker.Søker
 import no.nav.omsorgsdagermeldingapi.søker.SøkerService

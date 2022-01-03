@@ -1,7 +1,7 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val dusseldorfKtorVersion = "3.1.6.5-50b2e34"
+val dusseldorfKtorVersion = "3.1.6.7-f942a29"
 val ktorVersion = ext.get("ktorVersion").toString()
 val mainClass = "no.nav.omsorgsdagermeldingapi.AppKt"
 val kafkaEmbeddedEnvVersion = ext.get("kafkaEmbeddedEnvVersion").toString()
@@ -10,13 +10,13 @@ val kotlinxCoroutinesVersion = ext.get("kotlinxCoroutinesVersion").toString()
 val fuelVersion = "2.3.1"
 
 plugins {
-    kotlin("jvm") version "1.6.0"
-    id("com.github.johnrengelman.shadow") version "7.1.0"
+    kotlin("jvm") version "1.6.10"
+    id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
 buildscript {
     // Henter ut diverse dependency versjoner, i.e. ktorVersion.
-    apply("https://raw.githubusercontent.com/navikt/dusseldorf-ktor/50b2e34c6cc6123209d6d8c6e7421104c4d42cf1/gradle/dusseldorf-ktor.gradle.kts")
+    apply("https://raw.githubusercontent.com/navikt/dusseldorf-ktor/f942a29fd1007215e0254b7d1a83fbc7a3fe4c21/gradle/dusseldorf-ktor.gradle.kts")
 }
 
 dependencies {
@@ -35,18 +35,18 @@ dependencies {
     implementation ( "no.nav.helse:dusseldorf-ktor-client:$dusseldorfKtorVersion")
     implementation ( "no.nav.helse:dusseldorf-oauth2-client:$dusseldorfKtorVersion")
     implementation ("io.lettuce:lettuce-core:5.2.1.RELEASE")
-    implementation("com.github.fppt:jedis-mock:0.17.0")
 
     // kafka
     implementation("org.apache.kafka:kafka-clients:$kafkaVersion")
 
     // Test
+    testImplementation("com.github.fppt:jedis-mock:1.0.0")
     testImplementation("no.nav.helse:dusseldorf-test-support:$dusseldorfKtorVersion")
     testImplementation("no.nav:kafka-embedded-env:$kafkaEmbeddedEnvVersion")
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion") {
         exclude(group = "org.eclipse.jetty")
     }
-    testImplementation("io.mockk:mockk:1.12.1")
+    testImplementation("io.mockk:mockk:1.12.2")
     testImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion")
     testImplementation ("org.skyscreamer:jsonassert:1.5.0")
     testImplementation("org.awaitility:awaitility-kotlin:4.1.1")
@@ -96,7 +96,7 @@ tasks.withType<ShadowJar> {
 }
 
 tasks.withType<Wrapper> {
-    gradleVersion = "7.2"
+    gradleVersion = "7.3.3"
 }
 
 tasks.withType<Test> {

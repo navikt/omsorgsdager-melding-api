@@ -5,6 +5,8 @@ import io.ktor.features.*
 import io.ktor.http.*
 import io.ktor.response.*
 import no.nav.helse.dusseldorf.ktor.auth.ClaimEnforcementFailed
+import no.nav.helse.dusseldorf.ktor.auth.CookieNotSetException
+import no.nav.helse.dusseldorf.ktor.auth.IdTokenInvalidFormatException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
