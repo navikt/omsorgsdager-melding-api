@@ -4,8 +4,8 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import no.nav.helse.dusseldorf.ktor.auth.IdToken
 import no.nav.omsorgsdagermeldingapi.general.CallId
-import no.nav.omsorgsdagermeldingapi.general.auth.IdToken
 import java.net.URL
 
 class VedleggService(
