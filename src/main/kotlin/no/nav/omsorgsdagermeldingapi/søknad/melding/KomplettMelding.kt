@@ -23,7 +23,7 @@ data class KomplettMelding(
     val type: Meldingstype,
     val korona: Koronaoverføre? = null,
     val overføring: Overføre? = null,
-    val fordeling: Fordele? = null
+    val fordeling: KomplettFordele? = null
 ) {
     override fun toString(): String {
         return "KomplettMelding(mottatt=$mottatt, søknadId='$søknadId', id='$id')"

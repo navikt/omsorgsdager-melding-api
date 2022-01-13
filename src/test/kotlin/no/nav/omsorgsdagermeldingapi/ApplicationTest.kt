@@ -17,6 +17,7 @@ import no.nav.omsorgsdagermeldingapi.mellomlagring.started
 import no.nav.omsorgsdagermeldingapi.søknad.melding.BarnUtvidet
 import no.nav.omsorgsdagermeldingapi.søknad.melding.Fordele
 import no.nav.omsorgsdagermeldingapi.søknad.melding.Mottaker
+import no.nav.omsorgsdagermeldingapi.søknad.melding.vedleggId
 import no.nav.omsorgsdagermeldingapi.wiremock.*
 import org.json.JSONObject
 import org.junit.jupiter.api.AfterAll
@@ -485,8 +486,17 @@ class ApplicationTest {
         assertTrue(søknadPlukketFraTopic.has("mottatt"))
         søknadPlukketFraTopic.remove("mottatt") //Fjerner mottatt siden det settes i komplettSøknad
 
-        JSONAssert.assertEquals(søknadSendtInn, søknadPlukketFraTopic, true)
+        if(søknadSendtInn.get("fordeling").toString() != "null"){
+            val vedleggUrl = søknadSendtInn.getJSONObject("fordeling").getJSONArray("samværsavtale").map { it.toString() }
+            val forventetVedleggId = vedleggUrl.map { it.vedleggId() }
+            val faktiskVedleggId = søknadPlukketFraTopic.getJSONObject("fordeling").getJSONArray("samværsavtaleVedleggId").map { it.toString() }
 
-        logger.info("Verifisering OK")
+            assertEquals(forventetVedleggId, faktiskVedleggId)
+
+            søknadSendtInn.getJSONObject("fordeling").remove("samværsavtale")
+            søknadPlukketFraTopic.getJSONObject("fordeling").remove("samværsavtaleVedleggId")
+        }
+
+        JSONAssert.assertEquals(søknadSendtInn, søknadPlukketFraTopic, true)
     }
 }

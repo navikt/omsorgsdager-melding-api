@@ -19,8 +19,7 @@ val vedleggTooLargeProblemDetails = DefaultProblemDetails(
     status = 413,
     detail = "vedlegget var over maks tillatt størrelse på 8MB."
 )
-val fantIkkeSubjectPaaToken =
-    DefaultProblemDetails(title = "fant-ikke-subject", status = 413, detail = "Fant ikke subject på idToken")
+
 val vedleggContentTypeNotSupportedProblemDetails = DefaultProblemDetails(
     title = "attachment-content-type-not-supported",
     status = 400,
