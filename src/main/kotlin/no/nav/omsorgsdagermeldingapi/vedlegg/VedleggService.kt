@@ -6,6 +6,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import no.nav.helse.dusseldorf.ktor.auth.IdToken
 import no.nav.omsorgsdagermeldingapi.general.CallId
+import no.nav.omsorgsdagermeldingapi.søknad.melding.vedleggId
 import java.net.URL
 
 class VedleggService(
@@ -16,7 +17,7 @@ class VedleggService(
         vedlegg: Vedlegg,
         idToken: IdToken,
         callId: CallId
-    ): VedleggId {
+    ): String {
 
         return k9MellomlagringGateway.lagreVedlegg(
             vedlegg = vedlegg,
@@ -27,7 +28,7 @@ class VedleggService(
     }
 
     suspend fun slettVedlegg(
-        vedleggId: VedleggId,
+        vedleggId: String,
         idToken: IdToken,
         callId: CallId,
         eier: DokumentEier
@@ -45,11 +46,8 @@ class VedleggService(
         callId: CallId,
         eier: DokumentEier
     ) {
-        val vedleggsId = mutableListOf<VedleggId>()
-        vedleggsUrls.forEach { vedleggsId.add(vedleggIdFromUrl(it)) }
-
         k9MellomlagringGateway.slettPersistertVedlegg(
-            vedleggId = vedleggsId,
+            vedleggId = vedleggsUrls.map { it.vedleggId() },
             callId = callId,
             eier = eier
         )
@@ -60,22 +58,16 @@ class VedleggService(
         callId: CallId,
         eier: DokumentEier
     ) {
-        val vedleggsId = mutableListOf<VedleggId>()
-        vedleggsUrls.forEach { vedleggsId.add(vedleggIdFromUrl(it)) }
 
         k9MellomlagringGateway.persisterVedlegger(
-            vedleggId = vedleggsId,
+            vedleggId = vedleggsUrls.map { it.vedleggId() },
             callId = callId,
             eier = eier
         )
     }
 
-    private fun vedleggIdFromUrl(url: URL): VedleggId {
-        return VedleggId(url.path.substringAfterLast("/"))
-    }
-
     suspend fun hentVedlegg(
-        vedleggId: VedleggId,
+        vedleggId: String,
         idToken: IdToken,
         callId: CallId,
         eier: DokumentEier
@@ -100,7 +92,7 @@ class VedleggService(
             vedleggUrls.forEach {
                 futures.add(async {
                     hentVedlegg(
-                        vedleggId = vedleggIdFromUrl(it),
+                        vedleggId = it.vedleggId(),
                         idToken = idToken,
                         eier = eier,
                         callId = callId

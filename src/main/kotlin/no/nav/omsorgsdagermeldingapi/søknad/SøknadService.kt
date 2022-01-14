@@ -17,13 +17,11 @@ import no.nav.omsorgsdagermeldingapi.vedlegg.DokumentEier
 import no.nav.omsorgsdagermeldingapi.vedlegg.VedleggService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.net.URI
 
 class SøknadService(
     private val søkerService: SøkerService,
     private val barnService: BarnService,
     private val kafkaProducer: SøknadKafkaProducer,
-    private val k9MellomLagringIngress: URI,
     private val vedleggService: VedleggService
 ) {
 
@@ -51,7 +49,7 @@ class SøknadService(
             håndterVedlegg(melding.fordeling, idToken, callId, søker)
         }
 
-        val komplettMelding = melding.tilKomplettMelding(søker, k9MellomLagringIngress)
+        val komplettMelding = melding.tilKomplettMelding(søker)
 
         try {
             kafkaProducer.produserKafkaMelding(komplettMelding = komplettMelding, metadata = metadata)

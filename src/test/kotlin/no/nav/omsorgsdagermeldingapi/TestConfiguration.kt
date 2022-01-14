@@ -27,7 +27,6 @@ object TestConfiguration {
             Pair("nav.authorization.cookie_name", "localhost-idtoken"),
             Pair("nav.gateways.k9_oppslag_url","$k9OppslagUrl"),
             Pair("nav.gateways.k9_mellomlagring_url","$k9MellomlagringUrl"),
-            Pair("nav.gateways.k9_mellomlagring_ingress","$k9MellomlagringUrl"),
             Pair("nav.cors.addresses", corsAdresses)
         )
 

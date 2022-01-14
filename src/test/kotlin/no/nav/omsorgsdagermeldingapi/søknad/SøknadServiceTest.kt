@@ -22,7 +22,6 @@ import no.nav.omsorgsdagermeldingapi.vedlegg.VedleggService
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.assertThrows
-import java.net.URI
 import java.time.LocalDate
 import kotlin.test.Test
 
@@ -47,7 +46,6 @@ internal class SøknadServiceTest{
         søknadService = SøknadService(
             søkerService = søkerService,
             kafkaProducer = kafkaProducer,
-            k9MellomLagringIngress = URI("http://localhost:8080/v1/dokument"),
             vedleggService = vedleggService,
             barnService = barnService
         )

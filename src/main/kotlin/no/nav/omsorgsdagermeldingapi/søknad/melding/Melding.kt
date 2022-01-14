@@ -1,36 +1,33 @@
 package no.nav.omsorgsdagermeldingapi.søknad.melding
 
 import com.fasterxml.jackson.annotation.JsonAlias
-import io.ktor.http.*
-import no.nav.helse.dusseldorf.ktor.client.buildURL
 import no.nav.omsorgsdagermeldingapi.barn.Barn
 import no.nav.omsorgsdagermeldingapi.søker.Søker
-import java.net.URI
 import java.net.URL
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.util.*
 
 data class Melding(
-        val søknadId: String = UUID.randomUUID().toString(),
-        val id: String,
-        val språk: String,
-        val harForståttRettigheterOgPlikter: Boolean,
-        val harBekreftetOpplysninger: Boolean,
-        val mottakerFnr: String,
-        val mottakerNavn: String,
-        val harAleneomsorg: Boolean? = null,
-        val harUtvidetRett: Boolean? = null,
-        val erYrkesaktiv: Boolean? = null,
-        val arbeiderINorge: Boolean? = null,
-        val arbeidssituasjon: List<Arbeidssituasjon>,
-        @JsonAlias("antallDagerBruktEtter1Juli")
-        val antallDagerBruktIÅr: Int? = null,
-        val barn: List<BarnUtvidet>,
-        val type: Meldingstype,
-        val korona: Koronaoverføre? = null,
-        val overføring: Overføre? = null,
-        val fordeling: Fordele? = null,
+    val søknadId: String = UUID.randomUUID().toString(),
+    val id: String,
+    val språk: String,
+    val harForståttRettigheterOgPlikter: Boolean,
+    val harBekreftetOpplysninger: Boolean,
+    val mottakerFnr: String,
+    val mottakerNavn: String,
+    val harAleneomsorg: Boolean? = null,
+    val harUtvidetRett: Boolean? = null,
+    val erYrkesaktiv: Boolean? = null,
+    val arbeiderINorge: Boolean? = null,
+    val arbeidssituasjon: List<Arbeidssituasjon>,
+    @JsonAlias("antallDagerBruktEtter1Juli")
+    val antallDagerBruktIÅr: Int? = null,
+    val barn: List<BarnUtvidet>,
+    val type: Meldingstype,
+    val korona: Koronaoverføre? = null,
+    val overføring: Overføre? = null,
+    val fordeling: Fordele? = null,
 ) {
     override fun toString(): String {
         return "Melding(søknadId='$søknadId', id='$id')"
@@ -44,40 +41,39 @@ data class Melding(
         }
     }
 
-    fun tilKomplettMelding(søker: Søker, baseUrl: URI): KomplettMelding = KomplettMelding(
-            mottatt = ZonedDateTime.now(ZoneOffset.UTC),
-            søker = søker,
-            søknadId = søknadId,
-            id = id,
-            språk = språk,
-            harBekreftetOpplysninger = harBekreftetOpplysninger,
-            harForståttRettigheterOgPlikter = harForståttRettigheterOgPlikter,
-            mottakerFnr = mottakerFnr,
-            mottakerNavn = mottakerNavn,
-            harUtvidetRett = harUtvidetRett!!,
-            harAleneomsorg = harAleneomsorg!!,
-            erYrkesaktiv = erYrkesaktiv!!,
-            arbeiderINorge = arbeiderINorge!!,
-            arbeidssituasjon = arbeidssituasjon,
-            antallDagerBruktIÅr = antallDagerBruktIÅr,
-            barn = barn,
-            type = type,
-            korona = korona,
-            overføring = overføring,
-            fordeling = fordeling?.copy(
-                    samværsavtale = fordeling.samværsavtale.tilK9MellomLagringUrl(baseUrl)
+    fun tilKomplettMelding(søker: Søker): KomplettMelding = KomplettMelding(
+        mottatt = ZonedDateTime.now(ZoneOffset.UTC),
+        søker = søker,
+        søknadId = søknadId,
+        id = id,
+        språk = språk,
+        harBekreftetOpplysninger = harBekreftetOpplysninger,
+        harForståttRettigheterOgPlikter = harForståttRettigheterOgPlikter,
+        mottakerFnr = mottakerFnr,
+        mottakerNavn = mottakerNavn,
+        harUtvidetRett = harUtvidetRett!!,
+        harAleneomsorg = harAleneomsorg!!,
+        erYrkesaktiv = erYrkesaktiv!!,
+        arbeiderINorge = arbeiderINorge!!,
+        arbeidssituasjon = arbeidssituasjon,
+        antallDagerBruktIÅr = antallDagerBruktIÅr,
+        barn = barn,
+        type = type,
+        korona = korona,
+        overføring = overføring,
+        fordeling = fordeling?.let {
+            KomplettFordele(
+                it.mottakerType,
+                it.samværsavtale.map { url ->
+                    url.vedleggId()
+                }
             )
+        }
     )
-
-    private fun List<URL>.tilK9MellomLagringUrl(baseUrl: URI): List<URL> = map {
-        val idFraUrl = it.path.substringAfterLast("/")
-        Url.buildURL(
-                baseUrl = baseUrl,
-                pathParts = listOf(idFraUrl)
-        ).toURL()
-    }
 }
 
+fun URL.vedleggId(): String = this.toString().substringAfterLast("/")
+fun String.vedleggId(): String = substringAfterLast("/")
 
 private fun List<Barn>.hentIdentitetsnummerForBarn(aktørId: String?): String? {
     this.forEach {
