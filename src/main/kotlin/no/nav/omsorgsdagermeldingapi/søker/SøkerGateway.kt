@@ -14,6 +14,7 @@ import no.nav.helse.dusseldorf.ktor.health.Healthy
 import no.nav.helse.dusseldorf.ktor.health.Result
 import no.nav.helse.dusseldorf.ktor.health.UnHealthy
 import no.nav.helse.dusseldorf.ktor.metrics.Operation
+import no.nav.helse.dusseldorf.oauth2.client.CachedAccessTokenClient
 import no.nav.omsorgsdagermeldingapi.general.CallId
 import no.nav.omsorgsdagermeldingapi.general.oppslag.K9OppslagGateway
 import no.nav.omsorgsdagermeldingapi.general.oppslag.throwable
@@ -24,7 +25,9 @@ import java.time.Duration
 import java.time.LocalDate
 
 class SøkerGateway (
-    baseUrl: URI
+    baseUrl: URI,
+    private val exchangeTokenClient: CachedAccessTokenClient,
+    private val k9SelvbetjeningOppslagTokenxAudience: Set<String>
 ) : K9OppslagGateway(baseUrl) {
 
     private companion object {
@@ -41,6 +44,9 @@ class SøkerGateway (
         idToken: IdToken,
         callId : CallId
     ) : SokerOppslagRespons {
+        val exchangeToken = IdToken(exchangeTokenClient.getAccessToken(k9SelvbetjeningOppslagTokenxAudience, idToken.value).token)
+        logger.info("Utvekslet token fra {} med token fra {}.", idToken.issuer(), exchangeToken.issuer())
+
         val sokerUrl = Url.buildURL(
             baseUrl = baseUrl,
             pathParts = listOf("meg"),
@@ -48,7 +54,8 @@ class SøkerGateway (
                 attributter
             )
         ).toString()
-        val httpRequest = generateHttpRequest(idToken, sokerUrl, callId)
+
+        val httpRequest = generateHttpRequest(exchangeToken, sokerUrl, callId)
 
         val oppslagRespons = Retry.retry(
             operation = HENTE_SOKER_OPERATION,

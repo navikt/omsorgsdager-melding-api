@@ -9,11 +9,13 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-body-size: "100M"
 spec:
   image: {{ image }}
+  port: 8080
   azure:
     application:
       enabled: true
       tenant: {{ tenant }}
-  port: 8080
+  tokenx:
+    enabled: true
   accessPolicy:
     outbound:
       rules:

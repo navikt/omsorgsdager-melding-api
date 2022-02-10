@@ -1,6 +1,5 @@
 package no.nav.omsorgsdagermeldingapi.søker
 
-import com.auth0.jwt.JWT
 import no.nav.helse.dusseldorf.ktor.auth.IdToken
 import no.nav.omsorgsdagermeldingapi.general.CallId
 
@@ -11,7 +10,7 @@ class SøkerService (
         idToken: IdToken,
         callId: CallId
     ): Søker {
-        val ident: String = JWT.decode(idToken.value).subject ?: throw IllegalStateException("Token mangler 'sub' claim.")
+        val ident: String = idToken.getNorskIdentifikasjonsnummer()
         return søkerGateway.hentSøker(idToken, callId).tilSøker(ident)
     }
 

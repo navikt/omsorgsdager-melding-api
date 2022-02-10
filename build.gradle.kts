@@ -1,7 +1,7 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val dusseldorfKtorVersion = "3.1.6.7-f942a29"
+val dusseldorfKtorVersion = "3.1.6.7-3fd207a"
 val ktorVersion = ext.get("ktorVersion").toString()
 val mainClass = "no.nav.omsorgsdagermeldingapi.AppKt"
 val kafkaEmbeddedEnvVersion = ext.get("kafkaEmbeddedEnvVersion").toString()
@@ -16,7 +16,7 @@ plugins {
 
 buildscript {
     // Henter ut diverse dependency versjoner, i.e. ktorVersion.
-    apply("https://raw.githubusercontent.com/navikt/dusseldorf-ktor/f942a29fd1007215e0254b7d1a83fbc7a3fe4c21/gradle/dusseldorf-ktor.gradle.kts")
+    apply("https://raw.githubusercontent.com/navikt/dusseldorf-ktor/3fd207a05b907d554c00976daeef107e4cc7947b/gradle/dusseldorf-ktor.gradle.kts")
 }
 
 dependencies {
