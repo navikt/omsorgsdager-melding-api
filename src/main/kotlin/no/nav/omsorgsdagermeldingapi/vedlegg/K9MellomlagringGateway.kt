@@ -324,6 +324,9 @@ class K9MellomlagringGateway(
     }
 
     suspend fun hentVedlegg(vedleggId: String, idToken: IdToken, eier: DokumentEier, callId: CallId): Vedlegg? {
+        val exchangeToken = IdToken(exchangeTokenClient.getAccessToken(k9MellomlagringTokenxAudience, idToken.value).token)
+        logger.info("Utvekslet token fra {} med token fra {}.", idToken.issuer(), exchangeToken.issuer())
+
         val body = objectMapper.writeValueAsBytes(eier)
 
         val urlMedId = Url.buildURL(
@@ -336,7 +339,7 @@ class K9MellomlagringGateway(
             .httpPost()
             .body(body)
             .header(
-                HttpHeaders.Authorization to "Bearer ${idToken.value}",
+                HttpHeaders.Authorization to "Bearer ${exchangeToken.value}",
                 HttpHeaders.XCorrelationId to callId.value,
                 HttpHeaders.ContentType to "application/json",
                 HttpHeaders.Accept to "application/json"
