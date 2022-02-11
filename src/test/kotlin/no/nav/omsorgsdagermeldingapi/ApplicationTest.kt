@@ -8,9 +8,10 @@ import io.ktor.http.*
 import io.ktor.server.testing.*
 import io.mockk.impl.annotations.InjectMockKs
 import no.nav.common.KafkaEnvironment
+import no.nav.helse.TestUtils.getAuthCookie
+import no.nav.helse.TestUtils.getTokenDingsToken
 import no.nav.helse.dusseldorf.ktor.core.fromResources
 import no.nav.helse.dusseldorf.testsupport.wiremock.WireMockBuilder
-import no.nav.helse.getAuthCookie
 import no.nav.omsorgsdagermeldingapi.felles.*
 import no.nav.omsorgsdagermeldingapi.kafka.Topics
 import no.nav.omsorgsdagermeldingapi.mellomlagring.started
@@ -30,10 +31,6 @@ import java.time.LocalDate
 import java.util.*
 import kotlin.test.*
 
-private const val gyldigFodselsnummerA = "290990123456"
-private const val gyldigFodselsnummerB = "25118921464"
-private const val ikkeMyndigFnr = "12125012345"
-
 @InjectMockKs
 class ApplicationTest {
 
@@ -48,6 +45,7 @@ class ApplicationTest {
             .withAzureSupport()
             .withNaisStsSupport()
             .withLoginServiceSupport()
+            .withTokendingsSupport()
             .omsorgsdagerMeldingApiConfig()
             .build()
             .stubOppslagHealth()
@@ -57,6 +55,12 @@ class ApplicationTest {
 
         private val kafkaEnvironment = KafkaWrapper.bootstrap()
         private val kafkaTestConsumer = kafkaEnvironment.testConsumer()
+
+        private const val gyldigFodselsnummerA = "290990123456"
+        private const val gyldigFodselsnummerB = "25118921464"
+        private const val ikkeMyndigFnr = "12125012345"
+
+        val tokenXToken = getTokenDingsToken(fnr = gyldigFodselsnummerA)
 
         fun getConfig(kafkaEnvironment: KafkaEnvironment?): ApplicationConfig {
             val fileConfig = ConfigFactory.load()
@@ -135,6 +139,26 @@ class ApplicationTest {
     }
 
     @Test
+    fun `Tester lagring og sletting av vedlegg med tokenx`() {
+        val jpeg = "vedlegg/iPhone_6.jpg".fromResources().readBytes()
+
+        with(engine) {
+            // LASTER OPP VEDLEGG
+            val url = handleRequestUploadImage(
+                vedlegg = jpeg,
+                jwtToken = tokenXToken
+            )
+            val path = Url(url).fullPath
+            // SLETTER OPPLASTET VEDLEGG
+            handleRequest(HttpMethod.Delete, path) {
+                addHeader("Authorization", "Bearer $tokenXToken")
+            }.apply {
+                assertEquals(HttpStatusCode.NoContent, response.status())
+            }
+        }
+    }
+
+    @Test
     fun `Tester sletting av vedlegg som ikke finnes`(){
         val cookie = getAuthCookie(gyldigFodselsnummerA)
         with(engine){
@@ -147,11 +171,33 @@ class ApplicationTest {
     }
 
     @Test
+    fun `Hente søker med tokenx`() {
+        requestAndAssert(
+            httpMethod = HttpMethod.Get,
+            path = SØKER_URL,
+            expectedCode = HttpStatusCode.OK,
+            jwtToken = tokenXToken,
+            expectedResponse = """
+                {
+                  "aktørId": "12345",
+                  "fødselsdato": "1997-05-25",
+                  "fødselsnummer": "290990123456",
+                  "fornavn": "MOR",
+                  "mellomnavn": "HEISANN",
+                  "etternavn": "MORSEN",
+                  "myndig": true
+                }
+            """.trimIndent()
+        )
+    }
+
+    @Test
     fun `Hente søker`() {
         requestAndAssert(
             httpMethod = HttpMethod.Get,
             path = SØKER_URL,
             expectedCode = HttpStatusCode.OK,
+            cookie = getAuthCookie(gyldigFodselsnummerA),
             expectedResponse = """
                 {
                   "aktørId": "12345",
@@ -232,6 +278,7 @@ class ApplicationTest {
             httpMethod = HttpMethod.Get,
             path = "/barn",
             expectedCode = HttpStatusCode.OK,
+            cookie = getAuthCookie(gyldigFodselsnummerA),
             //language=json
             expectedResponse = """
                 {
@@ -327,6 +374,7 @@ class ApplicationTest {
             path = MELDING_URL_KORONAOVERFØRE,
             expectedResponse = null,
             expectedCode = HttpStatusCode.Accepted,
+            cookie = getAuthCookie(gyldigFodselsnummerA),
             requestEntity = søknad
         )
 
@@ -365,6 +413,7 @@ class ApplicationTest {
         requestAndAssert(
             httpMethod = HttpMethod.Post,
             path = MELDING_URL_OVERFØRE,
+            cookie = getAuthCookie(gyldigFodselsnummerA),
             expectedResponse = null,
             expectedCode = HttpStatusCode.Accepted,
             requestEntity = søknad
@@ -395,7 +444,8 @@ class ApplicationTest {
             path = MELDING_URL_OVERFØRE,
             expectedResponse = null,
             expectedCode = HttpStatusCode.Accepted,
-            requestEntity = søknad
+            requestEntity = søknad,
+            cookie = getAuthCookie(gyldigFodselsnummerA)
         )
 
         val meldingSendtTilProsessering = hentMeldingSendtTilProsessering(søknadID)
@@ -430,6 +480,43 @@ class ApplicationTest {
                 httpMethod = HttpMethod.Post,
                 path = MELDING_URL_FORDELE,
                 expectedResponse = null,
+                cookie = getAuthCookie(gyldigFodselsnummerA),
+                expectedCode = HttpStatusCode.Accepted,
+                requestEntity = søknad
+            )
+
+
+            val søknadSendtTilProsessering = hentMeldingSendtTilProsessering(søknadID)
+            verifiserAtInnholdetErLikt(JSONObject(søknad), søknadSendtTilProsessering)
+        }
+    }
+
+    @Test
+    fun `Sende gyldig melding om fordeling av omsorgsdager med tokenx og plukke opp fra kafka topic`() {
+        with(engine) {
+            val søknadID = UUID.randomUUID().toString()
+            val jpeg = "vedlegg/iPhone_6.jpg".fromResources().readBytes()
+
+            // LASTER OPP VEDLEGG
+            val vedleggId = handleRequestUploadImage(
+                jwtToken = tokenXToken,
+                vedlegg = jpeg
+            ).substringAfterLast("/")
+
+            val søknad = MeldingUtils.gyldigMeldingFordele.copy(
+                søknadId = søknadID,
+                fordeling = Fordele(
+                        Mottaker.SAMVÆRSFORELDER,
+                        samværsavtale = listOf(URL("${wireMockServer.getK9MellomlagringUrl()}/$vedleggId"))
+                )
+            ).somJson()
+
+
+            requestAndAssert(
+                httpMethod = HttpMethod.Post,
+                path = MELDING_URL_FORDELE,
+                expectedResponse = null,
+                jwtToken = tokenXToken,
                 expectedCode = HttpStatusCode.Accepted,
                 requestEntity = søknad
             )
@@ -446,13 +533,14 @@ class ApplicationTest {
         requestEntity: String? = null,
         expectedResponse: String?,
         expectedCode: HttpStatusCode,
-        leggTilCookie: Boolean = true,
-        cookie: Cookie = getAuthCookie(gyldigFodselsnummerA)
+        jwtToken: String? = null,
+        cookie: Cookie? = null
     ): String? {
         val respons: String?
         with(engine) {
             handleRequest(httpMethod, path) {
-                if (leggTilCookie) addHeader(HttpHeaders.Cookie, cookie.toString())
+                if (cookie != null) addHeader(HttpHeaders.Cookie, cookie.toString())
+                if (jwtToken != null) addHeader(HttpHeaders.Authorization, "Bearer $jwtToken")
                 logger.info("Request Entity = $requestEntity")
                 addHeader(HttpHeaders.Accept, "application/json")
                 if (requestEntity != null) addHeader(HttpHeaders.ContentType, "application/json")

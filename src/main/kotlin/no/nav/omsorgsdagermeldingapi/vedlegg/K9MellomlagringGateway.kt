@@ -32,9 +32,11 @@ import java.net.URI
 import java.time.Duration
 
 class K9MellomlagringGateway(
-    private val accessTokenClient: AccessTokenClient,
+    private val baseUrl: URI,
     private val k9MellomlagringScope: Set<String>,
-    private val baseUrl: URI
+    private val accessTokenClient: AccessTokenClient,
+    private val exchangeTokenClient: CachedAccessTokenClient,
+    private val k9MellomlagringTokenxAudience: Set<String>
 ) : HealthCheck {
 
     private companion object {
@@ -64,8 +66,10 @@ class K9MellomlagringGateway(
         idToken: IdToken,
         callId: CallId
     ): String {
-        val body = objectMapper.writeValueAsBytes(vedlegg)
+        val exchangeToken = IdToken(exchangeTokenClient.getAccessToken(k9MellomlagringTokenxAudience, idToken.value).token)
+        logger.info("Utvekslet token fra {} med token fra {}.", idToken.issuer(), exchangeToken.issuer())
 
+        val body = objectMapper.writeValueAsBytes(vedlegg)
         return retry(
             operation = LAGRE_VEDLEGG_OPERATION,
             initialDelay = Duration.ofMillis(200),
@@ -84,7 +88,7 @@ class K9MellomlagringGateway(
                     .httpPost()
                     .body(contentStream)
                     .header(
-                        HttpHeaders.Authorization to "Bearer ${idToken.value}",
+                        HttpHeaders.Authorization to "Bearer ${exchangeToken.value}",
                         HttpHeaders.ContentType to "application/json",
                         HttpHeaders.Accept to "application/json",
                         HttpHeaders.XCorrelationId to callId.value
@@ -111,6 +115,9 @@ class K9MellomlagringGateway(
         callId: CallId,
         eier: DokumentEier
     ): Boolean {
+        val exchangeToken = IdToken(exchangeTokenClient.getAccessToken(k9MellomlagringTokenxAudience, idToken.value).token)
+        logger.info("Utvekslet token fra {} med token fra {}.", idToken.issuer(), exchangeToken.issuer())
+
         val body = objectMapper.writeValueAsBytes(eier)
 
         val urlMedId = Url.buildURL(
@@ -123,7 +130,7 @@ class K9MellomlagringGateway(
             .httpDelete()
             .body(body)
             .header(
-                HttpHeaders.Authorization to "Bearer ${idToken.value}",
+                HttpHeaders.Authorization to "Bearer ${exchangeToken.value}",
                 HttpHeaders.XCorrelationId to callId.value,
                 HttpHeaders.ContentType to "application/json"
             )
@@ -317,6 +324,9 @@ class K9MellomlagringGateway(
     }
 
     suspend fun hentVedlegg(vedleggId: String, idToken: IdToken, eier: DokumentEier, callId: CallId): Vedlegg? {
+        val exchangeToken = IdToken(exchangeTokenClient.getAccessToken(k9MellomlagringTokenxAudience, idToken.value).token)
+        logger.info("Utvekslet token fra {} med token fra {}.", idToken.issuer(), exchangeToken.issuer())
+
         val body = objectMapper.writeValueAsBytes(eier)
 
         val urlMedId = Url.buildURL(
@@ -329,7 +339,7 @@ class K9MellomlagringGateway(
             .httpPost()
             .body(body)
             .header(
-                HttpHeaders.Authorization to "Bearer ${idToken.value}",
+                HttpHeaders.Authorization to "Bearer ${exchangeToken.value}",
                 HttpHeaders.XCorrelationId to callId.value,
                 HttpHeaders.ContentType to "application/json",
                 HttpHeaders.Accept to "application/json"

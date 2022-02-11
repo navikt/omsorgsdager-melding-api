@@ -12,6 +12,7 @@ import no.nav.helse.dusseldorf.ktor.health.Healthy
 import no.nav.helse.dusseldorf.ktor.health.Result
 import no.nav.helse.dusseldorf.ktor.health.UnHealthy
 import no.nav.helse.dusseldorf.ktor.metrics.Operation
+import no.nav.helse.dusseldorf.oauth2.client.CachedAccessTokenClient
 import no.nav.omsorgsdagermeldingapi.felles.k9SelvbetjeningOppslagKonfigurert
 import no.nav.omsorgsdagermeldingapi.general.CallId
 import no.nav.omsorgsdagermeldingapi.general.oppslag.K9OppslagGateway
@@ -23,7 +24,9 @@ import java.time.Duration
 import java.time.LocalDate
 
 class BarnGateway (
-    baseUrl: URI
+    baseUrl: URI,
+    private val exchangeTokenClient: CachedAccessTokenClient,
+    private val k9SelvbetjeningOppslagTokenxAudience: Set<String>
     ) : K9OppslagGateway(baseUrl) {
 
     private companion object {
@@ -39,13 +42,15 @@ class BarnGateway (
             "barn[].identitetsnummer"
             )
         )
-
     }
 
     suspend fun hentBarn(
         idToken: IdToken,
         callId : CallId
     ) : List<BarnOppslagDTO> {
+        val exchangeToken = IdToken(exchangeTokenClient.getAccessToken(k9SelvbetjeningOppslagTokenxAudience, idToken.value).token)
+        logger.info("Utvekslet token fra {} med token fra {}.", idToken.issuer(), exchangeToken.issuer())
+
         val barnUrl = Url.buildURL(
             baseUrl = baseUrl,
             pathParts = listOf("meg"),
@@ -54,7 +59,7 @@ class BarnGateway (
             )
         ).toString()
 
-        val httpRequest = generateHttpRequest(idToken, barnUrl, callId)
+        val httpRequest = generateHttpRequest(exchangeToken, barnUrl, callId)
 
         val oppslagRespons = Retry.retry(
             operation = HENTE_BARN_OPERATION,
