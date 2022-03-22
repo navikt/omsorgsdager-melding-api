@@ -97,9 +97,6 @@ fun Application.omsorgpengermidlertidigaleneapi() {
     }
 
     install(Routing) {
-
-        val accessTokenClientResolver = AccessTokenClientResolver(environment.config.clients())
-
         val søkerGateway = SøkerGateway(
             baseUrl = configuration.getK9OppslagUrl(),
             exchangeTokenClient = tokenxClient,
