@@ -43,22 +43,20 @@ fun Route.vedleggApis(
         val vedleggId = VedleggId(call.parameters["vedleggId"]!!)
         var eier = idTokenProvider.getIdToken(call).getNorskIdentifikasjonsnummer()
 
-        if (eier == null) call.respond(HttpStatusCode.Forbidden) else {
-            val vedlegg = vedleggService.hentVedlegg(
-                vedleggId = vedleggId.value,
-                idToken = idTokenProvider.getIdToken(call),
-                callId = call.getCallId(),
-                eier = DokumentEier(eier)
-            )
+        val vedlegg = vedleggService.hentVedlegg(
+            vedleggId = vedleggId.value,
+            idToken = idTokenProvider.getIdToken(call),
+            callId = call.getCallId(),
+            eier = DokumentEier(eier)
+        )
 
-            if(vedlegg == null) call.respondProblemDetails(vedleggNotFoundProblemDetails)
-            else {
-                call.respondBytes(
-                    bytes = vedlegg.content,
-                    contentType = ContentType.parse(vedlegg.contentType),
-                    status = HttpStatusCode.OK
-                )
-            }
+        if(vedlegg == null) call.respondProblemDetails(vedleggNotFoundProblemDetails)
+        else {
+            call.respondBytes(
+                bytes = vedlegg.content,
+                contentType = ContentType.parse(vedlegg.contentType),
+                status = HttpStatusCode.OK
+            )
         }
     }
 
