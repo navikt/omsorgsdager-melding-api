@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3.0.0
+        uses: actions/checkout@v3.0.2
       - name: Deploy redis to dev-gcp
         uses: nais/deploy/actions/deploy@v1
         env:
@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3.0.0
+        uses: actions/checkout@v3.0.2
       - name: Deploy redis to prod-gcp
         uses: nais/deploy/actions/deploy@v1
         env:
