@@ -47,7 +47,7 @@ dependencies {
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion") {
         exclude(group = "org.eclipse.jetty")
     }
-    testImplementation("io.mockk:mockk:1.12.3")
+    testImplementation("io.mockk:mockk:1.12.4")
     testImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion")
     testImplementation ("org.skyscreamer:jsonassert:1.5.0")
     testImplementation("org.awaitility:awaitility-kotlin:4.2.0")
