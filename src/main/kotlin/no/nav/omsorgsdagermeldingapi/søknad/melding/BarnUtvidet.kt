@@ -2,6 +2,7 @@ package no.nav.omsorgsdagermeldingapi.søknad.melding
 
 import no.nav.helse.dusseldorf.ktor.core.ParameterType
 import no.nav.helse.dusseldorf.ktor.core.Violation
+import no.nav.helse.dusseldorf.ktor.core.erGyldigFodselsnummer
 import java.time.LocalDate
 
 data class BarnUtvidet(
@@ -36,7 +37,7 @@ data class BarnUtvidet(
             )
         }
 
-        if(identitetsnummer != null && identitetsnummer!!.erGyldigNorskIdentifikator() er false){
+        if(identitetsnummer != null && identitetsnummer!!.erGyldigFodselsnummer() er false){
             mangler.add(
                 Violation(
                     parameterName = "barn[$index].identitetsnummer",
