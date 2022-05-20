@@ -10,7 +10,7 @@ val kotlinxCoroutinesVersion = ext.get("kotlinxCoroutinesVersion").toString()
 val fuelVersion = "2.3.1"
 val lettuceCoreVersion = "6.1.8.RELEASE"
 val tokenSupportVersion = "2.0.20"
-val mockOauth2ServerVersion = "0.4.6"
+val mockOauth2ServerVersion = "0.4.8"
 
 plugins {
     kotlin("jvm") version "1.6.21"
