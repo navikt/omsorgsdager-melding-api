@@ -10,7 +10,10 @@ import io.ktor.jackson.*
 import io.ktor.metrics.micrometer.*
 import io.ktor.routing.*
 import io.prometheus.client.hotspot.DefaultExports
-import no.nav.helse.dusseldorf.ktor.auth.*
+import no.nav.helse.dusseldorf.ktor.auth.IdTokenProvider
+import no.nav.helse.dusseldorf.ktor.auth.IdTokenStatusPages
+import no.nav.helse.dusseldorf.ktor.auth.clients
+import no.nav.helse.dusseldorf.ktor.auth.idToken
 import no.nav.helse.dusseldorf.ktor.core.*
 import no.nav.helse.dusseldorf.ktor.health.HealthReporter
 import no.nav.helse.dusseldorf.ktor.health.HealthRoute
@@ -37,16 +40,18 @@ import no.nav.omsorgsdagermeldingapi.søknad.søknadApis
 import no.nav.omsorgsdagermeldingapi.vedlegg.K9MellomlagringGateway
 import no.nav.omsorgsdagermeldingapi.vedlegg.VedleggService
 import no.nav.omsorgsdagermeldingapi.vedlegg.vedleggApis
+import no.nav.security.token.support.ktor.RequiredClaims
+import no.nav.security.token.support.ktor.asIssuerProps
+import no.nav.security.token.support.ktor.tokenValidationSupport
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.time.Duration
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
-private val logger: Logger = LoggerFactory.getLogger("nav.omsorgpengermidlertidigaleneapi")
 
 fun Application.omsorgpengermidlertidigaleneapi() {
-
+    val logger: Logger = LoggerFactory.getLogger("nav.omsorgpengermidlertidigaleneapi")
     val appId = environment.config.id()
     logProxyProperties()
     DefaultExports.initialize()
@@ -56,6 +61,8 @@ fun Application.omsorgpengermidlertidigaleneapi() {
     val configuration = Configuration(environment.config)
     val accessTokenClientResolver = AccessTokenClientResolver(environment.config.clients())
     val tokenxClient = CachedAccessTokenClient(accessTokenClientResolver.tokenxClient)
+    val allIssuers = environment.config.asIssuerProps().keys
+    val idTokenProvider = IdTokenProvider(cookieName = configuration.getCookieName())
 
     install(ContentNegotiation) {
         jackson {
@@ -80,14 +87,18 @@ fun Application.omsorgpengermidlertidigaleneapi() {
         }
     }
 
-    val idTokenProvider = IdTokenProvider(cookieName = configuration.getCookieName())
-    val issuers = configuration.issuers()
 
     install(Authentication) {
-        multipleJwtIssuers(
-            issuers = issuers,
-            extractHttpAuthHeader = { call -> idTokenProvider.getIdToken(call).somHttpAuthHeader() }
-        )
+        allIssuers.forEach { issuer ->
+            tokenValidationSupport(
+                name = issuer,
+                config = environment.config,
+                requiredClaims = RequiredClaims(
+                    issuer = issuer,
+                    claimMap = arrayOf("acr=Level4")
+                )
+            )
+        }
     }
 
     install(StatusPages) {
@@ -140,7 +151,7 @@ fun Application.omsorgpengermidlertidigaleneapi() {
             logger.info("Kafka Producer Stoppet.")
         }
 
-        authenticate(*issuers.allIssuers()) {
+        authenticate(*allIssuers.toTypedArray()) {
 
             søkerApis(
                 søkerService = søkerService,
@@ -218,7 +229,9 @@ fun Application.omsorgpengermidlertidigaleneapi() {
         logRequests()
         mdc("id_token_jti") { call ->
             try {
-                idTokenProvider.getIdToken(call).getId()
+                val idToken = call.idToken()
+                logger.info("Issuer [{}]", idToken.issuer())
+                idToken.getId()
             } catch (cause: Throwable) {
                 null
             }

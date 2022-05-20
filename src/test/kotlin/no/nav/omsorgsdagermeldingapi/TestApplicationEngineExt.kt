@@ -1,6 +1,5 @@
 package no.nav.omsorgsdagermeldingapi
 
-import com.github.tomakehurst.wiremock.http.Cookie
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.server.testing.*
@@ -10,7 +9,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 fun TestApplicationEngine.handleRequestUploadImage(
-    cookie: Cookie? = null,
+    cookie: String? = null,
     jwtToken: String? = null,
     vedlegg: ByteArray = "vedlegg/iPhone_6.jpg".fromResources().readBytes(),
     fileName: String = "iPhone_6.jpg",
@@ -20,7 +19,7 @@ fun TestApplicationEngine.handleRequestUploadImage(
     val boundary = "***vedlegg***"
 
     handleRequest(HttpMethod.Post, "/vedlegg") {
-        cookie?.let {  addHeader("Cookie", cookie.toString()) }
+        cookie?.let {  addHeader("Cookie", cookie) }
         jwtToken?.let { addHeader("Authorization", "Bearer $jwtToken") }
         addHeader(
             HttpHeaders.ContentType,
@@ -56,30 +55,4 @@ fun TestApplicationEngine.handleRequestUploadImage(
             locationHeader
         } else ""
     }
-}
-
-fun TestApplicationEngine.jpegUrl(
-    cookie: Cookie? = null,
-    jwtToken: String? = null
-): String {
-    return handleRequestUploadImage(
-        cookie = cookie,
-        jwtToken = jwtToken,
-        vedlegg = "vedlegg/nav-logo.png".fromResources().readBytes(),
-        fileName = "nav-logo.png",
-        contentType = "image/png"
-    )
-}
-
-fun TestApplicationEngine.pdUrl(
-    cookie: Cookie? = null,
-    jwtToken: String? = null
-): String {
-    return handleRequestUploadImage(
-        cookie = cookie,
-        jwtToken = jwtToken,
-        vedlegg = "vedlegg/test.pdf".fromResources().readBytes(),
-        fileName = "test.pdf",
-        contentType = "application/pdf"
-    )
 }
