@@ -4,13 +4,11 @@ import com.github.fppt.jedismock.RedisServer
 import com.github.tomakehurst.wiremock.WireMockServer
 import no.nav.common.KafkaEnvironment
 import no.nav.helse.dusseldorf.testsupport.jws.ClientCredentials
-import no.nav.helse.dusseldorf.testsupport.jws.LoginService
-import no.nav.helse.dusseldorf.testsupport.jws.Tokendings
 import no.nav.helse.dusseldorf.testsupport.wiremock.getAzureV2WellKnownUrl
-import no.nav.helse.dusseldorf.testsupport.wiremock.getLoginServiceV1WellKnownUrl
 import no.nav.helse.dusseldorf.testsupport.wiremock.getTokendingsWellKnownUrl
 import no.nav.omsorgsdagermeldingapi.wiremock.getK9MellomlagringUrl
 import no.nav.omsorgsdagermeldingapi.wiremock.getK9OppslagUrl
+import no.nav.security.mock.oauth2.MockOAuth2Server
 
 object TestConfiguration {
 
@@ -21,12 +19,13 @@ object TestConfiguration {
         k9OppslagUrl: String? = wireMockServer?.getK9OppslagUrl(),
         k9MellomlagringUrl: String? = wireMockServer?.getK9MellomlagringUrl(),
         corsAdresses: String = "http://localhost:8080",
-        redisServer: RedisServer
+        redisServer: RedisServer,
+        mockOAuth2Server: MockOAuth2Server
     ) : Map<String, String> {
 
         val map = mutableMapOf(
             Pair("ktor.deployment.port","$port"),
-            Pair("nav.authorization.cookie_name", "localhost-idtoken"),
+            Pair("nav.authorization.cookie_name", "selvbetjening-idtoken"),
             Pair("nav.gateways.k9_oppslag_url","$k9OppslagUrl"),
             Pair("nav.gateways.k9_mellomlagring_url","$k9MellomlagringUrl"),
             Pair("nav.cors.addresses", corsAdresses)
@@ -46,16 +45,14 @@ object TestConfiguration {
             map["nav.auth.clients.1.discovery_endpoint"] = wireMockServer.getTokendingsWellKnownUrl()
 
             // Issuers
-            map["nav.auth.issuers.0.alias"] = "login-service-v1"
-            map["nav.auth.issuers.0.discovery_endpoint"] = wireMockServer.getLoginServiceV1WellKnownUrl()
+            map["no.nav.security.jwt.issuers.0.issuer_name"] = "tokendings"
+            map["no.nav.security.jwt.issuers.0.discoveryurl"] = "${mockOAuth2Server.wellKnownUrl("tokendings")}"
+            map["no.nav.security.jwt.issuers.0.accepted_audience"] = "dev-gcp:dusseldorf:omsorgsdager-melding-api"
 
-            map["nav.auth.issuers.1.alias"] = "login-service-v2"
-            map["nav.auth.issuers.1.discovery_endpoint"] = wireMockServer.getLoginServiceV1WellKnownUrl()
-            map["nav.auth.issuers.1.audience"] = LoginService.V1_0.getAudience()
-
-            map["nav.auth.issuers.2.alias"] = "tokenx"
-            map["nav.auth.issuers.2.discovery_endpoint"] = wireMockServer.getTokendingsWellKnownUrl()
-            map["nav.auth.issuers.2.audience"] = Tokendings.getAudience()
+            map["no.nav.security.jwt.issuers.1.issuer_name"] = "login-service"
+            map["no.nav.security.jwt.issuers.1.discoveryurl"] = "${mockOAuth2Server.wellKnownUrl("login-service-v2")}"
+            map["no.nav.security.jwt.issuers.1.accepted_audience"] = "dev-gcp:dusseldorf:omsorgsdager-melding-api"
+            map["no.nav.security.jwt.issuers.1.cookie_name"] = "selvbetjening-idtoken"
 
             // Scopes
             map["nav.auth.scopes.persistere-dokument"] = "k9-mellomlagring/.default"

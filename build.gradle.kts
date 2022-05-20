@@ -9,6 +9,8 @@ val kafkaVersion = ext.get("kafkaVersion").toString() // Alligned med version fr
 val kotlinxCoroutinesVersion = ext.get("kotlinxCoroutinesVersion").toString()
 val fuelVersion = "2.3.1"
 val lettuceCoreVersion = "6.1.8.RELEASE"
+val tokenSupportVersion = "2.0.20"
+val mockOauth2ServerVersion = "0.4.6"
 
 plugins {
     kotlin("jvm") version "1.6.21"
@@ -32,6 +34,9 @@ dependencies {
         exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core")
     }
 
+    // Token validation
+    implementation ("no.nav.security:token-validation-ktor:$tokenSupportVersion")
+
     // Client
     implementation ( "no.nav.helse:dusseldorf-ktor-client:$dusseldorfKtorVersion")
     implementation ( "no.nav.helse:dusseldorf-oauth2-client:$dusseldorfKtorVersion")
@@ -41,6 +46,7 @@ dependencies {
     implementation("org.apache.kafka:kafka-clients:$kafkaVersion")
 
     // Test
+    testImplementation ("no.nav.security:mock-oauth2-server:$mockOauth2ServerVersion")
     testImplementation("com.github.fppt:jedis-mock:1.0.2")
     testImplementation("no.nav.helse:dusseldorf-test-support:$dusseldorfKtorVersion")
     testImplementation("no.nav:kafka-embedded-env:$kafkaEmbeddedEnvVersion")

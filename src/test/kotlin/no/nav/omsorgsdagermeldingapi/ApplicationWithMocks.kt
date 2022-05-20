@@ -9,6 +9,7 @@ import no.nav.omsorgsdagermeldingapi.wiremock.omsorgsdagerMeldingApiConfig
 import no.nav.omsorgsdagermeldingapi.wiremock.stubK9OppslagBarn
 import no.nav.omsorgsdagermeldingapi.wiremock.stubK9OppslagSoker
 import no.nav.omsorgsdagermeldingapi.wiremock.stubOppslagHealth
+import no.nav.security.mock.oauth2.MockOAuth2Server
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -38,7 +39,8 @@ class ApplicationWithMocks {
             val testArgs = TestConfiguration.asMap(
                 wireMockServer = wireMockServer,
                 port = 8082,
-                redisServer = redisServer
+                redisServer = redisServer,
+                mockOAuth2Server = MockOAuth2Server().apply { start() }
             ).asArguments()
 
             Runtime.getRuntime().addShutdownHook(object : Thread() {
