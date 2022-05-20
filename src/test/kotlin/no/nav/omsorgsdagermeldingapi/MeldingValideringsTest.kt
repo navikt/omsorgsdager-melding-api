@@ -6,17 +6,10 @@ import org.junit.jupiter.api.assertThrows
 import java.net.URL
 import java.time.LocalDate
 import kotlin.test.Test
-import kotlin.test.assertTrue
 
 internal class MeldingValideringsTest {
 
-    //--- Felles ---
-    @Test
-    fun `Tester gyldig fødselsdato dersom dnunmer`() {
-        val starterMedFodselsdato = "630293".starterMedFodselsdato()
-        assertTrue(starterMedFodselsdato)
-    }
-
+    //--- Felles --
     @Test
     fun `Gyldig søknad`() {
         val melding = MeldingUtils.gyldigMeldingKoronaoverføre
