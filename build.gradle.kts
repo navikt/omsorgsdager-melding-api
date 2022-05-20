@@ -9,7 +9,7 @@ val kafkaVersion = ext.get("kafkaVersion").toString() // Alligned med version fr
 val kotlinxCoroutinesVersion = ext.get("kotlinxCoroutinesVersion").toString()
 val fuelVersion = "2.3.1"
 val lettuceCoreVersion = "6.1.8.RELEASE"
-val tokenSupportVersion = "2.0.19"
+val tokenSupportVersion = "2.0.20"
 val mockOauth2ServerVersion = "0.4.6"
 
 plugins {
