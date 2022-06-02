@@ -21,6 +21,7 @@ spec:
       rules:
         - application: omsorgsdager-melding-api-redis
         - application: k9-mellomlagring
+        - application: k9-selvbetjening-oppslag
       external:
         {{#each externalHosts as |host|}}
         - host: {{host}}
@@ -55,8 +56,6 @@ spec:
   prometheus:
     enabled: true
     path: /metrics
-  vault:
-    enabled: false
   envFrom:
     - secret: {{app}}
     - configmap: loginservice-idporten
