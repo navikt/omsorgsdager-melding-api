@@ -13,14 +13,13 @@
   "externalHosts": [
     "oauth2.googleapis.com",
     "login.microsoftonline.com",
-    "k9-selvbetjening-oppslag.dev-fss-pub.nais.io"
   ],
   "env": {
     "REDIS_HOST": "omsorgsdager-melding-api-redis",
     "CORS_ADDRESSES": "https://deling-omsorgsdager.dev.nav.no",
     "COOKIE_NAME": "selvbetjening-idtoken",
-    "K9_OPPSLAG_REGISTER_URL": "https://k9-selvbetjening-oppslag.dev-fss-pub.nais.io",
-    "K9_SELVBETJENING_OPPSLAG_TOKENX_AUDIENCE": "dev-fss:dusseldorf:k9-selvbetjening-oppslag",
+    "K9_OPPSLAG_REGISTER_URL": "http://k9-selvbetjening-oppslag",
+    "K9_SELVBETJENING_OPPSLAG_TOKENX_AUDIENCE": "dev-gcp:dusseldorf:k9-selvbetjening-oppslag",
     "K9_MELLOMLAGRING_CLIENT_ID": "8d0460bd-ea81-4b08-b524-cf04874a794c/.default",
     "K9_MELLOMLAGRING_TOKENX_AUDIENCE": "dev-gcp:dusseldorf:k9-mellomlagring",
     "K9_MELLOMLAGRING_SERVICE_DISCOVERY": "http://k9-mellomlagring/v1/dokument",
