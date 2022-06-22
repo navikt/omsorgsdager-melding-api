@@ -1,12 +1,14 @@
 package no.nav.omsorgsdagermeldingapi.mellomlagring
 
-import io.ktor.application.*
-import io.ktor.http.*
-import io.ktor.request.*
-import io.ktor.response.*
-import io.ktor.routing.*
+import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
+import io.ktor.server.application.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import no.nav.helse.dusseldorf.ktor.auth.IdTokenProvider
 import no.nav.omsorgsdagermeldingapi.felles.MELLOMLAGRING_URL
+import org.json.JSONObject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -19,16 +21,16 @@ fun Route.mellomlagringApis(
 
     route(MELLOMLAGRING_URL){
         post() {
-            val midlertidigSøknad = call.receive<String>()
+            val midlertidigSøknad = call.receive<Map<*, *>>()
             val idToken = idTokenProvider.getIdToken(call)
-            mellomlagringService.setMellomlagring(idToken.getNorskIdentifikasjonsnummer(), midlertidigSøknad)
+            mellomlagringService.setMellomlagring(idToken.getNorskIdentifikasjonsnummer(), JSONObject(midlertidigSøknad).toString())
             call.respond(HttpStatusCode.NoContent)
         }
 
         put() {
-            val midlertidigSøknad = call.receive<String>()
+            val midlertidigSøknad = call.receive<Map<*, *>>()
             val idToken = idTokenProvider.getIdToken(call)
-            mellomlagringService.updateMellomlagring(idToken.getNorskIdentifikasjonsnummer(), midlertidigSøknad)
+            mellomlagringService.updateMellomlagring(idToken.getNorskIdentifikasjonsnummer(), JSONObject(midlertidigSøknad).toString())
             call.respond(HttpStatusCode.NoContent)
         }
 

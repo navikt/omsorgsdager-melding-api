@@ -1,12 +1,27 @@
 package no.nav.omsorgsdagermeldingapi.vedlegg
 
-import io.ktor.application.*
-import io.ktor.features.*
-import io.ktor.http.*
-import io.ktor.http.content.*
-import io.ktor.request.*
-import io.ktor.response.*
-import io.ktor.routing.*
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.URLBuilder
+import io.ktor.http.content.MultiPartData
+import io.ktor.http.content.PartData
+import io.ktor.http.content.readAllParts
+import io.ktor.http.content.streamProvider
+import io.ktor.http.path
+import io.ktor.server.application.ApplicationCall
+import io.ktor.server.application.call
+import io.ktor.server.plugins.origin
+import io.ktor.server.request.ApplicationRequest
+import io.ktor.server.request.contentType
+import io.ktor.server.request.receiveMultipart
+import io.ktor.server.response.header
+import io.ktor.server.response.respond
+import io.ktor.server.response.respondBytes
+import io.ktor.server.routing.Route
+import io.ktor.server.routing.delete
+import io.ktor.server.routing.get
+import io.ktor.server.routing.post
 import no.nav.helse.dusseldorf.ktor.auth.IdTokenProvider
 import no.nav.helse.dusseldorf.ktor.core.respondProblemDetails
 import no.nav.omsorgsdagermeldingapi.felles.VEDLEGG_MED_ID_URL
@@ -26,7 +41,7 @@ fun Route.vedleggApis(
         val vedleggId = VedleggId(call.parameters["vedleggId"]!!)
         logger.info("Sletter vedlegg")
         logger.info("$vedleggId")
-        var eier = idTokenProvider.getIdToken(call).getNorskIdentifikasjonsnummer()
+        val eier = idTokenProvider.getIdToken(call).getNorskIdentifikasjonsnummer()
         val resultat = vedleggService.slettVedlegg(
             vedleggId = vedleggId.value,
             idToken = idTokenProvider.getIdToken(call),
@@ -41,7 +56,7 @@ fun Route.vedleggApis(
 
     get(VEDLEGG_MED_ID_URL) {
         val vedleggId = VedleggId(call.parameters["vedleggId"]!!)
-        var eier = idTokenProvider.getIdToken(call).getNorskIdentifikasjonsnummer()
+        val eier = idTokenProvider.getIdToken(call).getNorskIdentifikasjonsnummer()
 
         val vedlegg = vedleggService.hentVedlegg(
             vedleggId = vedleggId.value,
@@ -65,7 +80,7 @@ fun Route.vedleggApis(
         if (!call.request.isFormMultipart()) {
             call.respondProblemDetails(hasToBeMultupartTypeProblemDetails)
         } else {
-            var eier = idTokenProvider.getIdToken(call).getNorskIdentifikasjonsnummer()
+            val eier = idTokenProvider.getIdToken(call).getNorskIdentifikasjonsnummer()
             var vedlegg: Vedlegg? = call.receiveMultipart().getVedlegg(DokumentEier(eier))
 
             if (vedlegg == null) {
@@ -115,7 +130,9 @@ private fun ApplicationRequest.isFormMultipart(): Boolean {
 }
 
 private suspend fun ApplicationCall.respondVedlegg(vedleggId: VedleggId) {
-    val url = URLBuilder(getBaseUrlFromRequest()).path("vedlegg",vedleggId.value).build().toString()
+    val urlBuilder = URLBuilder(getBaseUrlFromRequest())
+    urlBuilder.path("vedlegg",vedleggId.value)
+    val url = urlBuilder.build().toString()
     response.header(HttpHeaders.Location, url)
     response.header(HttpHeaders.AccessControlExposeHeaders, HttpHeaders.Location)
     respond(HttpStatusCode.Created)

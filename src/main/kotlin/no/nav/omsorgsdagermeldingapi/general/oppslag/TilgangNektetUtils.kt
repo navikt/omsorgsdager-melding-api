@@ -2,8 +2,8 @@ package no.nav.omsorgsdagermeldingapi.general.oppslag
 
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Request
-import io.ktor.application.*
-import io.ktor.request.*
+import io.ktor.server.application.*
+import io.ktor.server.request.*
 import no.nav.helse.dusseldorf.ktor.core.DefaultProblemDetails
 import no.nav.helse.dusseldorf.ktor.core.respondProblemDetails
 import org.slf4j.Logger

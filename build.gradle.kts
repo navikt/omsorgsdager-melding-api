@@ -1,7 +1,7 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val dusseldorfKtorVersion = "3.1.6.8-8dae6f4"
+val dusseldorfKtorVersion = "3.2.0.2-b18c5fe"
 val ktorVersion = ext.get("ktorVersion").toString()
 val mainClass = "no.nav.omsorgsdagermeldingapi.AppKt"
 val kafkaEmbeddedEnvVersion = ext.get("kafkaEmbeddedEnvVersion").toString()
@@ -9,17 +9,17 @@ val kafkaVersion = ext.get("kafkaVersion").toString() // Alligned med version fr
 val kotlinxCoroutinesVersion = ext.get("kotlinxCoroutinesVersion").toString()
 val fuelVersion = "2.3.1"
 val lettuceCoreVersion = "6.1.8.RELEASE"
-val tokenSupportVersion = "2.0.20"
-val mockOauth2ServerVersion = "0.4.6"
+val tokenSupportVersion = "2.1.0"
+val mockOauth2ServerVersion = "0.5.1"
 
 plugins {
-    kotlin("jvm") version "1.6.21"
+    kotlin("jvm") version "1.7.0"
     id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
 buildscript {
     // Henter ut diverse dependency versjoner, i.e. ktorVersion.
-    apply("https://raw.githubusercontent.com/navikt/dusseldorf-ktor/8dae6f4f4c7a89cd987e471fb0f6afa9f6b28e1c/gradle/dusseldorf-ktor.gradle.kts")
+    apply("https://raw.githubusercontent.com/navikt/dusseldorf-ktor/b18c5feeca2840e6812eb805d50937d7aa0aca6a/gradle/dusseldorf-ktor.gradle.kts")
 }
 
 dependencies {
@@ -33,9 +33,10 @@ dependencies {
     implementation("com.github.kittinunf.fuel:fuel-coroutines:$fuelVersion"){
         exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core")
     }
+    implementation("io.ktor:ktor-server-cors:$ktorVersion")
 
     // Token validation
-    implementation ("no.nav.security:token-validation-ktor:$tokenSupportVersion")
+    implementation ("no.nav.security:token-validation-ktor-v2:$tokenSupportVersion")
 
     // Client
     implementation ( "no.nav.helse:dusseldorf-ktor-client:$dusseldorfKtorVersion")
@@ -61,7 +62,6 @@ dependencies {
 }
 
 repositories {
-    mavenLocal()
     maven {
         name = "GitHubPackages"
         url = uri("https://maven.pkg.github.com/navikt/dusseldorf-ktor")

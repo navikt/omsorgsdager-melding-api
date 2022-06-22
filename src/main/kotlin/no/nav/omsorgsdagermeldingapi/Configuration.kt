@@ -2,7 +2,7 @@ package no.nav.omsorgsdagermeldingapi
 
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
-import io.ktor.config.*
+import io.ktor.server.config.*
 import no.nav.helse.dusseldorf.ktor.core.getOptionalList
 import no.nav.helse.dusseldorf.ktor.core.getOptionalString
 import no.nav.helse.dusseldorf.ktor.core.getRequiredList

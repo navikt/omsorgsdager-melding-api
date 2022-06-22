@@ -1,20 +1,34 @@
 package no.nav.omsorgsdagermeldingapi
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategies
-import com.fasterxml.jackson.databind.SerializationFeature
-import io.ktor.application.*
-import io.ktor.auth.*
-import io.ktor.features.*
-import io.ktor.http.*
-import io.ktor.jackson.*
-import io.ktor.metrics.micrometer.*
-import io.ktor.routing.*
+import io.ktor.http.HttpMethod
+import io.ktor.serialization.jackson.jackson
+import io.ktor.server.application.Application
+import io.ktor.server.application.ApplicationCallPipeline
+import io.ktor.server.application.ApplicationStopping
+import io.ktor.server.application.call
+import io.ktor.server.application.install
+import io.ktor.server.auth.Authentication
+import io.ktor.server.auth.authenticate
+import io.ktor.server.metrics.micrometer.MicrometerMetrics
+import io.ktor.server.plugins.callid.CallId
+import io.ktor.server.plugins.callloging.CallLogging
+import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.server.plugins.cors.routing.CORS
+import io.ktor.server.plugins.statuspages.StatusPages
+import io.ktor.server.routing.Routing
 import io.prometheus.client.hotspot.DefaultExports
 import no.nav.helse.dusseldorf.ktor.auth.IdTokenProvider
 import no.nav.helse.dusseldorf.ktor.auth.IdTokenStatusPages
 import no.nav.helse.dusseldorf.ktor.auth.clients
 import no.nav.helse.dusseldorf.ktor.auth.idToken
-import no.nav.helse.dusseldorf.ktor.core.*
+import no.nav.helse.dusseldorf.ktor.core.DefaultProbeRoutes
+import no.nav.helse.dusseldorf.ktor.core.DefaultStatusPages
+import no.nav.helse.dusseldorf.ktor.core.correlationIdAndRequestIdInMdc
+import no.nav.helse.dusseldorf.ktor.core.generated
+import no.nav.helse.dusseldorf.ktor.core.id
+import no.nav.helse.dusseldorf.ktor.core.log
+import no.nav.helse.dusseldorf.ktor.core.logProxyProperties
+import no.nav.helse.dusseldorf.ktor.core.logRequests
 import no.nav.helse.dusseldorf.ktor.health.HealthReporter
 import no.nav.helse.dusseldorf.ktor.health.HealthRoute
 import no.nav.helse.dusseldorf.ktor.health.HealthService
@@ -40,9 +54,9 @@ import no.nav.omsorgsdagermeldingapi.søknad.søknadApis
 import no.nav.omsorgsdagermeldingapi.vedlegg.K9MellomlagringGateway
 import no.nav.omsorgsdagermeldingapi.vedlegg.VedleggService
 import no.nav.omsorgsdagermeldingapi.vedlegg.vedleggApis
-import no.nav.security.token.support.ktor.RequiredClaims
-import no.nav.security.token.support.ktor.asIssuerProps
-import no.nav.security.token.support.ktor.tokenValidationSupport
+import no.nav.security.token.support.v2.RequiredClaims
+import no.nav.security.token.support.v2.asIssuerProps
+import no.nav.security.token.support.v2.tokenValidationSupport
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.time.Duration
@@ -52,38 +66,37 @@ fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
 fun Application.omsorgpengermidlertidigaleneapi() {
     val logger: Logger = LoggerFactory.getLogger("nav.omsorgpengermidlertidigaleneapi")
-    val appId = environment.config.id()
+    val applicationConfig = environment.config
+    val appId = applicationConfig.id()
     logProxyProperties()
     DefaultExports.initialize()
 
     System.setProperty("dusseldorf.ktor.serializeProblemDetailsWithContentNegotiation", "true")
 
-    val configuration = Configuration(environment.config)
-    val accessTokenClientResolver = AccessTokenClientResolver(environment.config.clients())
+    val configuration = Configuration(applicationConfig)
+    val accessTokenClientResolver = AccessTokenClientResolver(applicationConfig.clients())
     val tokenxClient = CachedAccessTokenClient(accessTokenClientResolver.tokenxClient)
-    val allIssuers = environment.config.asIssuerProps().keys
+    val allIssuers = applicationConfig.asIssuerProps().keys
     val idTokenProvider = IdTokenProvider(cookieName = configuration.getCookieName())
 
     install(ContentNegotiation) {
         jackson {
             dusseldorfConfigured()
-                .setPropertyNamingStrategy(PropertyNamingStrategies.LOWER_CAMEL_CASE)
-                .configure(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS, false)
         }
     }
 
     install(CORS) {
-        method(HttpMethod.Options)
-        method(HttpMethod.Get)
-        method(HttpMethod.Post)
-        method(HttpMethod.Put)
-        method(HttpMethod.Delete)
+        allowMethod(HttpMethod.Options)
+        allowMethod(HttpMethod.Get)
+        allowMethod(HttpMethod.Post)
+        allowMethod(HttpMethod.Put)
+        allowMethod(HttpMethod.Delete)
         allowNonSimpleContentTypes = true
         allowCredentials = true
-        log.info("Configuring CORS")
+        logger.info("Configuring CORS")
         configuration.getWhitelistedCorsAddreses().forEach {
-            log.info("Adding host {} with scheme {}", it.host, it.scheme)
-            host(host = it.authority, schemes = listOf(it.scheme))
+            logger.info("Adding host {} with scheme {}", it.host, it.scheme)
+            allowHost(host = it.authority, schemes = listOf(it.scheme))
         }
     }
 
@@ -92,7 +105,7 @@ fun Application.omsorgpengermidlertidigaleneapi() {
         allIssuers.forEach { issuer ->
             tokenValidationSupport(
                 name = issuer,
-                config = environment.config,
+                config = applicationConfig,
                 requiredClaims = RequiredClaims(
                     issuer = issuer,
                     claimMap = arrayOf("acr=Level4")
@@ -145,7 +158,7 @@ fun Application.omsorgpengermidlertidigaleneapi() {
             kafkaConfig = configuration.getKafkaConfig()
         )
 
-        environment.monitor.subscribe(ApplicationStopping) {
+        environment!!.monitor.subscribe(ApplicationStopping) {
             logger.info("Stopper Kafka Producer.")
             søknadKafkaProducer.stop()
             logger.info("Kafka Producer Stoppet.")
