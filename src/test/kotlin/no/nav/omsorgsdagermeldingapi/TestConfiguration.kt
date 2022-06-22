@@ -36,7 +36,6 @@ object TestConfiguration {
             map["nav.auth.clients.0.alias"] = "azure-v2"
             map["nav.auth.clients.0.client_id"] = "omsorgsdager-melding-api"
             map["nav.auth.clients.0.private_key_jwk"] = ClientCredentials.ClientC.privateKeyJwk
-            map["nav.auth.clients.0.certificate_hex_thumbprint"] = "The keyId of Azure JWK"
             map["nav.auth.clients.0.discovery_endpoint"] = wireMockServer.getAzureV2WellKnownUrl()
 
             map["nav.auth.clients.1.alias"] = "tokenx"
