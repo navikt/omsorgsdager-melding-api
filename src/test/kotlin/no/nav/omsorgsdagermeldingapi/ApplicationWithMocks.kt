@@ -52,7 +52,7 @@ class ApplicationWithMocks {
                 }
             })
 
-            withApplication { no.nav.omsorgsdagermeldingapi.main(testArgs) }
+            testApplication { no.nav.omsorgsdagermeldingapi.main(testArgs) }
         }
     }
 }

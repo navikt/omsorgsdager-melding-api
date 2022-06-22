@@ -1,5 +1,5 @@
-FROM navikt/java:17
-
-COPY docker-init-scripts/import-apigw-key.sh /init-scripts/20-import-apigw-key.sh
+FROM amazoncorretto:17.0.2-alpine3.15
 
 COPY build/libs/*.jar ./app.jar
+
+CMD ["java", "-jar", "app.jar"]

@@ -1,7 +1,7 @@
 package no.nav.omsorgsdagermeldingapi.general
 
-import io.ktor.application.*
-import io.ktor.features.*
+import io.ktor.server.application.*
+import io.ktor.server.plugins.callid.callId
 import no.nav.omsorgsdagermeldingapi.felles.Metadata
 
 data class CallId(val value : String)

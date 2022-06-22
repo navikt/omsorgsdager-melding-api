@@ -1,8 +1,8 @@
 package no.nav.omsorgsdagermeldingapi.søker
 
-import io.ktor.application.*
-import io.ktor.response.*
-import io.ktor.routing.*
+import io.ktor.server.application.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import no.nav.helse.dusseldorf.ktor.auth.IdTokenProvider
 import no.nav.omsorgsdagermeldingapi.felles.SØKER_URL
 import no.nav.omsorgsdagermeldingapi.general.getCallId

@@ -22,8 +22,7 @@
     "K9_SELVBETJENING_OPPSLAG_TOKENX_AUDIENCE": "prod-gcp:dusseldorf:k9-selvbetjening-oppslag",
     "K9_MELLOMLAGRING_CLIENT_ID": "19aaf0b2-f40a-4a64-bf7f-fd2dd62f0552/.default",
     "K9_MELLOMLAGRING_TOKENX_AUDIENCE": "prod-gcp:dusseldorf:k9-mellomlagring",
-    "K9_MELLOMLAGRING_SERVICE_DISCOVERY": "http://k9-mellomlagring/v1/dokument",
-    "AZURE_V2_DISCOVERY_ENDPOINT": "https://login.microsoftonline.com/62366534-1ec3-4962-8869-9b5535279d0b/v2.0/.well-known/openid-configuration"
+    "K9_MELLOMLAGRING_SERVICE_DISCOVERY": "http://k9-mellomlagring/v1/dokument"
   },
   "slack-channel": "sif-alerts",
   "slack-notify-type": "<!here> | omsorgsdager-melding-api | ",
