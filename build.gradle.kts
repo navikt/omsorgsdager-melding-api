@@ -13,7 +13,7 @@ val tokenSupportVersion = "2.1.0"
 val mockOauth2ServerVersion = "0.5.1"
 
 plugins {
-    kotlin("jvm") version "1.7.0"
+    kotlin("jvm") version "1.7.10"
     id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
