@@ -1,3 +1,5 @@
+OBS: Erstattet av [K9-brukerdialog-api](https://github.com/navikt/k9-brukerdialog-api)
+
 # Omsorgsdager-melding-api
 
 ![CI / CD](https://github.com/navikt/omsorgsdager-melding-api/workflows/CI%20/%20CD/badge.svg)
