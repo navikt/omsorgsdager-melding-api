@@ -48,7 +48,7 @@ dependencies {
 
     // Test
     testImplementation ("no.nav.security:mock-oauth2-server:$mockOauth2ServerVersion")
-    testImplementation("com.github.fppt:jedis-mock:1.0.2")
+    testImplementation("com.github.fppt:jedis-mock:1.0.3")
     testImplementation("no.nav.helse:dusseldorf-test-support:$dusseldorfKtorVersion")
     testImplementation("no.nav:kafka-embedded-env:$kafkaEmbeddedEnvVersion")
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion") {
